@@ -429,11 +429,6 @@ def do_block_translate(parser, token):
 
     This is much like ngettext, only in template syntax.
 
-    The "var as value" legacy format is still supported::
-
-        {% blocktrans with foo|filter as bar and baz|filter as boo %}
-        {% blocktrans count var|length as count %}
-
     The translated string can be stored in a variable using `asvar`::
 
         {% blocktrans with bar=foo|filter boo=baz|filter asvar var %}
@@ -461,12 +456,12 @@ def do_block_translate(parser, token):
             raise TemplateSyntaxError('The %r option was specified more '
                                       'than once.' % option)
         if option == 'with':
-            value = token_kwargs(remaining_bits, parser, support_legacy=True)
+            value = token_kwargs(remaining_bits, parser)
             if not value:
                 raise TemplateSyntaxError('"with" in %r tag needs at least '
                                           'one keyword argument.' % bits[0])
         elif option == 'count':
-            value = token_kwargs(remaining_bits, parser, support_legacy=True)
+            value = token_kwargs(remaining_bits, parser)
             if len(value) != 1:
                 raise TemplateSyntaxError('"count" in %r tag expected exactly '
                                           'one keyword argument.' % bits[0])

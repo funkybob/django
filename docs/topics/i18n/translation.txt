@@ -641,9 +641,6 @@ You can use multiple expressions inside a single ``blocktrans`` tag::
     This is {{ book_t }} by {{ author_t }}
     {% endblocktrans %}
 
-.. note:: The previous more verbose format is still supported:
-   ``{% blocktrans with book|title as book_t and author|title as author_t %}``
-
 Other block tags (for example ``{% for %}`` or ``{% if %}``) are not allowed
 inside a ``blocktrans`` tag.
 

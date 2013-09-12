@@ -37,7 +37,7 @@
 <div class="module">
 <h2 id="ns|{{ ns_views.grouper }}">
 {% if ns_views.grouper %}
-    {% blocktrans with ns_views.grouper as name %}Views by namespace {{ name }}{% endblocktrans %}
+    {% blocktrans with name=ns_views.grouper %}Views by namespace {{ name }}{% endblocktrans %}
 {% else %}
     {% blocktrans %}Views by empty namespace{% endblocktrans %}
 {% endif %}
@@ -46,7 +46,7 @@
 {% for view in ns_views.list|dictsort:"url" %}
 {% ifchanged %}
 <h3><a href="{% url 'django-admindocs-views-detail' view=view.full_name %}">{{ view.url }}</a></h3>
-<p class="small quiet">{% blocktrans with view.full_name as full_name and view.url_name as url_name %}
+<p class="small quiet">{% blocktrans with full_name=view.full_name url_name=view.url_name %}
     View function: <code>{{ full_name }}</code>. Name: <code>{{ url_name }}</code>.
 {% endblocktrans %}</p>
 <p>{{ view.title }}</p>
