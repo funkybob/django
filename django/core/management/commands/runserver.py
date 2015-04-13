@@ -13,7 +13,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.servers.basehttp import get_internal_wsgi_application, run
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.executor import MigrationExecutor
-from django.utils import autoreload, six
+from django.utils import autoreload
 from django.utils.encoding import force_text, get_system_encoding
 
 naiveip_re = re.compile(r"""^(?:
@@ -112,8 +112,6 @@ class Command(BaseCommand):
         except ImproperlyConfigured:
             pass
         now = datetime.now().strftime('%B %d, %Y - %X')
-        if six.PY2:
-            now = now.decode(get_system_encoding())
         self.stdout.write(now)
         self.stdout.write((
             "Django version %(version)s, using settings %(settings)r\n"

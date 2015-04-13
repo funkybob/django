@@ -9,47 +9,6 @@ from django.core.exceptions import SuspiciousFileOperation
 from django.utils import six
 from django.utils.encoding import force_text
 
-if six.PY2:
-    fs_encoding = sys.getfilesystemencoding() or sys.getdefaultencoding()
-
-
-# Under Python 2, define our own abspath function that can handle joining
-# unicode paths to a current working directory that has non-ASCII characters
-# in it.  This isn't necessary on Windows since the Windows version of abspath
-# handles this correctly. It also handles drive letters differently than the
-# pure Python implementation, so it's best not to replace it.
-if six.PY3 or os.name == 'nt':
-    abspathu = abspath
-else:
-    def abspathu(path):
-        """
-        Version of os.path.abspath that uses the unicode representation
-        of the current working directory, thus avoiding a UnicodeDecodeError
-        in join when the cwd has non-ASCII characters.
-        """
-        if not isabs(path):
-            path = join(os.getcwdu(), path)
-        return normpath(path)
-
-
-def upath(path):
-    """
-    Always return a unicode path.
-    """
-    if six.PY2 and not isinstance(path, six.text_type):
-        return path.decode(fs_encoding)
-    return path
-
-
-def npath(path):
-    """
-    Always return a native path, that is unicode on Python 3 and bytestring on
-    Python 2.
-    """
-    if six.PY2 and not isinstance(path, bytes):
-        return path.encode(fs_encoding)
-    return path
-
 
 def safe_join(base, *paths):
     """
@@ -61,8 +20,8 @@ def safe_join(base, *paths):
     """
     base = force_text(base)
     paths = [force_text(p) for p in paths]
-    final_path = abspathu(join(base, *paths))
-    base_path = abspathu(base)
+    final_path = abspath(join(base, *paths))
+    base_path = abspath(base)
     # Ensure final_path starts with base_path (using normcase to ensure we
     # don't false-negative on case insensitive operating systems like Windows),
     # further, one of the following conditions must be true:

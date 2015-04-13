@@ -2,21 +2,19 @@
 
 from __future__ import unicode_literals
 
+from html.parser import HTMLParseError, HTMLParser
+from urllib.parse import (
+    parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit,
+)
 import re
 import warnings
 
-from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_str, force_text
 from django.utils.functional import allow_lazy
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.safestring import SafeData, SafeText, mark_safe
-from django.utils.six.moves.urllib.parse import (
-    parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit,
-)
 from django.utils.text import normalize_newlines
-
-from .html_parser import HTMLParseError, HTMLParser
 
 # Configuration for urlize() function.
 TRAILING_PUNCTUATION = ['.', ',', ':', ';', '.)', '"', '\'', '!']
@@ -51,7 +49,7 @@ def escape(text):
     """
     return mark_safe(force_text(text).replace('&', '&amp;').replace('<', '&lt;')
         .replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
-escape = allow_lazy(escape, six.text_type, SafeText)
+escape = allow_lazy(escape, str, SafeText)
 
 _js_escapes = {
     ord('\\'): '\\u005C',
@@ -74,7 +72,7 @@ _js_escapes.update((ord('%c' % z), '\\u%04X' % z) for z in range(32))
 def escapejs(value):
     """Hex encodes characters for use in JavaScript strings."""
     return mark_safe(force_text(value).translate(_js_escapes))
-escapejs = allow_lazy(escapejs, six.text_type, SafeText)
+escapejs = allow_lazy(escapejs, str, SafeText)
 
 
 def conditional_escape(text):
@@ -97,7 +95,7 @@ def format_html(format_string, *args, **kwargs):
     of str.format or % interpolation to build up small HTML fragments.
     """
     args_safe = map(conditional_escape, args)
-    kwargs_safe = {k: conditional_escape(v) for (k, v) in six.iteritems(kwargs)}
+    kwargs_safe = {k: conditional_escape(v) for (k, v) in kwargs.items()}
     return mark_safe(format_string.format(*args_safe, **kwargs_safe))
 
 
@@ -130,12 +128,12 @@ def linebreaks(value, autoescape=False):
     else:
         paras = ['<p>%s</p>' % p.replace('\n', '<br />') for p in paras]
     return '\n\n'.join(paras)
-linebreaks = allow_lazy(linebreaks, six.text_type)
+linebreaks = allow_lazy(linebreaks, str)
 
 
 class MLStripper(HTMLParser):
     def __init__(self):
-        HTMLParser.__init__(self)
+        HTMLParser.__init__(self, convert_charrefs=False)
         self.reset()
         self.fed = []
 
@@ -199,13 +197,13 @@ def remove_tags(html, tags):
     html = starttag_re.sub('', html)
     html = endtag_re.sub('', html)
     return html
-remove_tags = allow_lazy(remove_tags, six.text_type)
+remove_tags = allow_lazy(remove_tags, str)
 
 
 def strip_spaces_between_tags(value):
     """Returns the given HTML with spaces between tags removed."""
     return re.sub(r'>\s+<', '><', force_text(value))
-strip_spaces_between_tags = allow_lazy(strip_spaces_between_tags, six.text_type)
+strip_spaces_between_tags = allow_lazy(strip_spaces_between_tags, str)
 
 
 def strip_entities(value):
@@ -215,7 +213,7 @@ def strip_entities(value):
         RemovedInDjango20Warning, stacklevel=2
     )
     return re.sub(r'&(?:\w+|#\d+);', '', force_text(value))
-strip_entities = allow_lazy(strip_entities, six.text_type)
+strip_entities = allow_lazy(strip_entities, str)
 
 
 def smart_urlquote(url):
@@ -351,7 +349,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
         elif autoescape:
             words[i] = escape(word)
     return ''.join(words)
-urlize = allow_lazy(urlize, six.text_type)
+urlize = allow_lazy(urlize, str)
 
 
 def avoid_wrapping(value):
@@ -372,22 +370,12 @@ def html_safe(klass):
             "can't apply @html_safe to %s because it defines "
             "__html__()." % klass.__name__
         )
-    if six.PY2:
-        if '__unicode__' not in klass.__dict__:
-            raise ValueError(
-                "can't apply @html_safe to %s because it doesn't "
-                "define __unicode__()." % klass.__name__
-            )
-        klass_unicode = klass.__unicode__
-        klass.__unicode__ = lambda self: mark_safe(klass_unicode(self))
-        klass.__html__ = lambda self: unicode(self)
-    else:
-        if '__str__' not in klass.__dict__:
-            raise ValueError(
-                "can't apply @html_safe to %s because it doesn't "
-                "define __str__()." % klass.__name__
-            )
-        klass_str = klass.__str__
-        klass.__str__ = lambda self: mark_safe(klass_str(self))
-        klass.__html__ = lambda self: str(self)
+    if '__str__' not in klass.__dict__:
+        raise ValueError(
+            "can't apply @html_safe to %s because it doesn't "
+            "define __str__()." % klass.__name__
+        )
+    klass_str = klass.__str__
+    klass.__str__ = lambda self: mark_safe(klass_str(self))
+    klass.__html__ = lambda self: str(self)
     return klass

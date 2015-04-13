@@ -2,13 +2,13 @@ from __future__ import unicode_literals
 
 import os
 import re
+from io import StringIO
 from unittest import skipUnless
 
 from django.contrib.gis.gdal import HAS_GDAL
 from django.core.management import call_command
 from django.db import connection, connections
 from django.test import TestCase, skipUnlessDBFeature
-from django.utils.six import StringIO
 
 from ..test_data import TEST_DATA
 

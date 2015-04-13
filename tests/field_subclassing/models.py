@@ -2,12 +2,11 @@
 Tests for field subclassing.
 """
 from django.db import models
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 
 from .fields import JSONField, Small, SmallerField, SmallField
 
 
-@python_2_unicode_compatible
 class MyModel(models.Model):
     name = models.CharField(max_length=10)
     data = SmallField('small field')

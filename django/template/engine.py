@@ -1,7 +1,7 @@
 import warnings
 
 from django.core.exceptions import ImproperlyConfigured
-from django.utils import lru_cache, six
+from django.utils import lru_cache
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
@@ -35,7 +35,7 @@ class Engine(object):
                 raise ImproperlyConfigured(
                     "app_dirs must not be set when loaders is defined.")
 
-        if isinstance(allowed_include_roots, six.string_types):
+        if isinstance(allowed_include_roots, str):
             raise ImproperlyConfigured(
                 "allowed_include_roots must be a tuple, not a string.")
 
@@ -108,7 +108,7 @@ class Engine(object):
         else:
             args = []
 
-        if isinstance(loader, six.string_types):
+        if isinstance(loader, str):
             loader_class = import_string(loader)
 
             if getattr(loader_class, '_accepts_engine_in_init', False):

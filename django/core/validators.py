@@ -1,14 +1,13 @@
 from __future__ import unicode_literals
 
 import re
+from urllib.parse import urlsplit, urlunsplit
 
 from django.core.exceptions import ValidationError
-from django.utils import six
 from django.utils.deconstruct import deconstructible
 from django.utils.encoding import force_text
 from django.utils.ipv6 import is_valid_ipv6_address
-from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
-from django.utils.translation import ugettext_lazy as _, ungettext_lazy
+from django.utils.translation import gettext_lazy as _, ngettext_lazy
 
 # These values, if given to validate(), will trigger the self.required check.
 EMPTY_VALUES = (None, '', [], (), {})
@@ -33,11 +32,11 @@ class RegexValidator(object):
             self.inverse_match = inverse_match
         if flags is not None:
             self.flags = flags
-        if self.flags and not isinstance(self.regex, six.string_types):
+        if self.flags and not isinstance(self.regex, str):
             raise TypeError("If the flags are set, regex must be a regular expression string.")
 
         # Compile the regex if it was not passed pre-compiled.
-        if isinstance(self.regex, six.string_types):
+        if isinstance(self.regex, str):
             self.regex = re.compile(self.regex, self.flags)
 
     def __call__(self, value):
@@ -310,7 +309,7 @@ class MinValueValidator(BaseValidator):
 class MinLengthValidator(BaseValidator):
     compare = lambda self, a, b: a < b
     clean = lambda self, x: len(x)
-    message = ungettext_lazy(
+    message = ngettext_lazy(
         'Ensure this value has at least %(limit_value)d character (it has %(show_value)d).',
         'Ensure this value has at least %(limit_value)d characters (it has %(show_value)d).',
         'limit_value')
@@ -321,7 +320,7 @@ class MinLengthValidator(BaseValidator):
 class MaxLengthValidator(BaseValidator):
     compare = lambda self, a, b: a > b
     clean = lambda self, x: len(x)
-    message = ungettext_lazy(
+    message = ngettext_lazy(
         'Ensure this value has at most %(limit_value)d character (it has %(show_value)d).',
         'Ensure this value has at most %(limit_value)d characters (it has %(show_value)d).',
         'limit_value')

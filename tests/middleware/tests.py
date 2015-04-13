@@ -6,6 +6,7 @@ import random
 import re
 from io import BytesIO
 from unittest import skipIf
+from urllib.parse import quote
 
 from django.conf import settings
 from django.core import mail
@@ -21,10 +22,7 @@ from django.middleware.gzip import GZipMiddleware
 from django.middleware.http import ConditionalGetMiddleware
 from django.test import RequestFactory, TestCase, override_settings
 from django.test.utils import patch_logger
-from django.utils import six
 from django.utils.encoding import force_str
-from django.utils.six.moves import range
-from django.utils.six.moves.urllib.parse import quote
 
 
 @override_settings(ROOT_URLCONF='middleware.urls')
@@ -85,15 +83,15 @@ class CommonMiddlewareTest(TestCase):
         msg = "maintaining %s data. Change your form to point to testserver/slash/"
         request = self.rf.get('/slash')
         request.method = 'POST'
-        with six.assertRaisesRegex(self, RuntimeError, msg % request.method):
+        with self.assertRaisesRegex(RuntimeError, msg % request.method):
             CommonMiddleware().process_request(request)
         request = self.rf.get('/slash')
         request.method = 'PUT'
-        with six.assertRaisesRegex(self, RuntimeError, msg % request.method):
+        with self.assertRaisesRegex(RuntimeError, msg % request.method):
             CommonMiddleware().process_request(request)
         request = self.rf.get('/slash')
         request.method = 'PATCH'
-        with six.assertRaisesRegex(self, RuntimeError, msg % request.method):
+        with self.assertRaisesRegex(RuntimeError, msg % request.method):
             CommonMiddleware().process_request(request)
 
     @override_settings(APPEND_SLASH=False)
@@ -194,7 +192,7 @@ class CommonMiddlewareTest(TestCase):
         request = self.rf.get('/customurlconf/slash')
         request.urlconf = 'middleware.extra_urls'
         request.method = 'POST'
-        with six.assertRaisesRegex(self, RuntimeError, 'end in a slash'):
+        with self.assertRaisesRegex(RuntimeError, 'end in a slash'):
             CommonMiddleware().process_request(request)
 
     @override_settings(APPEND_SLASH=False)
@@ -311,14 +309,6 @@ class BrokenLinkEmailsMiddlewareTest(TestCase):
         self.req.path = self.req.path_info = 'foo_url/that/does/not/exist'
         BrokenLinkEmailsMiddleware().process_response(self.req, self.resp)
         self.assertEqual(len(mail.outbox), 0)
-
-    @skipIf(six.PY3, "HTTP_REFERER is str type on Python 3")
-    def test_404_error_nonascii_referrer(self):
-        # Such referer strings should not happen, but anyway, if it happens,
-        # let's not crash
-        self.req.META['HTTP_REFERER'] = b'http://testserver/c/\xd0\xbb\xd0\xb8/'
-        BrokenLinkEmailsMiddleware().process_response(self.req, self.resp)
-        self.assertEqual(len(mail.outbox), 1)
 
     def test_custom_request_checker(self):
         class SubclassedMiddleware(BrokenLinkEmailsMiddleware):
@@ -606,7 +596,7 @@ class GZipMiddlewareTest(TestCase):
     """
     short_string = b"This string is too short to be worth compressing."
     compressible_string = b'a' * 500
-    uncompressible_string = b''.join(six.int2byte(random.randint(0, 255)) for _ in range(500))
+    uncompressible_string = b''.join(random.randint(0, 255).to_bytes(1, 'big') for _ in range(500))
     sequence = [b'a' * 500, b'b' * 200, b'a' * 300]
     sequence_unicode = ['a' * 500, 'é' * 200, 'a' * 300]
 

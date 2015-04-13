@@ -106,4 +106,4 @@ class FlatpageAdminFormTests(TestCase):
 
         self.assertEqual(
             f.errors,
-            {'sites': [translation.ugettext('This field is required.')]})
+            {'sites': [translation.gettext('This field is required.')]})

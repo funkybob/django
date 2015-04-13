@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 from django.db.backends.signals import connection_created
 from django.db.models import CharField, TextField
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from .lookups import Unaccent
 from .signals import register_hstore_handler

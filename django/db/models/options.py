@@ -14,9 +14,7 @@ from django.db.models.fields.related import ManyToManyField
 from django.utils import six
 from django.utils.datastructures import ImmutableList, OrderedSet
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import (
-    force_text, python_2_unicode_compatible, smart_text,
-)
+from django.utils.encoding import force_text, smart_text
 from django.utils.functional import cached_property
 from django.utils.lru_cache import lru_cache
 from django.utils.text import camel_case_to_spaces
@@ -83,7 +81,6 @@ def make_immutable_fields_list(name, data):
     return ImmutableList(data, warning=IMMUTABLE_WARNING % name)
 
 
-@python_2_unicode_compatible
 class Options(object):
     FORWARD_PROPERTIES = ('fields', 'many_to_many', 'concrete_fields',
                           'local_concrete_fields', '_forward_fields_map')

@@ -8,21 +8,18 @@ import copy
 import datetime
 import re
 from itertools import chain
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.forms.utils import flatatt, to_current_timezone
-from django.utils import datetime_safe, formats, six
+from django.utils import datetime_safe, formats
 from django.utils.datastructures import MultiValueDict
 from django.utils.dates import MONTHS
-from django.utils.encoding import (
-    force_str, force_text, python_2_unicode_compatible,
-)
+from django.utils.encoding import force_str, force_text
 from django.utils.formats import get_format
 from django.utils.html import conditional_escape, format_html, html_safe
 from django.utils.safestring import mark_safe
-from django.utils.six.moves import range
-from django.utils.six.moves.urllib.parse import urljoin
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 
 __all__ = (
     'Media', 'MediaDefiningClass', 'Widget', 'TextInput', 'NumberInput',
@@ -38,7 +35,6 @@ MEDIA_TYPES = ('css', 'js')
 
 
 @html_safe
-@python_2_unicode_compatible
 class Media(object):
     def __init__(self, media=None, **kwargs):
         if media:
@@ -158,7 +154,6 @@ class MediaDefiningClass(type):
 
 
 @html_safe
-@python_2_unicode_compatible
 class SubWidget(object):
     """
     Some widgets are made of multiple HTML elements -- namely, RadioSelect.
@@ -176,7 +171,7 @@ class SubWidget(object):
         return self.parent_widget.render(*args)
 
 
-class Widget(six.with_metaclass(MediaDefiningClass)):
+class Widget(metaclass=MediaDefiningClass):
     needs_multipart_form = False  # Determines does this widget need multipart form
     is_localized = False
     is_required = False
@@ -349,9 +344,9 @@ FILE_INPUT_CONTRADICTION = object()
 
 
 class ClearableFileInput(FileInput):
-    initial_text = ugettext_lazy('Currently')
-    input_text = ugettext_lazy('Change')
-    clear_checkbox_label = ugettext_lazy('Clear')
+    initial_text = gettext_lazy('Currently')
+    input_text = gettext_lazy('Change')
+    clear_checkbox_label = gettext_lazy('Clear')
 
     template_with_initial = (
         '%(initial_text)s: <a href="%(initial_url)s">%(initial)s</a> '
@@ -497,7 +492,7 @@ class CheckboxInput(Widget):
         value = data.get(name)
         # Translate true and false strings to boolean values.
         values = {'true': True, 'false': False}
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             value = values.get(value.lower(), value)
         return bool(value)
 
@@ -559,9 +554,9 @@ class NullBooleanSelect(Select):
     A Select Widget intended to be used with NullBooleanField.
     """
     def __init__(self, attrs=None):
-        choices = (('1', ugettext_lazy('Unknown')),
-                   ('2', ugettext_lazy('Yes')),
-                   ('3', ugettext_lazy('No')))
+        choices = (('1', gettext_lazy('Unknown')),
+                   ('2', gettext_lazy('Yes')),
+                   ('3', gettext_lazy('No')))
         super(NullBooleanSelect, self).__init__(attrs, choices)
 
     def render(self, name, value, attrs=None, choices=()):
@@ -602,7 +597,6 @@ class SelectMultiple(Select):
 
 
 @html_safe
-@python_2_unicode_compatible
 class ChoiceInput(SubWidget):
     """
     An object used by ChoiceFieldRenderer that represents a single
@@ -668,7 +662,6 @@ class CheckboxChoiceInput(ChoiceInput):
 
 
 @html_safe
-@python_2_unicode_compatible
 class ChoiceFieldRenderer(object):
     """
     An object used by RadioSelect to enable customization of radio widgets.
@@ -973,7 +966,7 @@ class SelectDateWidget(Widget):
             year_val, month_val, day_val = value.year, value.month, value.day
         except AttributeError:
             year_val = month_val = day_val = None
-            if isinstance(value, six.string_types):
+            if isinstance(value, str):
                 if settings.USE_L10N:
                     try:
                         input_format = get_format('DATE_INPUT_FORMATS')[0]
@@ -988,7 +981,7 @@ class SelectDateWidget(Widget):
         html = {}
         choices = [(i, i) for i in self.years]
         html['year'] = self.create_select(name, self.year_field, value, year_val, choices, self.year_none_value)
-        choices = list(six.iteritems(self.months))
+        choices = list(self.months.items())
         html['month'] = self.create_select(name, self.month_field, value, month_val, choices, self.month_none_value)
         choices = [(i, i) for i in range(1, 32)]
         html['day'] = self.create_select(name, self.day_field, value, day_val, choices, self.day_none_value)

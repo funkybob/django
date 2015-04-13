@@ -4,11 +4,12 @@ from __future__ import unicode_literals
 import codecs
 import importlib
 import os
+from unittest import mock
 
 from django.apps import apps
 from django.core.management import CommandError, call_command
 from django.db import DatabaseError, connection, models
-from django.test import ignore_warnings, mock, override_settings
+from django.test import ignore_warnings, override_settings
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
@@ -534,7 +535,7 @@ class MakeMigrationsTests(MigrationTestBase):
         Makes sure that makemigrations enters and exits interactive mode properly.
         """
         # Monkeypatch interactive questioner to auto reject
-        with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='N')):
+        with mock.patch('builtins.input', mock.Mock(return_value='N')):
             try:
                 with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
                     call_command("makemigrations", "migrations", merge=True, interactive=True, verbosity=0)
@@ -548,7 +549,7 @@ class MakeMigrationsTests(MigrationTestBase):
         Makes sure that makemigrations enters interactive mode and merges properly.
         """
         # Monkeypatch interactive questioner to auto accept
-        with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='y')):
+        with mock.patch('builtins.input', mock.Mock(return_value='y')):
             out = six.StringIO()
             try:
                 with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
@@ -771,7 +772,7 @@ class MakeMigrationsTests(MigrationTestBase):
         """
         # Monkeypatch interactive questioner to auto reject
         out = six.StringIO()
-        with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='N')):
+        with mock.patch('builtins.input', mock.Mock(return_value='N')):
             try:
                 with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
                     call_command("makemigrations", "migrations", merge=True, stdout=out)
@@ -807,7 +808,7 @@ class MakeMigrationsTests(MigrationTestBase):
         unspecified app even if it has conflicting migrations.
         """
         # Monkeypatch interactive questioner to auto accept
-        with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='y')):
+        with mock.patch('builtins.input', mock.Mock(return_value='y')):
             out = six.StringIO()
             try:
                 with self.temporary_migration_module(app_label="migrated_app") as migration_dir:

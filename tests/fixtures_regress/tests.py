@@ -7,6 +7,7 @@ import os
 import re
 import unittest
 import warnings
+from io import StringIO
 
 import django
 from django.core import management, serializers
@@ -19,9 +20,6 @@ from django.test import (
     TestCase, TransactionTestCase, override_settings, skipIfDBFeature,
     skipUnlessDBFeature,
 )
-from django.utils import six
-from django.utils._os import upath
-from django.utils.six import PY3, StringIO
 
 from .models import (
     Absolute, Animal, Article, Book, Child, Circle1, Circle2, Circle3,
@@ -33,17 +31,8 @@ from .models import (
     Person, RefToNKChild, Store, Stuff, Thingy, Widget,
 )
 
-_cur_dir = os.path.dirname(os.path.abspath(upath(__file__)))
+_cur_dir = os.path.dirname(os.path.abspath(__file__))
 
-
-def is_ascii(s):
-    return all(ord(c) < 128 for c in s)
-
-
-skipIfNonASCIIPath = unittest.skipIf(
-    not is_ascii(django.__file__) and six.PY2,
-    'Python 2 crashes when checking non-ASCII exception messages.'
-)
 
 
 class TestFixtures(TestCase):
@@ -159,7 +148,7 @@ class TestFixtures(TestCase):
         fixture directory.
         """
         load_absolute_path = os.path.join(
-            os.path.dirname(upath(__file__)),
+            os.path.dirname(__file__),
             'fixtures',
             'absolute.json'
         )
@@ -201,7 +190,7 @@ class TestFixtures(TestCase):
         Test for ticket #4371 -- Loading data of an unknown format should fail
         Validate that error conditions are caught correctly
         """
-        with six.assertRaisesRegex(self, management.CommandError,
+        with self.assertRaisesRegex(management.CommandError,
                 "Problem installing fixture 'bad_fixture1': "
                 "unkn is not a known serialization format."):
             management.call_command(
@@ -210,13 +199,12 @@ class TestFixtures(TestCase):
                 verbosity=0,
             )
 
-    @skipIfNonASCIIPath
     @override_settings(SERIALIZATION_MODULES={'unkn': 'unexistent.path'})
     def test_unimportable_serializer(self):
         """
         Test that failing serializer import raises the proper error
         """
-        with six.assertRaisesRegex(self, ImportError,
+        with self.assertRaisesRegex(ImportError,
                 r"No module named.*unexistent"):
             management.call_command(
                 'loaddata',
@@ -347,8 +335,8 @@ class TestFixtures(TestCase):
             self.assertEqual(
                 self.pre_save_checks,
                 [
-                    ("Count = 42 (<%s 'int'>)" % ('class' if PY3 else 'type'),
-                     "Weight = 1.2 (<%s 'float'>)" % ('class' if PY3 else 'type'))
+                    ("Count = 42 (<class 'int'>)",
+                     "Weight = 1.2 (<class 'float'>)")
                 ]
             )
         finally:
@@ -441,7 +429,7 @@ class TestFixtures(TestCase):
         """
         Regression for #3615 - Ensure data with nonexistent child key references raises error
         """
-        with six.assertRaisesRegex(self, IntegrityError,
+        with self.assertRaisesRegex(IntegrityError,
                 "Problem installing fixture"):
             management.call_command(
                 'loaddata',
@@ -470,7 +458,7 @@ class TestFixtures(TestCase):
         """
         Regression for #7043 - Error is quickly reported when no fixtures is provided in the command line.
         """
-        with six.assertRaisesRegex(self, management.CommandError,
+        with self.assertRaisesRegex(management.CommandError,
                 "No database fixture specified. Please provide the path of "
                 "at least one fixture in the command line."):
             management.call_command(
@@ -527,7 +515,6 @@ class TestFixtures(TestCase):
             verbosity=0,
         )
 
-    @skipIfNonASCIIPath
     @override_settings(FIXTURE_DIRS=[os.path.join(_cur_dir, 'fixtures')])
     def test_fixture_dirs_with_default_fixture_path(self):
         """

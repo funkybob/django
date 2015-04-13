@@ -6,17 +6,16 @@ from __future__ import unicode_literals
 
 import os
 import socket
+from urllib.error import HTTPError
+from urllib.request import urlopen
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import LiveServerTestCase, override_settings
-from django.utils._os import upath
 from django.utils.http import urlencode
-from django.utils.six.moves.urllib.error import HTTPError
-from django.utils.six.moves.urllib.request import urlopen
 
 from .models import Person
 
-TEST_ROOT = os.path.dirname(upath(__file__))
+TEST_ROOT = os.path.dirname(__file__)
 TEST_SETTINGS = {
     'MEDIA_URL': '/media/',
     'MEDIA_ROOT': os.path.join(TEST_ROOT, 'media'),

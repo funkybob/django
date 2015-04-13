@@ -7,7 +7,6 @@ import jinja2
 
 from django.conf import settings
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
-from django.utils import six
 from django.utils.module_loading import import_string
 
 from .base import BaseEngine
@@ -41,11 +40,9 @@ class Jinja2(BaseEngine):
         try:
             return Template(self.env.get_template(template_name))
         except jinja2.TemplateNotFound as exc:
-            six.reraise(TemplateDoesNotExist, TemplateDoesNotExist(exc.args),
-                        sys.exc_info()[2])
+            raise TemplateDoesNotExist(exc.args).with_traceback(sys.exc_info()[2])
         except jinja2.TemplateSyntaxError as exc:
-            six.reraise(TemplateSyntaxError, TemplateSyntaxError(exc.args),
-                        sys.exc_info()[2])
+            raise TemplateSyntaxError(exc.args).with_traceback(sys.exc_info()[2])
 
 
 class Template(object):

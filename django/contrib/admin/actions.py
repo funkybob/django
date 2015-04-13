@@ -9,7 +9,7 @@ from django.core.exceptions import PermissionDenied
 from django.db import router
 from django.template.response import TemplateResponse
 from django.utils.encoding import force_text
-from django.utils.translation import ugettext as _, ugettext_lazy
+from django.utils.translation import gettext as _, gettext_lazy
 
 
 def delete_selected(modeladmin, request, queryset):
@@ -85,4 +85,4 @@ def delete_selected(modeladmin, request, queryset):
         "admin/delete_selected_confirmation.html"
     ], context)
 
-delete_selected.short_description = ugettext_lazy("Delete selected %(verbose_name_plural)s")
+delete_selected.short_description = gettext_lazy("Delete selected %(verbose_name_plural)s")

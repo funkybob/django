@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 CHOICES = (
     (1, 'first'),
@@ -10,7 +9,6 @@ CHOICES = (
 )
 
 
-@python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100, default='Default headline')
     pub_date = models.DateTimeField()
@@ -41,7 +39,6 @@ class Event(models.Model):
     when = models.DateTimeField()
 
 
-@python_2_unicode_compatible
 class Department(models.Model):
     id = models.PositiveIntegerField(primary_key=True)
     name = models.CharField(max_length=200)
@@ -50,7 +47,6 @@ class Department(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Worker(models.Model):
     department = models.ForeignKey(Department)
     name = models.CharField(max_length=200)
@@ -59,7 +55,6 @@ class Worker(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class BrokenUnicodeMethod(models.Model):
     name = models.CharField(max_length=7)
 

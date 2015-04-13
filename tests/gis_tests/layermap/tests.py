@@ -11,7 +11,6 @@ from django.conf import settings
 from django.contrib.gis.gdal import HAS_GDAL
 from django.db import connection
 from django.test import TestCase, override_settings, skipUnlessDBFeature
-from django.utils._os import upath
 
 if HAS_GDAL:
     from django.contrib.gis.utils.layermapping import (LayerMapping,
@@ -23,7 +22,7 @@ if HAS_GDAL:
         city_mapping, co_mapping, cofeat_mapping, inter_mapping)
 
 
-shp_path = os.path.realpath(os.path.join(os.path.dirname(upath(__file__)), os.pardir, 'data'))
+shp_path = os.path.realpath(os.path.join(os.path.dirname(__file__), os.pardir, 'data'))
 city_shp = os.path.join(shp_path, 'cities', 'cities.shp')
 co_shp = os.path.join(shp_path, 'counties', 'counties.shp')
 inter_shp = os.path.join(shp_path, 'interstates', 'interstates.shp')

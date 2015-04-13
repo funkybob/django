@@ -2,11 +2,10 @@ from __future__ import unicode_literals
 
 import warnings
 from collections import deque
+from functools import total_ordering
 
 from django.db.migrations.state import ProjectState
 from django.utils.datastructures import OrderedSet
-from django.utils.encoding import python_2_unicode_compatible
-from django.utils.functional import total_ordering
 
 RECURSION_DEPTH_WARNING = (
     "Maximum recursion depth exceeded while generating migration graph, "
@@ -16,7 +15,6 @@ RECURSION_DEPTH_WARNING = (
 )
 
 
-@python_2_unicode_compatible
 @total_ordering
 class Node(object):
     """
@@ -77,7 +75,6 @@ class Node(object):
         return self.__dict__['_descendants']
 
 
-@python_2_unicode_compatible
 class MigrationGraph(object):
     """
     Represents the digraph of all migrations in a project.
@@ -285,7 +282,6 @@ class CircularDependencyError(Exception):
     pass
 
 
-@python_2_unicode_compatible
 class NodeNotFoundError(LookupError):
     """
     Raised when an attempt on a node is made that is not available in the graph.

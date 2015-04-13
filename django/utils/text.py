@@ -2,25 +2,19 @@ from __future__ import unicode_literals
 
 import re
 import unicodedata
+from html import entities
 from gzip import GzipFile
 from io import BytesIO
 
-from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.functional import SimpleLazyObject, allow_lazy
 from django.utils.safestring import SafeText, mark_safe
-from django.utils.six.moves import html_entities
-from django.utils.translation import pgettext, ugettext as _, ugettext_lazy
-
-if six.PY2:
-    # Import force_unicode even though this module doesn't use it, because some
-    # people rely on it being here.
-    from django.utils.encoding import force_unicode  # NOQA
+from django.utils.translation import pgettext, gettext as _, gettext_lazy
 
 
 # Capitalizes the first letter of a string.
 capfirst = lambda x: x and force_text(x)[0].upper() + force_text(x)[1:]
-capfirst = allow_lazy(capfirst, six.text_type)
+capfirst = allow_lazy(capfirst, str)
 
 # Set up regular expressions
 re_words = re.compile(r'<.*?>|((?:\w[-\w]*|&.*?;)+)', re.U | re.S)
@@ -60,7 +54,7 @@ def wrap(text, width):
             if line:
                 yield line
     return ''.join(_generator())
-wrap = allow_lazy(wrap, six.text_type)
+wrap = allow_lazy(wrap, str)
 
 
 class Truncator(SimpleLazyObject):
@@ -240,10 +234,10 @@ def get_valid_filename(s):
     """
     s = force_text(s).strip().replace(' ', '_')
     return re.sub(r'(?u)[^-\w.]', '', s)
-get_valid_filename = allow_lazy(get_valid_filename, six.text_type)
+get_valid_filename = allow_lazy(get_valid_filename, str)
 
 
-def get_text_list(list_, last_word=ugettext_lazy('or')):
+def get_text_list(list_, last_word=gettext_lazy('or')):
     """
     >>> get_text_list(['a', 'b', 'c', 'd'])
     'a, b, c or d'
@@ -264,14 +258,14 @@ def get_text_list(list_, last_word=ugettext_lazy('or')):
         # Translators: This string is used as a separator between list elements
         _(', ').join(force_text(i) for i in list_[:-1]),
         force_text(last_word), force_text(list_[-1]))
-get_text_list = allow_lazy(get_text_list, six.text_type)
+get_text_list = allow_lazy(get_text_list, str)
 
 
 def normalize_newlines(text):
     """Normalizes CRLF and CR newlines to just LF."""
     text = force_text(text)
     return re_newlines.sub('\n', text)
-normalize_newlines = allow_lazy(normalize_newlines, six.text_type)
+normalize_newlines = allow_lazy(normalize_newlines, str)
 
 
 def phone2numeric(phone):
@@ -372,12 +366,12 @@ def _replace_entity(match):
                 c = int(text[1:], 16)
             else:
                 c = int(text)
-            return six.unichr(c)
+            return chr(c)
         except ValueError:
             return match.group(0)
     else:
         try:
-            return six.unichr(html_entities.name2codepoint[text])
+            return chr(entities.name2codepoint[text])
         except (ValueError, KeyError):
             return match.group(0)
 
@@ -386,7 +380,7 @@ _entity_re = re.compile(r"&(#?[xX]?(?:[0-9a-fA-F]+|\w{1,8}));")
 
 def unescape_entities(text):
     return _entity_re.sub(_replace_entity, text)
-unescape_entities = allow_lazy(unescape_entities, six.text_type)
+unescape_entities = allow_lazy(unescape_entities, str)
 
 
 def unescape_string_literal(s):
@@ -420,7 +414,7 @@ def slugify(value):
     value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
     value = re.sub('[^\w\s-]', '', value).strip().lower()
     return mark_safe(re.sub('[-\s]+', '-', value))
-slugify = allow_lazy(slugify, six.text_type, SafeText)
+slugify = allow_lazy(slugify, str, SafeText)
 
 
 def camel_case_to_spaces(value):

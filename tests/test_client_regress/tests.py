@@ -17,11 +17,10 @@ from django.template.response import SimpleTemplateResponse
 from django.test import Client, TestCase, ignore_warnings, override_settings
 from django.test.client import RedirectCycleError, RequestFactory, encode_file
 from django.test.utils import ContextList, str_prefix
-from django.utils._os import upath
 from django.utils.deprecation import (
     RemovedInDjango20Warning, RemovedInDjango21Warning,
 )
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 
 from .models import CustomUser
 from .views import CustomTestException
@@ -174,11 +173,11 @@ class AssertContainsTests(TestCase):
 
     def test_nontext_contains(self):
         r = self.client.get('/no_template_view/')
-        self.assertContains(r, ugettext_lazy('once'))
+        self.assertContains(r, gettext_lazy('once'))
 
     def test_nontext_not_contains(self):
         r = self.client.get('/no_template_view/')
-        self.assertNotContains(r, ugettext_lazy('never'))
+        self.assertNotContains(r, gettext_lazy('never'))
 
     def test_assert_contains_renders_template_response(self):
         """ Test that we can pass in an unrendered SimpleTemplateReponse
@@ -937,7 +936,7 @@ class TemplateExceptionTests(TestCase):
 
     @override_settings(TEMPLATES=[{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'bad_templates')],
+        'DIRS': [os.path.join(os.path.dirname(__file__), 'bad_templates')],
     }])
     def test_bad_404_template(self):
         "Errors found when rendering 404 error templates are re-raised"

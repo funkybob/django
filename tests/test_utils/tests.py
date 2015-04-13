@@ -18,7 +18,6 @@ from django.test import (
 from django.test.html import HTMLParseError, parse_html
 from django.test.utils import CaptureQueriesContext, override_settings
 from django.utils import six
-from django.utils._os import abspathu
 
 from .models import Car, Person, PossessedCar
 from .views import empty_response
@@ -872,7 +871,7 @@ class OverrideSettingsTests(TestCase):
         django.contrib.staticfiles.storage.staticfiles_storage.
         """
         with self.settings(STATIC_ROOT='/tmp/test'):
-            self.assertEqual(staticfiles_storage.location, abspathu('/tmp/test'))
+            self.assertEqual(staticfiles_storage.location, '/tmp/test')
 
     def test_override_staticfiles_storage(self):
         """

@@ -3,11 +3,9 @@ import datetime
 from django.db import models
 from django.db.models.fields.related import \
     ReverseSingleRelatedObjectDescriptor
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import get_language
 
 
-@python_2_unicode_compatible
 class Country(models.Model):
     # Table Column Fields
     name = models.CharField(max_length=50)
@@ -16,7 +14,6 @@ class Country(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Person(models.Model):
     # Table Column Fields
     name = models.CharField(max_length=128)
@@ -34,7 +31,6 @@ class Person(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Group(models.Model):
     # Table Column Fields
     name = models.CharField(max_length=128)
@@ -48,7 +44,6 @@ class Group(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Membership(models.Model):
     # Table Column Fields
     membership_country = models.ForeignKey(Country)
@@ -141,7 +136,6 @@ class ActiveTranslationField(models.ForeignObject):
         setattr(cls, self.name, ArticleTranslationDescriptor(self))
 
 
-@python_2_unicode_compatible
 class Article(models.Model):
     active_translation = ActiveTranslationField(
         'ArticleTranslation',

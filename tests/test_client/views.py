@@ -1,3 +1,4 @@
+from urllib.parse import urlencode
 from xml.dom.minidom import parseString
 
 from django.contrib.auth.decorators import login_required, permission_required
@@ -12,7 +13,6 @@ from django.http import (
 from django.shortcuts import render_to_response
 from django.template import Context, Template
 from django.utils.decorators import method_decorator
-from django.utils.six.moves.urllib.parse import urlencode
 
 
 def get_view(request):

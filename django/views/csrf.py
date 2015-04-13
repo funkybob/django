@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.http import HttpResponseForbidden
 from django.template import Context, Engine
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.utils.version import get_docs_version
 
 

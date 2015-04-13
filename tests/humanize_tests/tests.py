@@ -10,7 +10,7 @@ from django.test import TestCase, modify_settings, override_settings
 from django.utils import translation
 from django.utils.html import escape
 from django.utils.timezone import get_fixed_timezone, utc
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 try:
     import pytz

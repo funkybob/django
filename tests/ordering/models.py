@@ -14,7 +14,6 @@ undefined -- not random, just undefined.
 """
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class Author(models.Model):
@@ -22,7 +21,6 @@ class Author(models.Model):
         ordering = ('-pk',)
 
 
-@python_2_unicode_compatible
 class Article(models.Model):
     author = models.ForeignKey(Author, null=True)
     headline = models.CharField(max_length=100)

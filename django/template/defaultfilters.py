@@ -10,7 +10,7 @@ from pprint import pformat
 
 from django.conf import settings
 from django.template.base import Library, Variable, VariableDoesNotExist
-from django.utils import formats, six
+from django.utils import formats
 from django.utils.dateformat import format, time_format
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, iri_to_uri
@@ -24,7 +24,7 @@ from django.utils.text import (
     Truncator, normalize_newlines, phone2numeric, slugify as _slugify, wrap,
 )
 from django.utils.timesince import timesince, timeuntil
-from django.utils.translation import ugettext, ungettext
+from django.utils.translation import gettext, ngettext
 
 register = Library()
 
@@ -170,7 +170,7 @@ def floatformat(text, arg=-1):
         # and `exponent` from `Decimal.as_tuple()` directly.
         sign, digits, exponent = d.quantize(exp, ROUND_HALF_UP,
             Context(prec=prec)).as_tuple()
-        digits = [six.text_type(digit) for digit in reversed(digits)]
+        digits = [str(digit) for digit in reversed(digits)]
         while len(digits) <= abs(exponent):
             digits.append('0')
         digits.insert(-exponent, '.')
@@ -196,7 +196,7 @@ def linenumbers(value, autoescape=True):
     lines = value.split('\n')
     # Find the maximum width of the line count, for use with zero padding
     # string format command
-    width = six.text_type(len(six.text_type(len(lines))))
+    width = str(len(str(len(lines))))
     if not autoescape or isinstance(value, SafeData):
         for i, line in enumerate(lines):
             lines[i] = ("%0" + width + "d. %s") % (i + 1, line)
@@ -248,7 +248,7 @@ def stringformat(value, arg):
     of Python string formatting
     """
     try:
-        return ("%" + six.text_type(arg)) % value
+        return ("%" + str(arg)) % value
     except (ValueError, TypeError):
         return ""
 
@@ -686,7 +686,7 @@ def unordered_list(value, autoescape=True):
                 next_item = next(item_iterator)
             except StopIteration:
                 next_item = None
-            if not isinstance(next_item, six.string_types):
+            if not isinstance(next_item, str):
                 try:
                     iter(next_item)
                 except TypeError:
@@ -857,7 +857,7 @@ def yesno(value, arg=None):
     ==========  ======================  ==================================
     """
     if arg is None:
-        arg = ugettext('yes,no,maybe')
+        arg = gettext('yes,no,maybe')
     bits = arg.split(',')
     if len(bits) < 2:
         return value  # Invalid arg.
@@ -886,7 +886,7 @@ def filesizeformat(bytes):
     try:
         bytes = float(bytes)
     except (TypeError, ValueError, UnicodeDecodeError):
-        value = ungettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}
+        value = ngettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}
         return avoid_wrapping(value)
 
     filesize_number_format = lambda value: formats.number_format(round(value, 1), 1)
@@ -898,17 +898,17 @@ def filesizeformat(bytes):
     PB = 1 << 50
 
     if bytes < KB:
-        value = ungettext("%(size)d byte", "%(size)d bytes", bytes) % {'size': bytes}
+        value = ngettext("%(size)d byte", "%(size)d bytes", bytes) % {'size': bytes}
     elif bytes < MB:
-        value = ugettext("%s KB") % filesize_number_format(bytes / KB)
+        value = gettext("%s KB") % filesize_number_format(bytes / KB)
     elif bytes < GB:
-        value = ugettext("%s MB") % filesize_number_format(bytes / MB)
+        value = gettext("%s MB") % filesize_number_format(bytes / MB)
     elif bytes < TB:
-        value = ugettext("%s GB") % filesize_number_format(bytes / GB)
+        value = gettext("%s GB") % filesize_number_format(bytes / GB)
     elif bytes < PB:
-        value = ugettext("%s TB") % filesize_number_format(bytes / TB)
+        value = gettext("%s TB") % filesize_number_format(bytes / TB)
     else:
-        value = ugettext("%s PB") % filesize_number_format(bytes / PB)
+        value = gettext("%s PB") % filesize_number_format(bytes / PB)
 
     return avoid_wrapping(value)
 

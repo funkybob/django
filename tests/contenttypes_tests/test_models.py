@@ -1,13 +1,14 @@
 from __future__ import unicode_literals
 
 import warnings
+from unittest import mock
 
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.views import shortcut
 from django.contrib.sites.shortcuts import get_current_site
 from django.db.utils import IntegrityError, OperationalError, ProgrammingError
 from django.http import Http404, HttpRequest
-from django.test import TestCase, mock, override_settings
+from django.test import TestCase, override_settings
 from django.utils import six
 
 from .models import (

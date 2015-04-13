@@ -1,3 +1,4 @@
+from urllib.parse import urlparse, urlunparse
 import warnings
 
 from django.conf import settings
@@ -19,8 +20,7 @@ from django.template.response import TemplateResponse
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.http import is_safe_url, urlsafe_base64_decode
-from django.utils.six.moves.urllib.parse import urlparse, urlunparse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters

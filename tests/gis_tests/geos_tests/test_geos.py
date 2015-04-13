@@ -11,9 +11,7 @@ from unittest import skipUnless
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.shortcuts import numpy
-from django.utils import six
 from django.utils.encoding import force_bytes
-from django.utils.six.moves import range
 
 from ..test_data import TestDataMixin
 
@@ -110,8 +108,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         self.assertEqual(True, GEOSGeometry(hexewkb_3d).hasz)
 
         # Same for EWKB.
-        self.assertEqual(six.memoryview(a2b_hex(hexewkb_2d)), pnt_2d.ewkb)
-        self.assertEqual(six.memoryview(a2b_hex(hexewkb_3d)), pnt_3d.ewkb)
+        self.assertEqual(memoryview(a2b_hex(hexewkb_2d)), pnt_2d.ewkb)
+        self.assertEqual(memoryview(a2b_hex(hexewkb_3d)), pnt_3d.ewkb)
 
         # Redundant sanity check.
         self.assertEqual(4326, GEOSGeometry(hexewkb_2d).srid)
@@ -132,7 +130,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 fromstr(err.wkt)
 
         # Bad WKB
-        self.assertRaises(GEOSException, GEOSGeometry, six.memoryview(b'0'))
+        self.assertRaises(GEOSException, GEOSGeometry, memoryview(b'0'))
 
         class NotAGeometry(object):
             pass
@@ -160,7 +158,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
     def test_create_wkb(self):
         "Testing creation from WKB."
         for g in self.geometries.hex_wkt:
-            wkb = six.memoryview(a2b_hex(g.hex.encode()))
+            wkb = memoryview(a2b_hex(g.hex.encode()))
             geom_h = GEOSGeometry(wkb)
             # we need to do this so decimal places get normalized
             geom_t = fromstr(g.wkt)
@@ -976,8 +974,6 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test_pickle(self):
         "Testing pickling and unpickling support."
-        # Using both pickle and cPickle -- just 'cause.
-        from django.utils.six.moves import cPickle
         import pickle
 
         # Creating a list of test geometries for pickling,
@@ -990,8 +986,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         tgeoms.extend(get_geoms(self.geometries.multipolygons, 3857))
 
         for geom in tgeoms:
-            s1, s2 = cPickle.dumps(geom), pickle.dumps(geom)
-            g1, g2 = cPickle.loads(s1), pickle.loads(s2)
+            s1, s2 = pickle.dumps(geom), pickle.dumps(geom)
+            g1, g2 = pickle.loads(s1), pickle.loads(s2)
             for tmpg in (g1, g2):
                 self.assertEqual(geom, tmpg)
                 self.assertEqual(geom.srid, tmpg.srid)
@@ -1041,13 +1037,13 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
         g = GEOSGeometry("POINT(0 0)")
         self.assertTrue(g.valid)
-        self.assertIsInstance(g.valid_reason, six.string_types)
+        self.assertIsInstance(g.valid_reason, str)
         self.assertEqual(g.valid_reason, "Valid Geometry")
 
         g = GEOSGeometry("LINESTRING(0 0, 0 0)")
 
         self.assertFalse(g.valid)
-        self.assertIsInstance(g.valid_reason, six.string_types)
+        self.assertIsInstance(g.valid_reason, str)
         self.assertTrue(g.valid_reason.startswith("Too few points in geometry component"))
 
     @skipUnless(HAS_GEOS, "Geos is required.")

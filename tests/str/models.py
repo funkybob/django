@@ -15,7 +15,6 @@ if you prefer. You must be careful to encode the results correctly, though.
 """
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class Article(models.Model):
@@ -28,7 +27,6 @@ class Article(models.Model):
         return self.headline
 
 
-@python_2_unicode_compatible
 class InternationalArticle(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateTimeField()

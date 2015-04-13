@@ -15,9 +15,7 @@ __all__ = [
     'get_language_info', 'get_language_bidi',
     'check_for_language', 'to_locale', 'templatize', 'string_concat',
     'gettext', 'gettext_lazy', 'gettext_noop',
-    'ugettext', 'ugettext_lazy', 'ugettext_noop',
     'ngettext', 'ngettext_lazy',
-    'ungettext', 'ungettext_lazy',
     'pgettext', 'pgettext_lazy',
     'npgettext', 'npgettext_lazy',
     'LANGUAGE_SESSION_KEY',
@@ -69,7 +67,6 @@ del Trans
 def gettext_noop(message):
     return _trans.gettext_noop(message)
 
-ugettext_noop = gettext_noop
 
 
 def gettext(message):
@@ -80,14 +77,6 @@ def ngettext(singular, plural, number):
     return _trans.ngettext(singular, plural, number)
 
 
-def ugettext(message):
-    return _trans.ugettext(message)
-
-
-def ungettext(singular, plural, number):
-    return _trans.ungettext(singular, plural, number)
-
-
 def pgettext(context, message):
     return _trans.pgettext(context, message)
 
@@ -96,7 +85,6 @@ def npgettext(context, singular, plural, number):
     return _trans.npgettext(context, singular, plural, number)
 
 gettext_lazy = lazy(gettext, str)
-ugettext_lazy = lazy(ugettext, six.text_type)
 pgettext_lazy = lazy(pgettext, six.text_type)
 
 
@@ -132,10 +120,6 @@ def lazy_number(func, resultclass, number=None, **kwargs):
 
 def ngettext_lazy(singular, plural, number=None):
     return lazy_number(ngettext, str, singular=singular, plural=plural, number=number)
-
-
-def ungettext_lazy(singular, plural, number=None):
-    return lazy_number(ungettext, six.text_type, singular=singular, plural=plural, number=number)
 
 
 def npgettext_lazy(context, singular, plural, number=None):

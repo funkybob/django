@@ -29,7 +29,7 @@ from django.utils.deprecation import (
 )
 from django.utils.encoding import force_text, smart_text
 from django.utils.functional import cached_property, curry
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
 

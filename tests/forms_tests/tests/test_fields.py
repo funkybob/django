@@ -46,7 +46,6 @@ from django.forms import (
 )
 from django.test import SimpleTestCase, ignore_warnings
 from django.utils import formats, six, translation
-from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.duration import duration_string
 
@@ -817,7 +816,7 @@ class FieldsTests(SimpleTestCase):
     def test_imagefield_annotate_with_image_after_clean(self):
         f = ImageField()
 
-        img_path = os.path.dirname(upath(__file__)) + '/filepath_test_files/1x1.png'
+        img_path = os.path.dirname(__file__) + '/filepath_test_files/1x1.png'
         with open(img_path, 'rb') as img_file:
             img_data = img_file.read()
 
@@ -1294,13 +1293,12 @@ class FieldsTests(SimpleTestCase):
     # FilePathField ###############################################################
 
     def test_filepathfield_1(self):
-        path = os.path.abspath(upath(forms.__file__))
+        path = os.path.abspath(forms.__file__)
         path = os.path.dirname(path) + '/'
         self.assertTrue(fix_os_paths(path).endswith('/django/forms/'))
 
     def test_filepathfield_2(self):
-        path = upath(forms.__file__)
-        path = os.path.dirname(os.path.abspath(path)) + '/'
+        path = os.path.dirname(os.path.abspath(forms.__file__)) + '/'
         f = FilePathField(path=path)
         f.choices = [p for p in f.choices if p[0].endswith('.py')]
         f.choices.sort()
@@ -1320,8 +1318,7 @@ class FieldsTests(SimpleTestCase):
         assert fix_os_paths(f.clean(path + 'fields.py')).endswith('/django/forms/fields.py')
 
     def test_filepathfield_3(self):
-        path = upath(forms.__file__)
-        path = os.path.dirname(os.path.abspath(path)) + '/'
+        path = os.path.dirname(os.path.abspath(forms.__file__)) + '/'
         f = FilePathField(path=path, match='^.*?\.py$')
         f.choices.sort()
         expected = [
@@ -1338,7 +1335,7 @@ class FieldsTests(SimpleTestCase):
             self.assertTrue(got[0].endswith(exp[0]))
 
     def test_filepathfield_4(self):
-        path = os.path.abspath(upath(forms.__file__))
+        path = os.path.abspath(forms.__file__)
         path = os.path.dirname(path) + '/'
         f = FilePathField(path=path, recursive=True, match='^.*?\.py$')
         f.choices.sort()
@@ -1358,7 +1355,7 @@ class FieldsTests(SimpleTestCase):
             self.assertTrue(got[0].endswith(exp[0]))
 
     def test_filepathfield_folders(self):
-        path = os.path.dirname(upath(__file__)) + '/filepath_test_files/'
+        path = os.path.dirname(__file__) + '/filepath_test_files/'
         f = FilePathField(path=path, allow_folders=True, allow_files=False)
         f.choices.sort()
         expected = [

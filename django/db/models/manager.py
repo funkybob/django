@@ -5,7 +5,6 @@ from importlib import import_module
 from django.db import router
 from django.db.models.query import QuerySet
 from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
 
 
 def ensure_default_manager(cls):
@@ -50,7 +49,6 @@ def ensure_default_manager(cls):
             )
 
 
-@python_2_unicode_compatible
 class BaseManager(object):
     # Tracks each time a Manager instance is created. Used to retain order.
     creation_counter = 0

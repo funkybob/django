@@ -8,7 +8,6 @@ from threading import local
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import six
-from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
@@ -110,7 +109,7 @@ def load_backend(backend_name):
     except ImportError as e_user:
         # The database backend wasn't found. Display a helpful error message
         # listing all possible (built-in) database backends.
-        backend_dir = os.path.join(os.path.dirname(upath(__file__)), 'backends')
+        backend_dir = os.path.join(os.path.dirname(__file__), 'backends')
         try:
             builtin_backends = [
                 name for _, name, ispkg in pkgutil.iter_modules([backend_dir])

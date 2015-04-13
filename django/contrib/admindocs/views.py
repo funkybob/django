@@ -18,9 +18,8 @@ from django.template.base import (
 )
 from django.template.engine import Engine
 from django.utils import six
-from django.utils._os import upath
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 
 # Exclude methods starting with these strings from documentation
@@ -332,7 +331,7 @@ def load_all_installed_template_libraries():
         try:
             libraries = [
                 os.path.splitext(p)[0]
-                for p in os.listdir(os.path.dirname(upath(mod.__file__)))
+                for p in os.listdir(os.path.dirname(mod.__file__))
                 if p.endswith('.py') and p[0].isalpha()
             ]
         except OSError:

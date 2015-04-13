@@ -1,7 +1,5 @@
 from django.apps import apps
 from django.db import DEFAULT_DB_ALIAS, router
-from django.utils import six
-from django.utils.six.moves import input
 
 
 def update_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, **kwargs):
@@ -38,7 +36,7 @@ def update_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT
     }
     to_remove = [
         ct
-        for (model_name, ct) in six.iteritems(content_types)
+        for (model_name, ct) in content_types.items()
         if model_name not in app_models
     ]
 
@@ -47,7 +45,7 @@ def update_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT
             app_label=app_label,
             model=model_name,
         )
-        for (model_name, model) in six.iteritems(app_models)
+        for (model_name, model) in app_models.items()
         if model_name not in content_types
     ]
     ContentType.objects.using(using).bulk_create(cts)

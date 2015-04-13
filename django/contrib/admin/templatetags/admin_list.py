@@ -20,7 +20,7 @@ from django.utils.encoding import force_text
 from django.utils.html import escapejs, format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 register = Library()
 

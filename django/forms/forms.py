@@ -12,13 +12,10 @@ from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.forms.fields import Field, FileField
 from django.forms.utils import ErrorDict, ErrorList, flatatt
 from django.forms.widgets import Media, MediaDefiningClass, Textarea, TextInput
-from django.utils import six
-from django.utils.encoding import (
-    force_text, python_2_unicode_compatible, smart_text,
-)
+from django.utils.encoding import force_text, smart_text
 from django.utils.html import conditional_escape, format_html, html_safe
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 __all__ = ('BaseForm', 'Form')
 
@@ -68,7 +65,6 @@ class DeclarativeFieldsMetaclass(MediaDefiningClass):
 
 
 @html_safe
-@python_2_unicode_compatible
 class BaseForm(object):
     # This is the main implementation of all the Form logic. Note that this
     # class is different than Form. See the comments by the Form class for more
@@ -197,7 +193,7 @@ class BaseForm(object):
                     top_errors.extend(
                         [_('(Hidden field %(name)s) %(error)s') % {'name': name, 'error': force_text(e)}
                          for e in bf_errors])
-                hidden_fields.append(six.text_type(bf))
+                hidden_fields.append(str(bf))
             else:
                 # Create a 'class="..."' attribute if the row should have any
                 # CSS classes applied.
@@ -222,7 +218,7 @@ class BaseForm(object):
                 output.append(normal_row % {
                     'errors': force_text(bf_errors),
                     'label': force_text(label),
-                    'field': six.text_type(bf),
+                    'field': str(bf),
                     'help_text': help_text,
                     'html_class_attr': html_class_attr,
                     'field_name': bf.html_name,
@@ -493,7 +489,7 @@ class BaseForm(object):
         return [field for field in self if not field.is_hidden]
 
 
-class Form(six.with_metaclass(DeclarativeFieldsMetaclass, BaseForm)):
+class Form(BaseForm, metaclass=DeclarativeFieldsMetaclass):
     "A collection of Fields, plus their associated data."
     # This is a separate class from BaseForm in order to abstract the way
     # self.fields is specified. This class (Form) is the one that does the
@@ -503,7 +499,6 @@ class Form(six.with_metaclass(DeclarativeFieldsMetaclass, BaseForm)):
 
 
 @html_safe
-@python_2_unicode_compatible
 class BoundField(object):
     "A Field plus data"
     def __init__(self, form, field, name):
@@ -544,7 +539,7 @@ class BoundField(object):
     def __getitem__(self, idx):
         # Prevent unnecessary reevaluation when accessing BoundField's attrs
         # from templates.
-        if not isinstance(idx, six.integer_types):
+        if not isinstance(idx, int):
             raise TypeError
         return list(self.__iter__())[idx]
 

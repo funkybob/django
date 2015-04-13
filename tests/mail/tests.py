@@ -8,7 +8,10 @@ import smtpd
 import sys
 import tempfile
 import threading
+from email import message_from_bytes, message_from_binary_file
 from email.mime.text import MIMEText
+from email.utils import parseaddr
+from io import StringIO
 from smtplib import SMTP, SMTPException
 from ssl import SSLError
 
@@ -21,16 +24,7 @@ from django.core.mail.backends import console, dummy, filebased, locmem, smtp
 from django.core.mail.message import BadHeaderError
 from django.test import SimpleTestCase, override_settings
 from django.utils.encoding import force_bytes, force_text
-from django.utils.six import PY3, StringIO, binary_type
-from django.utils.translation import ugettext_lazy
-
-if PY3:
-    from email.utils import parseaddr
-    from email import message_from_bytes, message_from_binary_file
-else:
-    from email.Utils import parseaddr
-    from email import (message_from_string as message_from_bytes,
-        message_from_file as message_from_binary_file)
+from django.utils.translation import gettext_lazy
 
 
 class HeadersCheckMixin(object):
@@ -43,7 +37,7 @@ class HeadersCheckMixin(object):
         string with the contents of an email message.
         :param headers: should be a set of (header-name, header-value) tuples.
         """
-        if isinstance(message, binary_type):
+        if isinstance(message, bytes):
             message = message_from_bytes(message)
         msg_headers = set(message.items())
         self.assertTrue(headers.issubset(msg_headers), msg='Message is missing '
@@ -124,7 +118,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
     def test_header_injection(self):
         email = EmailMessage('Subject\nInjection Test', 'Content', 'from@example.com', ['to@example.com'])
         self.assertRaises(BadHeaderError, email.message)
-        email = EmailMessage(ugettext_lazy('Subject\nInjection Test'), 'Content', 'from@example.com', ['to@example.com'])
+        email = EmailMessage(gettext_lazy('Subject\nInjection Test'), 'Content', 'from@example.com', ['to@example.com'])
         self.assertRaises(BadHeaderError, email.message)
 
     def test_space_continuation(self):
@@ -598,12 +592,12 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
         String prefix + lazy translated subject = bad output
         Regression for #13494
         """
-        mail_managers(ugettext_lazy('Subject'), 'Content')
+        mail_managers(gettext_lazy('Subject'), 'Content')
         message = self.get_the_message()
         self.assertEqual(message.get('subject'), '[Django] Subject')
 
         self.flush_mailbox()
-        mail_admins(ugettext_lazy('Subject'), 'Content')
+        mail_admins(gettext_lazy('Subject'), 'Content')
         message = self.get_the_message()
         self.assertEqual(message.get('subject'), '[Django] Subject')
 
@@ -669,7 +663,7 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
         """
         Email sending should support lazy email addresses (#24416).
         """
-        _ = ugettext_lazy
+        _ = gettext_lazy
         self.assertTrue(send_mail('Subject', 'Content', _('tester'), [_('django')]))
         message = self.get_the_message()
         self.assertEqual(message.get('from'), 'tester')
@@ -875,8 +869,7 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
         self.sink_lock = threading.Lock()
 
     def process_message(self, peer, mailfrom, rcpttos, data):
-        if PY3:
-            data = data.encode('utf-8')
+        data = data.encode('utf-8')
         m = message_from_bytes(data)
         maddr = parseaddr(m.get('from'))[1]
         if mailfrom != maddr:
@@ -1117,8 +1110,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
 
             self.assertTrue(msg)
 
-            if PY3:
-                msg = msg.decode('utf-8')
+            msg = msg.decode('utf-8')
             # Ensure that the message only contains CRLF and not combinations of CRLF, LF, and CR.
             msg = msg.replace('\r\n', '')
             self.assertNotIn('\r', msg)

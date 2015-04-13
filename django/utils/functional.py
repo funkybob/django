@@ -1,10 +1,8 @@
 import copy
+import copyreg
 import operator
 import sys
-from functools import wraps
-
-from django.utils import six
-from django.utils.six.moves import copyreg
+from functools import wraps, total_ordering
 
 
 # You can't trivially replace this with `functools.partial` because this binds
@@ -87,20 +85,13 @@ def lazy(func, *resultclasses):
                         meth = cls.__promise__(method_name)
                         setattr(cls, method_name, meth)
             cls._delegate_bytes = bytes in resultclasses
-            cls._delegate_text = six.text_type in resultclasses
+            cls._delegate_text = str in resultclasses
             assert not (cls._delegate_bytes and cls._delegate_text), (
                 "Cannot call lazy() with both bytes and text return types.")
             if cls._delegate_text:
-                if six.PY3:
-                    cls.__str__ = cls.__text_cast
-                else:
-                    cls.__unicode__ = cls.__text_cast
-                    cls.__str__ = cls.__bytes_cast_encoded
+                cls.__str__ = cls.__text_cast
             elif cls._delegate_bytes:
-                if six.PY3:
-                    cls.__bytes__ = cls.__bytes_cast
-                else:
-                    cls.__str__ = cls.__bytes_cast
+                cls.__bytes__ = cls.__bytes_cast
 
         @classmethod
         def __promise__(cls, method_name):
@@ -148,10 +139,8 @@ def lazy(func, *resultclasses):
             return hash(self.__cast())
 
         def __mod__(self, rhs):
-            if self._delegate_bytes and six.PY2:
-                return bytes(self) % rhs
-            elif self._delegate_text:
-                return six.text_type(self) % rhs
+            if self._delegate_text:
+                return str(self) % rhs
             return self.__cast() % rhs
 
         def __deepcopy__(self, memo):
@@ -184,7 +173,7 @@ def allow_lazy(func, *resultclasses):
 
     @wraps(func)
     def wrapper(*args, **kwargs):
-        for arg in list(args) + list(six.itervalues(kwargs)):
+        for arg in list(args) + list(kwargs.values()):
             if isinstance(arg, Promise):
                 break
         else:
@@ -279,14 +268,9 @@ class LazyObject(object):
             return result
         return copy.deepcopy(self._wrapped, memo)
 
-    if six.PY3:
-        __bytes__ = new_method_proxy(bytes)
-        __str__ = new_method_proxy(str)
-        __bool__ = new_method_proxy(bool)
-    else:
-        __str__ = new_method_proxy(str)
-        __unicode__ = new_method_proxy(unicode)
-        __nonzero__ = new_method_proxy(bool)
+    __bytes__ = new_method_proxy(bytes)
+    __str__ = new_method_proxy(str)
+    __bool__ = new_method_proxy(bool)
 
     # Introspection support
     __dir__ = new_method_proxy(dir)
@@ -385,36 +369,3 @@ def partition(predicate, values):
     for item in values:
         results[predicate(item)].append(item)
     return results
-
-if sys.version_info >= (2, 7, 2):
-    from functools import total_ordering
-else:
-    # For Python < 2.7.2. total_ordering in versions prior to 2.7.2 is buggy.
-    # See http://bugs.python.org/issue10042 for details. For these versions use
-    # code borrowed from Python 2.7.3.
-    def total_ordering(cls):
-        """Class decorator that fills in missing ordering methods"""
-        convert = {
-            '__lt__': [('__gt__', lambda self, other: not (self < other or self == other)),
-                       ('__le__', lambda self, other: self < other or self == other),
-                       ('__ge__', lambda self, other: not self < other)],
-            '__le__': [('__ge__', lambda self, other: not self <= other or self == other),
-                       ('__lt__', lambda self, other: self <= other and not self == other),
-                       ('__gt__', lambda self, other: not self <= other)],
-            '__gt__': [('__lt__', lambda self, other: not (self > other or self == other)),
-                       ('__ge__', lambda self, other: self > other or self == other),
-                       ('__le__', lambda self, other: not self > other)],
-            '__ge__': [('__le__', lambda self, other: (not self >= other) or self == other),
-                       ('__gt__', lambda self, other: self >= other and not self == other),
-                       ('__lt__', lambda self, other: not self >= other)]
-        }
-        roots = set(dir(cls)) & set(convert)
-        if not roots:
-            raise ValueError('must define at least one ordering operation: < > <= >=')
-        root = max(roots)       # prefer __lt__ to __le__ to __gt__ to __ge__
-        for opname, opfunc in convert[root]:
-            if opname not in roots:
-                opfunc.__name__ = opname
-                opfunc.__doc__ = getattr(int, opname).__doc__
-                setattr(cls, opname, opfunc)
-        return cls

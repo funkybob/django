@@ -7,7 +7,8 @@ import re
 import shutil
 import time
 import warnings
-from unittest import SkipTest, skipUnless
+from io import StringIO
+from unittest import SkipTest, skipUnless, mock
 
 from django.conf import settings
 from django.core import management
@@ -16,17 +17,14 @@ from django.core.management.base import CommandError
 from django.core.management.commands.makemessages import \
     Command as MakeMessagesCommand
 from django.core.management.utils import find_command
-from django.test import SimpleTestCase, mock, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
-from django.utils import six
-from django.utils._os import upath
 from django.utils.encoding import force_text
-from django.utils.six import StringIO
 from django.utils.translation import TranslatorCommentWarning
 
 LOCALE = 'de'
 has_xgettext = find_command('xgettext')
-this_directory = os.path.dirname(upath(__file__))
+this_directory = os.path.dirname(__file__)
 
 
 @skipUnless(has_xgettext, 'xgettext is mandatory for extraction tests')
@@ -220,8 +218,8 @@ class BasicExtractorTests(ExtractorTests):
         self.assertRaises(SyntaxError, management.call_command, 'makemessages', locale=[LOCALE], extensions=['tpl'], verbosity=0)
         with self.assertRaises(SyntaxError) as context_manager:
             management.call_command('makemessages', locale=[LOCALE], extensions=['tpl'], verbosity=0)
-        six.assertRegex(
-            self, str(context_manager.exception),
+        self.assertRegex(
+            str(context_manager.exception),
             r'Translation blocks must not include other block tags: blocktrans \(file templates[/\\]template_with_error\.tpl, line 3\)'
         )
         # Check that the temporary file was cleaned up
@@ -301,16 +299,16 @@ class BasicExtractorTests(ExtractorTests):
             self.assertEqual(len(ws), 3)
             for w in ws:
                 self.assertTrue(issubclass(w.category, TranslatorCommentWarning))
-            six.assertRegex(
-                self, str(ws[0].message),
+            self.assertRegex(
+                str(ws[0].message),
                 r"The translator-targeted comment 'Translators: ignored i18n comment #1' \(file templates[/\\]comments.thtml, line 4\) was ignored, because it wasn't the last item on the line\."
             )
-            six.assertRegex(
-                self, str(ws[1].message),
+            self.assertRegex(
+                str(ws[1].message),
                 r"The translator-targeted comment 'Translators: ignored i18n comment #3' \(file templates[/\\]comments.thtml, line 6\) was ignored, because it wasn't the last item on the line\."
             )
-            six.assertRegex(
-                self, str(ws[2].message),
+            self.assertRegex(
+                str(ws[2].message),
                 r"The translator-targeted comment 'Translators: ignored i18n comment #4' \(file templates[/\\]comments.thtml, line 8\) was ignored, because it wasn't the last item on the line\."
             )
         # Now test .po file contents
@@ -346,8 +344,8 @@ class BasicExtractorTests(ExtractorTests):
             self.assertIn('#. Translators: valid i18n comment #7', po_contents)
             self.assertMsgId('Translatable literal #9i', po_contents)
 
-            six.assertRegex(self, po_contents, r'#\..+Translators: valid i18n comment #8')
-            six.assertRegex(self, po_contents, r'#\..+Translators: valid i18n comment #9')
+            self.assertRegex(po_contents, r'#\..+Translators: valid i18n comment #8')
+            self.assertRegex(po_contents, r'#\..+Translators: valid i18n comment #9')
             self.assertMsgId("Translatable literal #9j", po_contents)
 
     def test_makemessages_find_files(self):
@@ -395,7 +393,7 @@ class BasicExtractorTests(ExtractorTests):
         mocked_popen_wrapper.return_value = (
             "any other return value\n", '', 0)
         cmd = MakeMessagesCommand()
-        with six.assertRaisesRegex(self, CommandError, "Unable to get gettext version. Is it installed?"):
+        with self.assertRaisesRegex(CommandError, "Unable to get gettext version. Is it installed?"):
             cmd.gettext_version
 
     def test_po_file_encoding_when_updating(self):
@@ -716,7 +714,7 @@ class CustomLayoutExtractionTests(ExtractorTests):
 
     def test_no_locale_raises(self):
         os.chdir(self.test_dir)
-        with six.assertRaisesRegex(self, management.CommandError,
+        with self.assertRaisesRegex(management.CommandError,
                 "Unable to find a locale path to store translations for file"):
             management.call_command('makemessages', locale=LOCALE, verbosity=0)
 

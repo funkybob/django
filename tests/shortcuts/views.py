@@ -2,9 +2,8 @@ import os.path
 
 from django.shortcuts import render, render_to_response
 from django.template import Context, RequestContext
-from django.utils._os import upath
 
-dirs = (os.path.join(os.path.dirname(upath(__file__)), 'other_templates'),)
+dirs = (os.path.join(os.path.dirname(__file__), 'other_templates'),)
 
 
 def render_to_response_view(request):

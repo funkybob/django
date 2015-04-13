@@ -7,7 +7,6 @@ import threading
 
 from django.db import models
 from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class DumbCategory(models.Model):
@@ -19,7 +18,6 @@ class ProxyCategory(DumbCategory):
         proxy = True
 
 
-@python_2_unicode_compatible
 class NamedCategory(DumbCategory):
     name = models.CharField(max_length=10)
 
@@ -27,7 +25,6 @@ class NamedCategory(DumbCategory):
         return self.name
 
 
-@python_2_unicode_compatible
 class Tag(models.Model):
     name = models.CharField(max_length=10)
     parent = models.ForeignKey('self', blank=True, null=True,
@@ -41,7 +38,6 @@ class Tag(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Note(models.Model):
     note = models.CharField(max_length=100)
     misc = models.CharField(max_length=10)
@@ -60,7 +56,6 @@ class Note(models.Model):
         self.lock = threading.Lock()
 
 
-@python_2_unicode_compatible
 class Annotation(models.Model):
     name = models.CharField(max_length=10)
     tag = models.ForeignKey(Tag)
@@ -70,7 +65,6 @@ class Annotation(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class ExtraInfo(models.Model):
     info = models.CharField(max_length=100)
     note = models.ForeignKey(Note)
@@ -83,7 +77,6 @@ class ExtraInfo(models.Model):
         return self.info
 
 
-@python_2_unicode_compatible
 class Author(models.Model):
     name = models.CharField(max_length=10)
     num = models.IntegerField(unique=True)
@@ -96,7 +89,6 @@ class Author(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Item(models.Model):
     name = models.CharField(max_length=10)
     created = models.DateTimeField()
@@ -112,7 +104,6 @@ class Item(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Report(models.Model):
     name = models.CharField(max_length=10)
     creator = models.ForeignKey(Author, to_field='num', null=True)
@@ -121,7 +112,6 @@ class Report(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Ranking(models.Model):
     rank = models.IntegerField()
     author = models.ForeignKey(Author)
@@ -134,7 +124,6 @@ class Ranking(models.Model):
         return '%d: %s' % (self.rank, self.author.name)
 
 
-@python_2_unicode_compatible
 class Cover(models.Model):
     title = models.CharField(max_length=50)
     item = models.ForeignKey(Item)
@@ -146,7 +135,6 @@ class Cover(models.Model):
         return self.title
 
 
-@python_2_unicode_compatible
 class Number(models.Model):
     num = models.IntegerField()
 
@@ -209,7 +197,6 @@ class CustomManager(models.Manager):
         return qs.filter(public=True, tag__name='t1')
 
 
-@python_2_unicode_compatible
 class ManagedModel(models.Model):
     data = models.CharField(max_length=10)
     tag = models.ForeignKey(Tag)
@@ -268,7 +255,6 @@ class CustomPkTag(models.Model):
 # path to another model, and a return path from that model.
 
 
-@python_2_unicode_compatible
 class Celebrity(models.Model):
     name = models.CharField("Name", max_length=20)
     greatest_fan = models.ForeignKey("Fan", null=True, unique=True)
@@ -287,7 +273,6 @@ class Fan(models.Model):
 # Multiple foreign keys
 
 
-@python_2_unicode_compatible
 class LeafA(models.Model):
     data = models.CharField(max_length=10)
 
@@ -304,7 +289,6 @@ class Join(models.Model):
     b = models.ForeignKey(LeafB)
 
 
-@python_2_unicode_compatible
 class ReservedName(models.Model):
     name = models.CharField(max_length=20)
     order = models.IntegerField()
@@ -315,7 +299,6 @@ class ReservedName(models.Model):
 # A simpler shared-foreign-key setup that can expose some problems.
 
 
-@python_2_unicode_compatible
 class SharedConnection(models.Model):
     data = models.CharField(max_length=10)
 
@@ -333,7 +316,6 @@ class PointerB(models.Model):
 # Multi-layer ordering
 
 
-@python_2_unicode_compatible
 class SingleObject(models.Model):
     name = models.CharField(max_length=10)
 
@@ -352,7 +334,6 @@ class RelatedObject(models.Model):
         ordering = ['single']
 
 
-@python_2_unicode_compatible
 class Plaything(models.Model):
     name = models.CharField(max_length=10)
     others = models.ForeignKey(RelatedObject, null=True)
@@ -364,7 +345,6 @@ class Plaything(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Article(models.Model):
     name = models.CharField(max_length=20)
     created = models.DateTimeField()
@@ -373,7 +353,6 @@ class Article(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Food(models.Model):
     name = models.CharField(max_length=20, unique=True)
 
@@ -381,7 +360,6 @@ class Food(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Eaten(models.Model):
     food = models.ForeignKey(Food, to_field="name", null=True)
     meal = models.CharField(max_length=20)
@@ -390,7 +368,6 @@ class Eaten(models.Model):
         return "%s at %s" % (self.food, self.meal)
 
 
-@python_2_unicode_compatible
 class Node(models.Model):
     num = models.IntegerField(unique=True)
     parent = models.ForeignKey("self", to_field="num", null=True)
@@ -401,7 +378,6 @@ class Node(models.Model):
 # Bug #12252
 
 
-@python_2_unicode_compatible
 class ObjectA(models.Model):
     name = models.CharField(max_length=50)
 
@@ -422,7 +398,6 @@ class ChildObjectA(ObjectA):
     pass
 
 
-@python_2_unicode_compatible
 class ObjectB(models.Model):
     name = models.CharField(max_length=50)
     objecta = models.ForeignKey(ObjectA)
@@ -437,7 +412,6 @@ class ProxyObjectB(ObjectB):
         proxy = True
 
 
-@python_2_unicode_compatible
 class ObjectC(models.Model):
     name = models.CharField(max_length=50)
     objecta = models.ForeignKey(ObjectA, null=True)
@@ -448,7 +422,6 @@ class ObjectC(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class SimpleCategory(models.Model):
     name = models.CharField(max_length=15)
 
@@ -456,7 +429,6 @@ class SimpleCategory(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class SpecialCategory(SimpleCategory):
     special_name = models.CharField(max_length=15)
 
@@ -464,7 +436,6 @@ class SpecialCategory(SimpleCategory):
         return self.name + " " + self.special_name
 
 
-@python_2_unicode_compatible
 class CategoryItem(models.Model):
     category = models.ForeignKey(SimpleCategory)
 
@@ -472,7 +443,6 @@ class CategoryItem(models.Model):
         return "category item: " + str(self.category)
 
 
-@python_2_unicode_compatible
 class OneToOneCategory(models.Model):
     new_name = models.CharField(max_length=15)
     category = models.OneToOneField(SimpleCategory)
@@ -512,7 +482,6 @@ class ModelA(models.Model):
     d = models.ForeignKey(ModelD)
 
 
-@python_2_unicode_compatible
 class Job(models.Model):
     name = models.CharField(max_length=20, unique=True)
 
@@ -525,7 +494,6 @@ class JobResponsibilities(models.Model):
     responsibility = models.ForeignKey('Responsibility', to_field='description')
 
 
-@python_2_unicode_compatible
 class Responsibility(models.Model):
     description = models.CharField(max_length=20, unique=True)
     jobs = models.ManyToManyField(Job, through=JobResponsibilities,
@@ -558,7 +526,6 @@ class BaseA(models.Model):
     c = models.ForeignKey(FK3, null=True)
 
 
-@python_2_unicode_compatible
 class Identifier(models.Model):
     name = models.CharField(max_length=100)
 
@@ -602,7 +569,6 @@ class MyObject(models.Model):
 # Models for #17600 regressions
 
 
-@python_2_unicode_compatible
 class Order(models.Model):
     id = models.IntegerField(primary_key=True)
 
@@ -613,7 +579,6 @@ class Order(models.Model):
         return '%s' % self.pk
 
 
-@python_2_unicode_compatible
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name='items')
     status = models.IntegerField()
@@ -629,7 +594,6 @@ class BaseUser(models.Model):
     pass
 
 
-@python_2_unicode_compatible
 class Task(models.Model):
     title = models.CharField(max_length=10)
     owner = models.ForeignKey(BaseUser, related_name='owner')
@@ -639,7 +603,6 @@ class Task(models.Model):
         return self.title
 
 
-@python_2_unicode_compatible
 class Staff(models.Model):
     name = models.CharField(max_length=10)
 
@@ -647,7 +610,6 @@ class Staff(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class StaffUser(BaseUser):
     staff = models.OneToOneField(Staff, related_name='user')
 
@@ -670,7 +632,6 @@ class Person(models.Model):
     name = models.CharField(max_length=128)
 
 
-@python_2_unicode_compatible
 class Company(models.Model):
     name = models.CharField(max_length=128)
     employees = models.ManyToManyField(Person, related_name='employers', through='Employment')

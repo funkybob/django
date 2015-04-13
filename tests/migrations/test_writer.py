@@ -10,6 +10,7 @@ import unittest
 
 import custom_migration_operations.more_operations
 import custom_migration_operations.operations
+from io import StringIO
 
 from django.conf import settings
 from django.core.validators import EmailValidator, RegexValidator
@@ -18,11 +19,10 @@ from django.db.migrations.writer import (
     MigrationWriter, OperationWriter, SettingsReference,
 )
 from django.test import SimpleTestCase, TestCase, ignore_warnings
-from django.utils import datetime_safe, six
-from django.utils._os import upath
+from django.utils import datetime_safe
 from django.utils.deconstruct import deconstructible
 from django.utils.timezone import FixedOffset, get_default_timezone, utc
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from .models import FoodManager, FoodQuerySet
 
@@ -228,7 +228,7 @@ class WriterTests(TestCase):
         )
 
     def test_serialize_functions(self):
-        with six.assertRaisesRegex(self, ValueError, 'Cannot serialize function: lambda'):
+        with self.assertRaisesRegex(ValueError, 'Cannot serialize function: lambda'):
             self.assertSerializedEqual(lambda x: 42)
         self.assertSerializedEqual(models.SET_NULL)
         string, imports = MigrationWriter.serialize(models.SET(42))
@@ -340,7 +340,7 @@ class WriterTests(TestCase):
         self.assertEqual(string, "migrations.test_writer.EmailValidator(message='hello')")
 
         validator = deconstructible(path="custom.EmailValidator")(EmailValidator)(message="hello")
-        with six.assertRaisesRegex(self, ImportError, "No module named '?custom'?"):
+        with self.assertRaisesRegex(ImportError, "No module named '?custom'?"):
             MigrationWriter.serialize(validator)
 
         validator = deconstructible(path="django.core.validators.EmailValidator2")(EmailValidator)(message="hello")
@@ -358,15 +358,6 @@ class WriterTests(TestCase):
         self.assertSerializedEqual(empty_tuple)
         self.assertSerializedEqual(one_item_tuple)
         self.assertSerializedEqual(many_items_tuple)
-
-    @unittest.skipUnless(six.PY2, "Only applies on Python 2")
-    def test_serialize_direct_function_reference(self):
-        """
-        Ticket #22436: You cannot use a function straight from its body
-        (e.g. define the method and use it in the same body)
-        """
-        with self.assertRaises(ValueError):
-            self.serialize_round_trip(TestModel1.thing)
 
     def test_serialize_local_function_reference(self):
         """
@@ -388,7 +379,7 @@ class WriterTests(TestCase):
                 return "somewhere dynamic"
             thing = models.FileField(upload_to=upload_to)
 
-        with six.assertRaisesRegex(self, ValueError,
+        with self.assertRaisesRegex(ValueError,
                 '^Could not find function upload_to in migrations.test_writer'):
             self.serialize_round_trip(TestModel2.thing)
 
@@ -436,14 +427,14 @@ class WriterTests(TestCase):
         writer = MigrationWriter(migration)
         output = writer.as_string()
         # It should NOT be unicode.
-        self.assertIsInstance(output, six.binary_type, "Migration as_string returned unicode")
+        self.assertIsInstance(output, bytes, "Migration as_string returned unicode")
         # We don't test the output formatting - that's too fragile.
         # Just make sure it runs for now, and that things look alright.
         result = self.safe_exec(output)
         self.assertIn("Migration", result)
         # In order to preserve compatibility with Python 3.2 unicode literals
         # prefix shouldn't be added to strings.
-        tokens = tokenize.generate_tokens(six.StringIO(str(output)).readline)
+        tokens = tokenize.generate_tokens(StringIO(str(output)).readline)
         for token_type, token_source, (srow, scol), __, line in tokens:
             if token_type == tokenize.STRING:
                 self.assertFalse(
@@ -464,7 +455,7 @@ class WriterTests(TestCase):
             'migrations.migrations_test_apps.without_init_file',
         ]
 
-        base_dir = os.path.dirname(os.path.dirname(upath(__file__)))
+        base_dir = os.path.dirname(os.path.dirname(__file__))
 
         for app in test_apps:
             with self.modify_settings(INSTALLED_APPS={'append': app}):

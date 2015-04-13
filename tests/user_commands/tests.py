@@ -1,4 +1,5 @@
 import os
+from io import StringIO
 
 from django.apps import apps
 from django.core import management
@@ -8,9 +9,7 @@ from django.db import connection
 from django.test import SimpleTestCase, ignore_warnings, override_settings
 from django.test.utils import captured_stderr, captured_stdout, extend_sys_path
 from django.utils import translation
-from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.six import StringIO
 
 
 # A minimal set of apps to avoid system checks running on all apps.
@@ -86,7 +85,7 @@ class CommandTests(SimpleTestCase):
         """
         Test that management commands can also be loaded from Python eggs.
         """
-        egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
+        egg_dir = '%s/eggs' % os.path.dirname(__file__)
         egg_name = '%s/basic.egg' % egg_dir
         with extend_sys_path(egg_name):
             with self.settings(INSTALLED_APPS=['commandegg']):

@@ -6,7 +6,6 @@ from django import conf
 from django.contrib import admin
 from django.test import TestCase, override_settings
 from django.test.utils import extend_sys_path
-from django.utils._os import npath, upath
 from django.utils.autoreload import gen_filenames
 
 LOCALE_PATH = os.path.join(os.path.dirname(__file__), 'locale')
@@ -60,7 +59,7 @@ class TestFilenameGenerator(TestCase):
         """
         filenames = list(gen_filenames())
         self.assertIn(
-            os.path.join(os.path.dirname(upath(admin.__file__)), 'locale', 'nl', 'LC_MESSAGES', 'django.mo'),
+            os.path.join(os.path.dirname(admin.__file__), 'locale', 'nl', 'LC_MESSAGES', 'django.mo'),
             filenames
         )
 
@@ -72,7 +71,7 @@ class TestFilenameGenerator(TestCase):
         """
         filenames = list(gen_filenames())
         self.assertNotIn(
-            os.path.join(os.path.dirname(upath(conf.__file__)), 'locale', 'nl', 'LC_MESSAGES', 'django.mo'),
+            os.path.join(os.path.dirname(conf.__file__), 'locale', 'nl', 'LC_MESSAGES', 'django.mo'),
             filenames
         )
 
@@ -95,6 +94,6 @@ class TestFilenameGenerator(TestCase):
             pass
         with extend_sys_path(dirname):
             import_module('test_deleted_removed_module')
-        self.assertIn(npath(filename), gen_filenames())
+        self.assertIn(filename, gen_filenames())
         os.unlink(filename)
         self.assertNotIn(filename, gen_filenames())

@@ -6,13 +6,12 @@ from django.apps import apps
 from django.test import TestCase
 from django.test.utils import extend_sys_path
 from django.utils import six
-from django.utils._os import upath
 
 
 class EggLoadingTest(TestCase):
 
     def setUp(self):
-        self.egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
+        self.egg_dir = '%s/eggs' % os.path.dirname(__file__)
 
     def tearDown(self):
         apps.clear_cache()

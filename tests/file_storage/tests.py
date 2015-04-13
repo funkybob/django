@@ -11,6 +11,8 @@ import time
 import unittest
 import warnings
 from datetime import datetime, timedelta
+from io import StringIO
+from urllib.request import urlopen
 
 from django.core.cache import cache
 from django.core.exceptions import SuspiciousFileOperation, SuspiciousOperation
@@ -20,9 +22,6 @@ from django.core.files.uploadedfile import (
     InMemoryUploadedFile, SimpleUploadedFile, TemporaryUploadedFile,
 )
 from django.test import LiveServerTestCase, SimpleTestCase, override_settings
-from django.utils import six
-from django.utils._os import upath
-from django.utils.six.moves.urllib.request import urlopen
 
 from .models import Storage, temp_storage, temp_storage_location
 
@@ -43,7 +42,7 @@ class GetStorageClassTests(SimpleTestCase):
         """
         get_storage_class raises an error if the requested import don't exist.
         """
-        with six.assertRaisesRegex(self, ImportError, "No module named '?storage'?"):
+        with self.assertRaisesRegex(ImportError, "No module named '?storage'?"):
             get_storage_class('storage.NonExistingStorage')
 
     def test_get_nonexisting_storage_class(self):
@@ -58,7 +57,7 @@ class GetStorageClassTests(SimpleTestCase):
         get_storage_class raises an error if the requested module don't exist.
         """
         # Error message may or may not be the fully qualified path.
-        with six.assertRaisesRegex(self, ImportError,
+        with self.assertRaisesRegex(ImportError,
                 "No module named '?(django.core.files.)?non_existing_storage'?"):
             get_storage_class(
                 'django.core.files.non_existing_storage.NonExistingStorage')
@@ -102,7 +101,7 @@ class FileStorageTests(unittest.TestCase):
         """
         storage = self.storage_class(location='')
         self.assertEqual(storage.base_location, '')
-        self.assertEqual(storage.location, upath(os.getcwd()))
+        self.assertEqual(storage.location, os.getcwd())
 
     def test_file_access_options(self):
         """
@@ -215,8 +214,8 @@ class FileStorageTests(unittest.TestCase):
             self.assertFalse(file.closed)
             self.assertFalse(file.file.closed)
 
-        file = InMemoryUploadedFile(six.StringIO('1'), '', 'test',
-                                    'text/plain', 1, 'utf8')
+        file = InMemoryUploadedFile(StringIO('1'), '', 'test', 'text/plain', 1,
+                                    'utf8')
         with file:
             self.assertFalse(file.closed)
             self.storage.save('path/to/test.file', file)
@@ -465,7 +464,7 @@ class FileFieldStorageTests(SimpleTestCase):
         obj2 = Storage()
         obj2.normal.save("django_test.txt", ContentFile("more content"))
         obj2_name = obj2.normal.name
-        six.assertRegex(self, obj2_name, "tests/django_test_%s.txt" % FILE_SUFFIX_REGEX)
+        self.assertRegex(obj2_name, "tests/django_test_%s.txt" % FILE_SUFFIX_REGEX)
         self.assertEqual(obj2.normal.size, 12)
         obj2.normal.close()
 
@@ -473,7 +472,7 @@ class FileFieldStorageTests(SimpleTestCase):
         obj2.delete()
         obj2.normal.save("django_test.txt", ContentFile("more content"))
         self.assertNotEqual(obj2_name, obj2.normal.name)
-        six.assertRegex(self, obj2.normal.name, "tests/django_test_%s.txt" % FILE_SUFFIX_REGEX)
+        self.assertRegex(obj2.normal.name, "tests/django_test_%s.txt" % FILE_SUFFIX_REGEX)
         obj2.normal.close()
 
     def test_filefield_read(self):
@@ -494,7 +493,7 @@ class FileFieldStorageTests(SimpleTestCase):
         try:
             names = [o.normal.name for o in objs]
             self.assertEqual(names[0], "tests/multiple_files.txt")
-            six.assertRegex(self, names[1], "tests/multiple_files_%s.txt" % FILE_SUFFIX_REGEX)
+            self.assertRegex(names[1], "tests/multiple_files_%s.txt" % FILE_SUFFIX_REGEX)
         finally:
             for o in objs:
                 o.delete()
@@ -514,7 +513,7 @@ class FileFieldStorageTests(SimpleTestCase):
             # Testing truncation.
             names = [o.limited_length.name for o in objs]
             self.assertEqual(names[0], 'tests/%s' % filename)
-            six.assertRegex(self, names[1], 'tests/fi_%s.ext' % FILE_SUFFIX_REGEX)
+            self.assertRegex(names[1], 'tests/fi_%s.ext' % FILE_SUFFIX_REGEX)
 
             # Testing exception is raised when filename is too short to truncate.
             filename = 'short.longext'
@@ -619,7 +618,7 @@ class FileFieldStorageTests(SimpleTestCase):
 
     def test_stringio(self):
         # Test passing StringIO instance as content argument to save
-        output = six.StringIO()
+        output = StringIO()
         output.write('content')
         output.seek(0)
 
@@ -658,7 +657,7 @@ class FileSaveRaceConditionTest(unittest.TestCase):
         self.thread.join()
         files = sorted(os.listdir(self.storage_dir))
         self.assertEqual(files[0], 'conflict')
-        six.assertRegex(self, files[1], 'conflict_%s' % FILE_SUFFIX_REGEX)
+        self.assertRegex(files[1], 'conflict_%s' % FILE_SUFFIX_REGEX)
 
 
 @unittest.skipIf(sys.platform.startswith('win'), "Windows only partially supports umasks and chmod.")
@@ -722,7 +721,7 @@ class FileStoragePathParsing(unittest.TestCase):
         files = sorted(os.listdir(os.path.join(self.storage_dir, 'dotted.path')))
         self.assertFalse(os.path.exists(os.path.join(self.storage_dir, 'dotted_.path')))
         self.assertEqual(files[0], 'test')
-        six.assertRegex(self, files[1], 'test_%s' % FILE_SUFFIX_REGEX)
+        self.assertRegex(files[1], 'test_%s' % FILE_SUFFIX_REGEX)
 
     def test_first_character_dot(self):
         """
@@ -735,7 +734,7 @@ class FileStoragePathParsing(unittest.TestCase):
         files = sorted(os.listdir(os.path.join(self.storage_dir, 'dotted.path')))
         self.assertFalse(os.path.exists(os.path.join(self.storage_dir, 'dotted_.path')))
         self.assertEqual(files[0], '.test')
-        six.assertRegex(self, files[1], '.test_%s' % FILE_SUFFIX_REGEX)
+        self.assertRegex(files[1], '.test_%s' % FILE_SUFFIX_REGEX)
 
 
 class ContentFileStorageTestCase(unittest.TestCase):

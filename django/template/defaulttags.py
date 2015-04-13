@@ -19,7 +19,7 @@ from django.template.base import (
 )
 from django.template.defaultfilters import date
 from django.template.smartif import IfParser, Literal
-from django.utils import six, timezone
+from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, smart_text
 from django.utils.html import format_html
@@ -497,7 +497,7 @@ class URLNode(Node):
                         # Re-raise the original exception, not the one with
                         # the path relative to the project. This makes a
                         # better error message.
-                        six.reraise(*exc_info)
+                        raise
             else:
                 if self.asvar is None:
                     raise
@@ -564,7 +564,7 @@ class WithNode(Node):
 
     def render(self, context):
         values = {key: val.resolve(context) for key, val in
-                  six.iteritems(self.extra_context)}
+                  self.extra_context.items()}
         with context.push(**values):
             return self.nodelist.render(context)
 

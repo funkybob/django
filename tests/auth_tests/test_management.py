@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import locale
 import sys
 from datetime import date
+from unittest import mock
 
 from django.apps import apps
 from django.contrib.auth import management, models
@@ -20,7 +21,7 @@ from django.core.management.base import CommandError
 from django.test import TestCase, override_settings, override_system_checks
 from django.utils import six
 from django.utils.encoding import force_str
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from .models import (
     CustomUserBadRequiredFields, CustomUserNonListRequiredFields,
@@ -35,13 +36,8 @@ def mock_inputs(inputs):
     """
     def inner(test_func):
         def wrapped(*args):
-            class mock_getpass:
-                @staticmethod
-                def getpass(prompt=b'Password: ', stream=None):
-                    if six.PY2:
-                        # getpass on Windows only supports prompt as bytestring (#19807)
-                        assert isinstance(prompt, six.binary_type)
-                    return inputs['password']
+            def mock_getpass(prompt=b'Password: ', stream=None):
+                return inputs['password']
 
             def mock_input(prompt):
                 # prompt should be encoded in Python 2. This line will raise an
@@ -55,15 +51,10 @@ def mock_inputs(inputs):
                         break
                 return response
 
-            old_getpass = createsuperuser.getpass
-            old_input = createsuperuser.input
-            createsuperuser.getpass = mock_getpass
-            createsuperuser.input = mock_input
-            try:
-                test_func(*args)
-            finally:
-                createsuperuser.getpass = old_getpass
-                createsuperuser.input = old_input
+            with mock.patch('builtins.input', new=mock_input):
+                with mock.patch('getpass.getpass', new=mock_getpass):
+                    test_func(*args)
+
         return wrapped
     return inner
 

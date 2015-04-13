@@ -6,6 +6,7 @@ import io
 import os
 import re
 import sys
+from functools import total_ordering
 from itertools import dropwhile
 
 import django
@@ -14,10 +15,8 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import (
     find_command, handle_extensions, popen_wrapper,
 )
-from django.utils import six
-from django.utils._os import upath
 from django.utils.encoding import DEFAULT_LOCALE_ENCODING, force_str
-from django.utils.functional import cached_property, total_ordering
+from django.utils.functional import cached_property
 from django.utils.jslex import prepare_js_for_gettext
 from django.utils.text import get_text_list
 
@@ -37,15 +36,13 @@ def gettext_popen_wrapper(args, os_err_exc_type=CommandError, stdout_encoding="u
     Makes sure text obtained from stdout of gettext utilities is Unicode.
     """
     stdout, stderr, status_code = popen_wrapper(args, os_err_exc_type=os_err_exc_type)
-    if os.name == 'nt' and six.PY3 and stdout_encoding != DEFAULT_LOCALE_ENCODING:
+    if os.name == 'nt' and stdout_encoding != DEFAULT_LOCALE_ENCODING:
         # This looks weird because it's undoing what
         # subprocess.Popen(universal_newlines=True).communicate()
         # does when capturing PO files contents from stdout of gettext command
         # line programs. No need to do anything on Python 2 because it's
         # already a byte-string there (#23271).
         stdout = stdout.encode(DEFAULT_LOCALE_ENCODING).decode(stdout_encoding)
-    if six.PY2:
-        stdout = stdout.decode(stdout_encoding)
     return stdout, stderr, status_code
 
 
@@ -485,7 +482,7 @@ class Command(BaseCommand):
         the msgs string, inserting it at the right place. msgs should be the
         contents of a newly created .po file.
         """
-        django_dir = os.path.normpath(os.path.join(os.path.dirname(upath(django.__file__))))
+        django_dir = os.path.normpath(os.path.join(os.path.dirname(django.__file__)))
         if self.domain == 'djangojs':
             domains = ('djangojs', 'django')
         else:

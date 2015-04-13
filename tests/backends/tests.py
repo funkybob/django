@@ -9,6 +9,7 @@ import threading
 import unittest
 import warnings
 from decimal import Decimal, Rounded
+from unittest import mock
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -25,12 +26,10 @@ from django.db.models import Avg, StdDev, Sum, Variance
 from django.db.models.sql.constants import CURSOR
 from django.db.utils import ConnectionHandler
 from django.test import (
-    TestCase, TransactionTestCase, mock, override_settings, skipIfDBFeature,
+    TestCase, TransactionTestCase, override_settings, skipIfDBFeature,
     skipUnlessDBFeature,
 )
 from django.test.utils import str_prefix
-from django.utils import six
-from django.utils.six.moves import range
 
 from . import models
 
@@ -82,7 +81,7 @@ class OracleTests(unittest.TestCase):
         # than 4000 chars and read it properly
         with connection.cursor() as cursor:
             cursor.execute('CREATE TABLE ltext ("TEXT" NCLOB)')
-            long_str = ''.join(six.text_type(x) for x in range(4000))
+            long_str = ''.join(str(x) for x in range(4000))
             cursor.execute('INSERT INTO ltext VALUES (%s)', [long_str])
             cursor.execute('SELECT text FROM ltext')
             row = cursor.fetchone()
@@ -357,7 +356,7 @@ class LastExecutedQueryTest(TestCase):
         sql, params = data.query.sql_with_params()
         cursor = data.query.get_compiler('default').execute_sql(CURSOR)
         last_sql = cursor.db.ops.last_executed_query(cursor, sql, params)
-        self.assertIsInstance(last_sql, six.text_type)
+        self.assertIsInstance(last_sql, str)
 
     @unittest.skipUnless(connection.vendor == 'sqlite',
                          "This test is specific to SQLite.")
@@ -705,7 +704,7 @@ class BackendTestCase(TransactionTestCase):
 
         self.assertIsInstance(connection.queries, list)
         self.assertIsInstance(connection.queries[0], dict)
-        six.assertCountEqual(self, connection.queries[0].keys(), ['sql', 'time'])
+        self.assertCountEqual(connection.queries[0].keys(), ['sql', 'time'])
 
         reset_queries()
         self.assertEqual(0, len(connection.queries))

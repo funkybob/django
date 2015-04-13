@@ -1,9 +1,7 @@
 from django.db import models
 from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Site(models.Model):
     domain = models.CharField(max_length=100)
 
@@ -28,7 +26,6 @@ class Article(models.Model):
     test_from_model_with_override.short_description = "not What you Expect"
 
 
-@python_2_unicode_compatible
 class Count(models.Model):
     num = models.PositiveSmallIntegerField()
     parent = models.ForeignKey('self', null=True)

@@ -13,16 +13,12 @@ def ngettext(singular, plural, number):
 ngettext_lazy = ngettext
 
 
-def ungettext(singular, plural, number):
-    return force_text(ngettext(singular, plural, number))
-
-
 def pgettext(context, message):
-    return ugettext(message)
+    return gettext(message)
 
 
 def npgettext(context, singular, plural, number):
-    return ungettext(singular, plural, number)
+    return ngettext(singular, plural, number)
 
 activate = lambda x: None
 deactivate = deactivate_all = lambda: None
@@ -34,9 +30,6 @@ check_for_language = lambda x: True
 def gettext(message):
     return message
 
-
-def ugettext(message):
-    return force_text(gettext(message))
 
 gettext_noop = gettext_lazy = _ = gettext
 

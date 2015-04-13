@@ -40,9 +40,7 @@ from django.contrib.gis.gdal.driver import Driver
 from django.contrib.gis.gdal.error import GDALException, OGRIndexError
 from django.contrib.gis.gdal.layer import Layer
 from django.contrib.gis.gdal.prototypes import ds as capi
-from django.utils import six
 from django.utils.encoding import force_bytes, force_text
-from django.utils.six.moves import range
 
 
 # For more information, see the OGR C API source code:
@@ -63,7 +61,7 @@ class DataSource(GDALBase):
 
         Driver.ensure_registered()
 
-        if isinstance(ds_input, six.string_types):
+        if isinstance(ds_input, str):
             # The data source driver is a void pointer.
             ds_driver = Driver.ptr_type()
             try:
@@ -97,7 +95,7 @@ class DataSource(GDALBase):
 
     def __getitem__(self, index):
         "Allows use of the index [] operator to get a layer at the index."
-        if isinstance(index, six.string_types):
+        if isinstance(index, str):
             l = capi.get_layer_by_name(self.ptr, force_bytes(index))
             if not l:
                 raise OGRIndexError('invalid OGR Layer name given: "%s"' % index)

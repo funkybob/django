@@ -4,7 +4,6 @@ from django.http import HttpResponse
 from django.template import Context, RequestContext, Template, loader
 from django.template.backends.django import Template as BackendTemplate
 from django.template.context import _current_app_undefined
-from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 
 
@@ -76,7 +75,7 @@ class SimpleTemplateResponse(HttpResponse):
         "Accepts a template object, path-to-template or list of paths"
         if isinstance(template, (list, tuple)):
             return loader.select_template(template, using=self.using)
-        elif isinstance(template, six.string_types):
+        elif isinstance(template, str):
             return loader.get_template(template, using=self.using)
         else:
             return template

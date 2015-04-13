@@ -10,7 +10,6 @@ from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.measure import D
 from django.test import TestCase, skipUnlessDBFeature
-from django.utils._os import upath
 
 from ..utils import oracle, postgis
 
@@ -72,7 +71,7 @@ class GeographyTest(TestCase):
         from django.contrib.gis.utils import LayerMapping
 
         # Getting the shapefile and mapping dictionary.
-        shp_path = os.path.realpath(os.path.join(os.path.dirname(upath(__file__)), '..', 'data'))
+        shp_path = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'data'))
         co_shp = os.path.join(shp_path, 'counties', 'counties.shp')
         co_mapping = {'name': 'Name',
                       'state': 'State',

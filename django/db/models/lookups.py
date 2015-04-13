@@ -4,7 +4,6 @@ from copy import copy
 from django.conf import settings
 from django.utils import timezone
 from django.utils.functional import cached_property
-from django.utils.six.moves import range
 
 from .query_utils import QueryWrapper
 

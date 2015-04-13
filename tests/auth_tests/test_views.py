@@ -6,6 +6,7 @@ import itertools
 import os
 import re
 from importlib import import_module
+from urllib.parse import ParseResult, urlparse
 
 from django.apps import apps
 from django.conf import settings
@@ -31,7 +32,6 @@ from django.test.utils import patch_logger
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.http import urlquote
-from django.utils.six.moves.urllib.parse import ParseResult, urlparse
 from django.utils.translation import LANGUAGE_SESSION_KEY
 
 from .models import UUIDUser

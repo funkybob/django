@@ -7,7 +7,6 @@ from django.contrib.gis.maps.google.overlays import (
 from django.template.loader import render_to_string
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from django.utils.six.moves import range
 
 
 class GoogleMapException(Exception):

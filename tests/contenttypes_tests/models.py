@@ -1,11 +1,9 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.http import urlquote
 
 
-@python_2_unicode_compatible
 class Author(models.Model):
     name = models.CharField(max_length=100)
 
@@ -16,7 +14,6 @@ class Author(models.Model):
         return '/authors/%s/' % self.id
 
 
-@python_2_unicode_compatible
 class Article(models.Model):
     title = models.CharField(max_length=100)
     slug = models.SlugField()
@@ -27,7 +24,6 @@ class Article(models.Model):
         return self.title
 
 
-@python_2_unicode_compatible
 class SchemeIncludedURL(models.Model):
     url = models.URLField(max_length=100)
 
@@ -47,7 +43,6 @@ class ProxyModel(ConcreteModel):
         proxy = True
 
 
-@python_2_unicode_compatible
 class FooWithoutUrl(models.Model):
     """
     Fake model not defining ``get_absolute_url`` for

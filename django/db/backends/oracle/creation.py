@@ -4,7 +4,6 @@ import time
 from django.conf import settings
 from django.db.backends.base.creation import BaseDatabaseCreation
 from django.db.utils import DatabaseError
-from django.utils.six.moves import input
 
 TEST_DATABASE_PREFIX = 'test_'
 PASSWORD = 'Im_a_lumberjack'

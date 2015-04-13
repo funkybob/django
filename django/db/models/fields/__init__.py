@@ -9,6 +9,7 @@ import math
 import uuid
 import warnings
 from base64 import b64decode, b64encode
+from functools import total_ordering
 
 from django.apps import apps
 from django.db import connection
@@ -20,13 +21,12 @@ from django.core import exceptions, validators, checks
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import parse_date, parse_datetime, parse_time, parse_duration
 from django.utils.duration import duration_string
-from django.utils.functional import cached_property, curry, total_ordering, Promise
+from django.utils.functional import cached_property, curry, Promise
 from django.utils.text import capfirst
 from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango21Warning
-from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import (smart_text, force_text, force_bytes,
-    python_2_unicode_compatible)
+from django.utils.translation import gettext_lazy as _
+from django.utils.encoding import smart_text, force_text, force_bytes
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils import six
 from django.utils.itercompat import is_iterable
@@ -88,7 +88,6 @@ def _empty(of_cls):
 
 
 @total_ordering
-@python_2_unicode_compatible
 class Field(RegisterLookupMixin):
     """Base class for all field types"""
 

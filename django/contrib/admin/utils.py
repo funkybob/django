@@ -15,7 +15,7 @@ from django.utils import formats, six, timezone
 from django.utils.encoding import force_str, force_text, smart_text
 from django.utils.html import format_html
 from django.utils.text import capfirst
-from django.utils.translation import ungettext
+from django.utils.translation import ngettext
 
 
 def lookup_needs_distinct(opts, lookup_path):
@@ -257,7 +257,7 @@ def model_ngettext(obj, n=None):
         obj = obj.model
     d = model_format_dict(obj)
     singular, plural = d["verbose_name"], d["verbose_name_plural"]
-    return ungettext(singular, plural, n or 0)
+    return ngettext(singular, plural, n or 0)
 
 
 def lookup_field(name, obj, model_admin=None):

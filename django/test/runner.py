@@ -2,6 +2,7 @@ import logging
 import os
 import unittest
 from importlib import import_module
+from io import StringIO
 from unittest import TestSuite, defaultTestLoader
 
 from django.conf import settings
@@ -9,7 +10,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import setup_test_environment, teardown_test_environment
 from django.utils.datastructures import OrderedSet
-from django.utils.six import StringIO
 
 
 class DebugSQLTextTestResult(unittest.TextTestResult):

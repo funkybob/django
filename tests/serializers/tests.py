@@ -6,6 +6,7 @@ import json
 import re
 import unittest
 from datetime import datetime
+from io import StringIO
 from xml.dom import minidom
 
 from django.core import management, serializers
@@ -14,8 +15,6 @@ from django.test import (
     TestCase, TransactionTestCase, override_settings, skipUnlessDBFeature,
 )
 from django.test.utils import Approximate
-from django.utils import six
-from django.utils.six import StringIO
 
 from .models import (
     Actor, Article, Author, AuthorProfile, Category, Movie, Player, Score,
@@ -329,7 +328,7 @@ class XmlSerializerTestCase(SerializersTestBase, TestCase):
     def _comparison_value(value):
         # The XML serializer handles everything as strings, so comparisons
         # need to be performed on the stringified value
-        return six.text_type(value)
+        return str(value)
 
     @staticmethod
     def _validate_output(serial_str):
@@ -701,7 +700,7 @@ class NoYamlSerializerTestCase(TestCase):
 
     def test_dumpdata_pyyaml_error_message(self):
         """Calling dumpdata produces an error when yaml package missing"""
-        with six.assertRaisesRegex(self, management.CommandError, YAML_IMPORT_ERROR_MESSAGE):
+        with self.assertRaisesRegex(management.CommandError, YAML_IMPORT_ERROR_MESSAGE):
             management.call_command('dumpdata', format='yaml')
 
 
@@ -769,7 +768,7 @@ class YamlSerializerTestCase(SerializersTestBase, TestCase):
                 # yaml.safe_load will return non-string objects for some
                 # of the fields we are interested in, this ensures that
                 # everything comes back as a string
-                if isinstance(field_value, six.string_types):
+                if isinstance(field_value, str):
                     ret_list.append(field_value)
                 else:
                     ret_list.append(str(field_value))

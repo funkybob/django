@@ -7,11 +7,11 @@ import tempfile
 import types
 import unittest
 from contextlib import contextmanager
+from io import StringIO
 
 from django.template import Context, TemplateDoesNotExist
 from django.template.engine import Engine
 from django.test import SimpleTestCase, override_settings
-from django.utils import six
 
 from .utils import TEMPLATE_DIR
 
@@ -77,9 +77,6 @@ class EggLoaderTests(SimpleTestCase):
         resources: A dictionary of template names mapped to file-like objects.
         """
 
-        if six.PY2:
-            name = name.encode('utf-8')
-
         class MockLoader(object):
             pass
 
@@ -125,7 +122,7 @@ class EggLoaderTests(SimpleTestCase):
 
     def test_existing(self):
         templates = {
-            os.path.normcase('templates/y.html'): six.StringIO("y"),
+            os.path.normcase('templates/y.html'): StringIO("y"),
         }
 
         with self.create_egg('egg', templates):
@@ -148,7 +145,7 @@ class EggLoaderTests(SimpleTestCase):
         Template loading fails if the egg is not in INSTALLED_APPS.
         """
         templates = {
-            os.path.normcase('templates/y.html'): six.StringIO("y"),
+            os.path.normcase('templates/y.html'): StringIO("y"),
         }
 
         with self.create_egg('egg', templates):

@@ -49,7 +49,6 @@ from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.shortcuts import numpy
 from django.utils import six
-from django.utils._os import upath
 
 from ..data.rasters.textrasters import JSON_RASTER
 
@@ -64,7 +63,7 @@ class GDALRasterTests(unittest.TestCase):
     Test a GDALRaster instance created from a file (GeoTiff).
     """
     def setUp(self):
-        self.rs_path = os.path.join(os.path.dirname(upath(__file__)),
+        self.rs_path = os.path.join(os.path.dirname(__file__),
                                     '../data/rasters/raster.tif')
         self.rs = GDALRaster(self.rs_path)
 
@@ -159,7 +158,7 @@ class GDALRasterTests(unittest.TestCase):
 @unittest.skipUnless(HAS_GDAL, "GDAL is required")
 class GDALBandTests(unittest.TestCase):
     def setUp(self):
-        self.rs_path = os.path.join(os.path.dirname(upath(__file__)),
+        self.rs_path = os.path.join(os.path.dirname(__file__),
                                '../data/rasters/raster.tif')
         rs = GDALRaster(self.rs_path)
         self.band = rs.bands[0]

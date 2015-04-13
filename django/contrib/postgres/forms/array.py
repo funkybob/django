@@ -7,7 +7,7 @@ from django.contrib.postgres.validators import (
 from django.core.exceptions import ValidationError
 from django.utils import six
 from django.utils.safestring import mark_safe
-from django.utils.translation import string_concat, ugettext_lazy as _
+from django.utils.translation import string_concat, gettext_lazy as _
 
 
 class SimpleArrayField(forms.CharField):

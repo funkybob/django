@@ -1,11 +1,9 @@
 from datetime import datetime
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
 # M2M described on one of the models
-@python_2_unicode_compatible
 class Person(models.Model):
     name = models.CharField(max_length=128)
 
@@ -16,7 +14,6 @@ class Person(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Group(models.Model):
     name = models.CharField(max_length=128)
     members = models.ManyToManyField(Person, through='Membership')
@@ -30,7 +27,6 @@ class Group(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Membership(models.Model):
     person = models.ForeignKey(Person)
     group = models.ForeignKey(Group)
@@ -44,7 +40,6 @@ class Membership(models.Model):
         return "%s is a member of %s" % (self.person.name, self.group.name)
 
 
-@python_2_unicode_compatible
 class CustomMembership(models.Model):
     person = models.ForeignKey(Person, db_column="custom_person_column", related_name="custom_person_related_name")
     group = models.ForeignKey(Group)
@@ -64,7 +59,6 @@ class TestNoDefaultsOrNulls(models.Model):
     nodefaultnonull = models.CharField(max_length=5)
 
 
-@python_2_unicode_compatible
 class PersonSelfRefM2M(models.Model):
     name = models.CharField(max_length=5)
     friends = models.ManyToManyField('self', through="Friendship", symmetrical=False)
@@ -80,7 +74,6 @@ class Friendship(models.Model):
 
 
 # Custom through link fields
-@python_2_unicode_compatible
 class Event(models.Model):
     title = models.CharField(max_length=50)
     invitees = models.ManyToManyField(Person, through='Invitation', through_fields=('event', 'invitee'), related_name='events_invited')
@@ -96,7 +89,6 @@ class Invitation(models.Model):
     invitee = models.ForeignKey(Person, related_name='invitations')
 
 
-@python_2_unicode_compatible
 class Employee(models.Model):
     name = models.CharField(max_length=5)
     subordinates = models.ManyToManyField('self', through="Relationship", through_fields=('source', 'target'), symmetrical=False)

@@ -10,7 +10,6 @@ from django.contrib.sitemaps import GenericSitemap, Sitemap
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.test import ignore_warnings, modify_settings, override_settings
-from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.formats import localize
 from django.utils.translation import activate, deactivate
@@ -41,7 +40,7 @@ class HTTPSitemapTests(SitemapTestsBase):
     @ignore_warnings(category=RemovedInDjango20Warning)
     @override_settings(TEMPLATES=[{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'templates')],
+        'DIRS': [os.path.join(os.path.dirname(__file__), 'templates')],
     }])
     def test_simple_sitemap_custom_index(self):
         "A simple sitemap index can be rendered with a custom template"
@@ -82,7 +81,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 
     @override_settings(TEMPLATES=[{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'templates')],
+        'DIRS': [os.path.join(os.path.dirname(__file__), 'templates')],
     }])
     def test_simple_custom_sitemap(self):
         "A simple sitemap can be rendered with a custom template"

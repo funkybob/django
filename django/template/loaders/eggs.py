@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 from django.apps import apps
 from django.template.base import TemplateDoesNotExist
-from django.utils import six
 
 from .base import Loader as BaseLoader
 
@@ -32,7 +31,5 @@ class Loader(BaseLoader):
                 resource = resource_string(app_config.name, pkg_name)
             except Exception:
                 continue
-            if six.PY2:
-                resource = resource.decode(self.engine.file_charset)
             return (resource, 'egg:%s:%s' % (app_config.name, pkg_name))
         raise TemplateDoesNotExist(template_name)

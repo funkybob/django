@@ -62,13 +62,11 @@ from django.apps import apps
 from django.template.context import (  # NOQA: imported for backwards compatibility
     BaseContext, Context, ContextPopException, RequestContext,
 )
-from django.utils import lru_cache, six
+from django.utils import lru_cache
 from django.utils.deprecation import (
     RemovedInDjango20Warning, RemovedInDjango21Warning,
 )
-from django.utils.encoding import (
-    force_str, force_text, python_2_unicode_compatible,
-)
+from django.utils.encoding import force_str, force_text
 from django.utils.formats import localize
 from django.utils.html import conditional_escape, escape
 from django.utils.itercompat import is_iterable
@@ -80,7 +78,7 @@ from django.utils.text import (
     get_text_list, smart_split, unescape_string_literal,
 )
 from django.utils.timezone import template_localtime
-from django.utils.translation import pgettext_lazy, ugettext_lazy
+from django.utils.translation import pgettext_lazy, gettext_lazy
 
 TOKEN_TEXT = 0
 TOKEN_VAR = 1
@@ -141,7 +139,6 @@ class TemplateEncodingError(Exception):
     pass
 
 
-@python_2_unicode_compatible
 class VariableDoesNotExist(Exception):
 
     def __init__(self, msg, params=()):
@@ -784,7 +781,7 @@ class Variable(object):
         self.translate = False
         self.message_context = None
 
-        if not isinstance(var, six.string_types):
+        if not isinstance(var, str):
             raise TypeError(
                 "Variable must be a string or number, got %s" % type(var))
         try:
@@ -836,7 +833,7 @@ class Variable(object):
             if self.message_context:
                 return pgettext_lazy(self.message_context, value)
             else:
-                return ugettext_lazy(value)
+                return gettext_lazy(value)
         return value
 
     def __repr__(self):
@@ -1097,7 +1094,7 @@ def parse_bits(parser, bits, params, varargs, varkw, defaults,
         kwarg = token_kwargs([bit], parser)
         if kwarg:
             # The kwarg was successfully extracted
-            param, value = list(six.iteritems(kwarg))[0]
+            param, value = list(kwarg.items())[0]
             if param not in params and varkw is None:
                 # An unexpected keyword argument was supplied
                 raise TemplateSyntaxError(
@@ -1315,7 +1312,7 @@ class Library(object):
                             t = file_name
                         elif isinstance(getattr(file_name, 'template', None), Template):
                             t = file_name.template
-                        elif not isinstance(file_name, six.string_types) and is_iterable(file_name):
+                        elif not isinstance(file_name, str) and is_iterable(file_name):
                             t = context.template.engine.select_template(file_name)
                         else:
                             t = context.template.engine.get_template(file_name)

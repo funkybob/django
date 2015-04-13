@@ -7,6 +7,7 @@ import sys
 from copy import copy
 from importlib import import_module
 from io import BytesIO
+from urllib.parse import urlparse, urlsplit
 
 from django.apps import apps
 from django.conf import settings
@@ -21,12 +22,11 @@ from django.http import HttpRequest, QueryDict, SimpleCookie
 from django.template import TemplateDoesNotExist
 from django.test import signals
 from django.test.utils import ContextList
-from django.utils import six
 from django.utils.encoding import force_bytes, force_str, uri_to_iri
 from django.utils.functional import SimpleLazyObject, curry
 from django.utils.http import urlencode
 from django.utils.itercompat import is_iterable
-from django.utils.six.moves.urllib.parse import urlparse, urlsplit
+from django.utils import six
 
 __all__ = ('Client', 'RedirectCycleError', 'RequestFactory', 'encode_file', 'encode_multipart')
 
@@ -168,7 +168,7 @@ def encode_multipart(boundary, data):
     for (key, value) in data.items():
         if is_file(value):
             lines.extend(encode_file(boundary, key, value))
-        elif not isinstance(value, six.string_types) and is_iterable(value):
+        elif not isinstance(value, str) and is_iterable(value):
             for item in value:
                 if is_file(item):
                     lines.extend(encode_file(boundary, key, item))
@@ -290,7 +290,7 @@ class RequestFactory(object):
         # Under Python 3, non-ASCII values in the WSGI environ are arbitrarily
         # decoded with ISO-8859-1. We replicate this behavior here.
         # Refs comment in `get_bytes_from_wsgi()`.
-        return path.decode(ISO_8859_1) if six.PY3 else path
+        return path.decode(ISO_8859_1)
 
     def get(self, path, data=None, secure=False, **extra):
         "Construct a GET request."
@@ -373,8 +373,7 @@ class RequestFactory(object):
         if not r.get('QUERY_STRING'):
             query_string = force_bytes(parsed[4])
             # WSGI requires latin-1 encoded strings. See get_path_info().
-            if six.PY3:
-                query_string = query_string.decode('iso-8859-1')
+            query_string = query_string.decode('iso-8859-1')
             r['QUERY_STRING'] = query_string
         return self.request(**r)
 

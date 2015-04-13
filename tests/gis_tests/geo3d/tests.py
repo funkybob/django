@@ -7,7 +7,6 @@ from unittest import skipUnless
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import HAS_GEOS
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
-from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
 
 if HAS_GEOS:
@@ -21,7 +20,7 @@ if HAS_GDAL:
     from django.contrib.gis.utils import LayerMapping, LayerMapError
 
 
-data_path = os.path.realpath(os.path.join(os.path.dirname(upath(__file__)), '..', 'data'))
+data_path = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'data'))
 city_file = os.path.join(data_path, 'cities', 'cities.shp')
 vrt_file = os.path.join(data_path, 'test_vrt', 'test_vrt.vrt')
 

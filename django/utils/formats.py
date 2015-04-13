@@ -4,7 +4,7 @@ import unicodedata
 from importlib import import_module
 
 from django.conf import settings
-from django.utils import dateformat, datetime_safe, numberformat, six
+from django.utils import dateformat, datetime_safe, numberformat
 from django.utils.encoding import force_str
 from django.utils.functional import lazy
 from django.utils.safestring import mark_safe
@@ -53,7 +53,7 @@ def iter_format_modules(lang, format_module_path=None):
 
     format_locations = []
     if format_module_path:
-        if isinstance(format_module_path, six.string_types):
+        if isinstance(format_module_path, str):
             format_module_path = [format_module_path]
         for path in format_module_path:
             format_locations.append(path + '.%s')
@@ -119,7 +119,7 @@ def get_format(format_type, lang=None, use_l10n=None):
             _format_cache[cache_key] = None
     return getattr(settings, format_type)
 
-get_format_lazy = lazy(get_format, six.text_type, list, tuple)
+get_format_lazy = lazy(get_format, str, list, tuple)
 
 
 def date_format(value, format=None, use_l10n=None):
@@ -173,8 +173,8 @@ def localize(value, use_l10n=None):
     be localized (or not), overriding the value of settings.USE_L10N.
     """
     if isinstance(value, bool):
-        return mark_safe(six.text_type(value))
-    elif isinstance(value, (decimal.Decimal, float) + six.integer_types):
+        return mark_safe(str(value))
+    elif isinstance(value, (decimal.Decimal, float, int)):
         return number_format(value, use_l10n=use_l10n)
     elif isinstance(value, datetime.datetime):
         return date_format(value, 'DATETIME_FORMAT', use_l10n=use_l10n)
@@ -191,7 +191,7 @@ def localize_input(value, default=None):
     Checks if an input value is a localizable type and returns it
     formatted with the appropriate formatting string of the current locale.
     """
-    if isinstance(value, (decimal.Decimal, float) + six.integer_types):
+    if isinstance(value, (decimal.Decimal, float, int)):
         return number_format(value)
     elif isinstance(value, datetime.datetime):
         value = datetime_safe.new_datetime(value)
@@ -212,7 +212,7 @@ def sanitize_separators(value):
     Sanitizes a value according to the current decimal and
     thousand separator setting. Used with form field input.
     """
-    if settings.USE_L10N and isinstance(value, six.string_types):
+    if settings.USE_L10N and isinstance(value, str):
         parts = []
         decimal_separator = get_format('DECIMAL_SEPARATOR')
         if decimal_separator in value:

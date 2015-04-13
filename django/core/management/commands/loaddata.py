@@ -18,7 +18,6 @@ from django.db import (
     transaction,
 )
 from django.utils import lru_cache
-from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 
@@ -253,7 +252,7 @@ class Command(BaseCommand):
                 dirs.append(app_dir)
         dirs.extend(list(fixture_dirs))
         dirs.append('')
-        dirs = [upath(os.path.abspath(os.path.realpath(d))) for d in dirs]
+        dirs = [os.path.abspath(os.path.realpath(d)) for d in dirs]
         return dirs
 
     def parse_name(self, fixture_name):

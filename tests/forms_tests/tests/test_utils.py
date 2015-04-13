@@ -6,10 +6,9 @@ import copy
 from django.core.exceptions import ValidationError
 from django.forms.utils import ErrorDict, ErrorList, flatatt
 from django.test import TestCase
-from django.utils import six
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 
 
 class FormsUtilsTestCase(TestCase):
@@ -54,11 +53,11 @@ class FormsUtilsTestCase(TestCase):
                          '<ul class="errorlist"><li>There was an error.</li></ul>')
 
         # Can take a unicode string.
-        self.assertHTMLEqual(six.text_type(ErrorList(ValidationError("Not \u03C0.").messages)),
+        self.assertHTMLEqual(str(ErrorList(ValidationError("Not \u03C0.").messages)),
                          '<ul class="errorlist"><li>Not π.</li></ul>')
 
         # Can take a lazy string.
-        self.assertHTMLEqual(str(ErrorList(ValidationError(ugettext_lazy("Error.")).messages)),
+        self.assertHTMLEqual(str(ErrorList(ValidationError(gettext_lazy("Error.")).messages)),
                          '<ul class="errorlist"><li>Error.</li></ul>')
 
         # Can take a list.
@@ -76,7 +75,7 @@ class FormsUtilsTestCase(TestCase):
             str(ErrorList(sorted(ValidationError([
                 "1. First error.",
                 "2. Not \u03C0.",
-                ugettext_lazy("3. Error."),
+                gettext_lazy("3. Error."),
                 {
                     'error_1': "4. First dict error.",
                     'error_2': "5. Second dict error.",
@@ -91,7 +90,6 @@ class FormsUtilsTestCase(TestCase):
             '</ul>'
         )
 
-        @python_2_unicode_compatible
         class VeryBadError:
             def __str__(self):
                 return "A very bad error."

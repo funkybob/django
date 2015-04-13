@@ -8,9 +8,7 @@ See also http://www.aryehleib.com/MutableLists.html
 
 Author: Aryeh Leib Taurog.
 """
-from django.utils import six
-from django.utils.functional import total_ordering
-from django.utils.six.moves import range
+from functools import total_ordering
 
 
 @total_ordering
@@ -85,12 +83,12 @@ class ListMixin(object):
 
     def __delitem__(self, index):
         "Delete the item(s) at the specified index/slice."
-        if not isinstance(index, six.integer_types + (slice,)):
+        if not isinstance(index, (int, slice,)):
             raise TypeError("%s is not a legal index" % index)
 
         # calculate new length and dimensions
         origLen = len(self)
-        if isinstance(index, six.integer_types):
+        if isinstance(index, int):
             index = self._checkindex(index)
             indexRange = [index]
         else:
@@ -203,7 +201,7 @@ class ListMixin(object):
 
     def insert(self, index, val):
         "Standard list insert method"
-        if not isinstance(index, six.integer_types):
+        if not isinstance(index, int):
             raise TypeError("%s is not a legal index" % index)
         self[index:index] = [val]
 

@@ -13,10 +13,11 @@ import re
 import warnings
 from importlib import import_module
 from threading import local
+from urllib.parse import urlsplit, urlunsplit
 
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.http import Http404
-from django.utils import lru_cache, six
+from django.utils import lru_cache
 from django.utils.datastructures import MultiValueDict
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_str, force_text, iri_to_uri
@@ -24,7 +25,6 @@ from django.utils.functional import cached_property, lazy
 from django.utils.http import RFC3986_SUBDELIMS, urlquote
 from django.utils.module_loading import module_has_submodule
 from django.utils.regex_helper import normalize
-from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
 from django.utils.translation import get_language, override
 
 # SCRIPT_NAME prefixes for each thread are stored here. If there's no entry for
@@ -184,7 +184,7 @@ class LocaleRegexProvider(object):
         """
         language_code = get_language()
         if language_code not in self._regex_dict:
-            if isinstance(self._regex, six.string_types):
+            if isinstance(self._regex, str):
                 regex = self._regex
             else:
                 regex = force_text(self._regex)
@@ -193,7 +193,7 @@ class LocaleRegexProvider(object):
             except re.error as e:
                 raise ImproperlyConfigured(
                     '"%s" is not a valid regular expression: %s' %
-                    (regex, six.text_type(e)))
+                    (regex, str(e)))
 
             self._regex_dict[language_code] = compiled_regex
         return self._regex_dict[language_code]
@@ -399,7 +399,7 @@ class RegexURLResolver(LocaleRegexProvider):
 
     @cached_property
     def urlconf_module(self):
-        if isinstance(self.urlconf_name, six.string_types):
+        if isinstance(self.urlconf_name, str):
             return import_module(self.urlconf_name)
         else:
             return self.urlconf_name
@@ -536,7 +536,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
 
     prefix = get_script_prefix()
 
-    if not isinstance(viewname, six.string_types):
+    if not isinstance(viewname, str):
         view = viewname
     else:
         parts = viewname.split(':')
@@ -582,7 +582,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
 
     return force_text(iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs)))
 
-reverse_lazy = lazy(reverse, six.text_type)
+reverse_lazy = lazy(reverse, str)
 
 
 def clear_url_caches():

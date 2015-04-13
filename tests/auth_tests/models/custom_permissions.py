@@ -8,7 +8,6 @@ from django.contrib.auth.tests.custom_user import (
     CustomUserManager, RemoveGroupsAndPermissions,
 )
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class CustomPermissionsUserManager(CustomUserManager):
@@ -20,7 +19,6 @@ class CustomPermissionsUserManager(CustomUserManager):
 
 
 with RemoveGroupsAndPermissions():
-    @python_2_unicode_compatible
     class CustomPermissionsUser(AbstractBaseUser, PermissionsMixin):
         email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
         date_of_birth = models.DateField()

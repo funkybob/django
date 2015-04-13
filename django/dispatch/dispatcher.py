@@ -2,14 +2,10 @@ import sys
 import threading
 import warnings
 import weakref
+from weakref import WeakMethod
 
 from django.utils.deprecation import RemovedInDjango21Warning
-from django.utils.six.moves import range
 
-if sys.version_info < (3, 4):
-    from .weakref_backports import WeakMethod
-else:
-    from weakref import WeakMethod
 
 
 def _make_id(target):

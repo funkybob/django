@@ -10,6 +10,7 @@ been reviewed for security issues. DON'T USE IT FOR PRODUCTION USE!
 from __future__ import unicode_literals
 
 import socket
+import socketserver
 import sys
 from wsgiref import simple_server
 
@@ -17,10 +18,8 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import ISO_8859_1, UTF_8
 from django.core.management.color import color_style
 from django.core.wsgi import get_wsgi_application
-from django.utils import six
 from django.utils.encoding import uri_to_iri
 from django.utils.module_loading import import_string
-from django.utils.six.moves import socketserver
 
 __all__ = ('WSGIServer', 'WSGIRequestHandler')
 
@@ -53,8 +52,7 @@ def get_internal_wsgi_application():
                 'exception': e,
             })
         )
-        six.reraise(ImproperlyConfigured, ImproperlyConfigured(msg),
-                    sys.exc_info()[2])
+        raise ImproperlyConfigured(msg).with_traceback(sys.exc_info()[2])
 
 
 def is_broken_pipe_error():
@@ -154,7 +152,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         # Under Python 3, non-ASCII values in the WSGI environ are arbitrarily
         # decoded with ISO-8859-1. We replicate this behavior here.
         # Refs comment in `get_bytes_from_wsgi()`.
-        env['PATH_INFO'] = path.decode(ISO_8859_1) if six.PY3 else path
+        env['PATH_INFO'] = path.decode(ISO_8859_1)
 
         return env
 

@@ -3,19 +3,19 @@ import os
 import warnings
 from datetime import datetime
 from inspect import getargspec
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
 from django.core.files import File, locks
 from django.core.files.move import file_move_safe
-from django.utils._os import abspathu, safe_join
+from django.utils._os import safe_join
 from django.utils.crypto import get_random_string
 from django.utils.deconstruct import deconstructible
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import filepath_to_uri, force_text
 from django.utils.functional import LazyObject
 from django.utils.module_loading import import_string
-from django.utils.six.moves.urllib.parse import urljoin
 from django.utils.text import get_valid_filename
 
 __all__ = ('Storage', 'FileSystemStorage', 'DefaultStorage', 'default_storage')
@@ -183,7 +183,7 @@ class FileSystemStorage(Storage):
         if location is None:
             location = settings.MEDIA_ROOT
         self.base_location = location
-        self.location = abspathu(self.base_location)
+        self.location = os.path.abspath(self.base_location)
         if base_url is None:
             base_url = settings.MEDIA_URL
         elif not base_url.endswith('/'):

@@ -6,8 +6,7 @@ import sys
 
 from django.apps import apps
 from django.db.models.fields import NOT_PROVIDED
-from django.utils import datetime_safe, six, timezone
-from django.utils.six.moves import input
+from django.utils import datetime_safe, timezone
 
 from .loader import MIGRATIONS_MODULE_NAME
 
@@ -102,13 +101,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         print("Please enter the default value now, as valid Python")
         print("The datetime and django.utils.timezone modules are available, so you can do e.g. timezone.now()")
         while True:
-            if six.PY3:
-                # Six does not correctly abstract over the fact that
-                # py3 input returns a unicode string, while py2 raw_input
-                # returns a bytestring.
-                code = input(">>> ")
-            else:
-                code = input(">>> ").decode(sys.stdin.encoding)
+            code = input(">>> ")
             if not code:
                 print("Please enter some code, or 'exit' (with no quotes) to exit.")
             elif code == "exit":

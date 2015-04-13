@@ -6,10 +6,8 @@ from django.contrib.contenttypes.fields import (
 )
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Book(models.Model):
     title = models.CharField(max_length=50)
     year = models.PositiveIntegerField(null=True, blank=True)
@@ -23,7 +21,6 @@ class Book(models.Model):
         return self.title
 
 
-@python_2_unicode_compatible
 class Department(models.Model):
     code = models.CharField(max_length=4, unique=True)
     description = models.CharField(max_length=50, blank=True, null=True)
@@ -32,7 +29,6 @@ class Department(models.Model):
         return self.description
 
 
-@python_2_unicode_compatible
 class Employee(models.Model):
     department = models.ForeignKey(Department, to_field="code")
     name = models.CharField(max_length=100)
@@ -41,7 +37,6 @@ class Employee(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class TaggedItem(models.Model):
     tag = models.SlugField()
     content_type = models.ForeignKey(ContentType, related_name='tagged_items')
@@ -52,7 +47,6 @@ class TaggedItem(models.Model):
         return self.tag
 
 
-@python_2_unicode_compatible
 class Bookmark(models.Model):
     url = models.URLField()
     tags = GenericRelation(TaggedItem)

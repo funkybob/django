@@ -8,7 +8,7 @@ from django.forms import (
 )
 from django.test import TestCase, ignore_warnings
 from django.utils import translation
-from django.utils.translation import gettext_lazy, ugettext_lazy
+from django.utils.translation import gettext_lazy, gettext_lazy
 
 from ..models import Cheese
 
@@ -29,7 +29,7 @@ class FormsRegressionsTestCase(TestCase):
         # There were some problems with form translations in #3600
 
         class SomeForm(Form):
-            username = CharField(max_length=10, label=ugettext_lazy('username'))
+            username = CharField(max_length=10, label=gettext_lazy('username'))
 
         f = SomeForm()
         self.assertHTMLEqual(f.as_p(), '<p><label for="id_username">username:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>')
@@ -43,8 +43,8 @@ class FormsRegressionsTestCase(TestCase):
     def test_regression_5216(self):
         # There was some problems with form translations in #5216
         class SomeForm(Form):
-            field_1 = CharField(max_length=10, label=ugettext_lazy('field_1'))
-            field_2 = CharField(max_length=10, label=ugettext_lazy('field_2'), widget=TextInput(attrs={'id': 'field_2_id'}))
+            field_1 = CharField(max_length=10, label=gettext_lazy('field_1'))
+            field_2 = CharField(max_length=10, label=gettext_lazy('field_2'), widget=TextInput(attrs={'id': 'field_2_id'}))
 
         f = SomeForm()
         self.assertHTMLEqual(f['field_1'].label_tag(), '<label for="id_field_1">field_1:</label>')

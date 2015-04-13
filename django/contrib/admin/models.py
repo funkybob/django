@@ -5,8 +5,8 @@ from django.contrib.admin.utils import quote
 from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import NoReverseMatch, reverse
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible, smart_text
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.encoding import smart_text
+from django.utils.translation import gettext, gettext_lazy as _
 
 ADDITION = 1
 CHANGE = 2
@@ -24,7 +24,6 @@ class LogEntryManager(models.Manager):
         e.save()
 
 
-@python_2_unicode_compatible
 class LogEntry(models.Model):
     action_time = models.DateTimeField(_('action time'), auto_now=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
@@ -47,16 +46,16 @@ class LogEntry(models.Model):
 
     def __str__(self):
         if self.action_flag == ADDITION:
-            return ugettext('Added "%(object)s".') % {'object': self.object_repr}
+            return gettext('Added "%(object)s".') % {'object': self.object_repr}
         elif self.action_flag == CHANGE:
-            return ugettext('Changed "%(object)s" - %(changes)s') % {
+            return gettext('Changed "%(object)s" - %(changes)s') % {
                 'object': self.object_repr,
                 'changes': self.change_message,
             }
         elif self.action_flag == DELETION:
-            return ugettext('Deleted "%(object)s."') % {'object': self.object_repr}
+            return gettext('Deleted "%(object)s."') % {'object': self.object_repr}
 
-        return ugettext('LogEntry Object')
+        return gettext('LogEntry Object')
 
     def is_addition(self):
         return self.action_flag == ADDITION

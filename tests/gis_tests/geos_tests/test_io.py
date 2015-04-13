@@ -5,7 +5,6 @@ import unittest
 from unittest import skipUnless
 
 from django.contrib.gis.geos import HAS_GEOS
-from django.utils.six import memoryview
 
 if HAS_GEOS:
     from django.contrib.gis.geos import (

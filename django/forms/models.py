@@ -21,7 +21,7 @@ from django.forms.widgets import (
 from django.utils import six
 from django.utils.encoding import force_text, smart_text
 from django.utils.text import capfirst, get_text_list
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 __all__ = (
     'ModelForm', 'BaseModelForm', 'model_to_dict', 'fields_for_model',
@@ -725,17 +725,17 @@ class BaseModelFormSet(BaseFormSet):
 
     def get_unique_error_message(self, unique_check):
         if len(unique_check) == 1:
-            return ugettext("Please correct the duplicate data for %(field)s.") % {
+            return gettext("Please correct the duplicate data for %(field)s.") % {
                 "field": unique_check[0],
             }
         else:
-            return ugettext("Please correct the duplicate data for %(field)s, "
+            return gettext("Please correct the duplicate data for %(field)s, "
                 "which must be unique.") % {
                 "field": get_text_list(unique_check, six.text_type(_("and"))),
             }
 
     def get_date_error_message(self, date_check):
-        return ugettext("Please correct the duplicate data for %(field_name)s "
+        return gettext("Please correct the duplicate data for %(field_name)s "
             "which must be unique for the %(lookup)s in %(date_field)s.") % {
             'field_name': date_check[2],
             'date_field': date_check[3],
@@ -743,7 +743,7 @@ class BaseModelFormSet(BaseFormSet):
         }
 
     def get_form_error(self):
-        return ugettext("Please correct the duplicate values below.")
+        return gettext("Please correct the duplicate values below.")
 
     def save_existing_objects(self, commit=True):
         self.changed_objects = []

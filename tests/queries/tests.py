@@ -14,8 +14,6 @@ from django.db.models.sql.datastructures import EmptyResultSet
 from django.db.models.sql.where import NothingNode, WhereNode
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
-from django.utils import six
-from django.utils.six.moves import range
 
 from .models import (
     FK1, X, Annotation, Article, Author, BaseA, Book, CategoryItem,
@@ -389,7 +387,7 @@ class Queries1Tests(BaseQuerysetTest):
         local_recursion_limit = 127
         msg = 'Maximum recursion depth exceeded: too many subqueries.'
         with self.assertRaisesMessage(RuntimeError, msg):
-            for i in six.moves.range(local_recursion_limit * 2):
+            for i in range(local_recursion_limit * 2):
                 x = Tag.objects.filter(pk__in=x)
 
     def test_reasonable_number_of_subq_aliases(self):
@@ -1332,7 +1330,7 @@ class Queries4Tests(BaseQuerysetTest):
 
     def test_ticket11811(self):
         unsaved_category = NamedCategory(name="Other")
-        with six.assertRaisesRegex(self, ValueError,
+        with self.assertRaisesRegex(ValueError,
                 'Unsaved model instance <NamedCategory: Other> '
                 'cannot be used in an ORM query.'):
             Tag.objects.filter(pk=self.t1.pk).update(category=unsaved_category)
@@ -2239,21 +2237,6 @@ class QuerySetSupportsPythonIdioms(TestCase):
              "<Article: Article 5>",
              "<Article: Article 7>"])
 
-    @unittest.skipUnless(six.PY2, "Python 2 only -- Python 3 doesn't have longs.")
-    def test_slicing_works_with_longs(self):
-        self.assertEqual(self.get_ordered_articles()[long(0)].name, 'Article 1')
-        self.assertQuerysetEqual(self.get_ordered_articles()[long(1):long(3)],
-            ["<Article: Article 2>", "<Article: Article 3>"])
-        self.assertQuerysetEqual(self.get_ordered_articles()[::long(2)],
-            ["<Article: Article 1>",
-            "<Article: Article 3>",
-            "<Article: Article 5>",
-            "<Article: Article 7>"])
-
-        # And can be mixed with ints.
-        self.assertQuerysetEqual(self.get_ordered_articles()[1:long(3)],
-            ["<Article: Article 2>", "<Article: Article 3>"])
-
     def test_slicing_without_step_is_lazy(self):
         with self.assertNumQueries(0):
             self.get_ordered_articles()[0:5]
@@ -2284,8 +2267,7 @@ class QuerySetSupportsPythonIdioms(TestCase):
              "<Article: Article 7>"])
 
     def test_slicing_cannot_filter_queryset_once_sliced(self):
-        six.assertRaisesRegex(
-            self,
+        self.assertRaisesRegex(
             AssertionError,
             "Cannot filter a query once a slice has been taken.",
             Article.objects.all()[0:5].filter,
@@ -2293,8 +2275,7 @@ class QuerySetSupportsPythonIdioms(TestCase):
         )
 
     def test_slicing_cannot_reorder_queryset_once_sliced(self):
-        six.assertRaisesRegex(
-            self,
+        self.assertRaisesRegex(
             AssertionError,
             "Cannot reorder a query once a slice has been taken.",
             Article.objects.all()[0:5].order_by,
@@ -2302,8 +2283,7 @@ class QuerySetSupportsPythonIdioms(TestCase):
         )
 
     def test_slicing_cannot_combine_queries_once_sliced(self):
-        six.assertRaisesRegex(
-            self,
+        self.assertRaisesRegex(
             AssertionError,
             "Cannot combine queries once a slice has been taken.",
             lambda: Article.objects.all()[0:1] & Article.objects.all()[4:5]
@@ -2311,8 +2291,7 @@ class QuerySetSupportsPythonIdioms(TestCase):
 
     def test_slicing_negative_indexing_not_supported_for_single_element(self):
         """hint: inverting your ordering might do what you need"""
-        six.assertRaisesRegex(
-            self,
+        self.assertRaisesRegex(
             AssertionError,
             "Negative indexing is not supported.",
             lambda: Article.objects.all()[-1]
@@ -2320,8 +2299,7 @@ class QuerySetSupportsPythonIdioms(TestCase):
 
     def test_slicing_negative_indexing_not_supported_for_range(self):
         """hint: inverting your ordering might do what you need"""
-        six.assertRaisesRegex(
-            self,
+        self.assertRaisesRegex(
             AssertionError,
             "Negative indexing is not supported.",
             lambda: Article.objects.all()[0:-5]

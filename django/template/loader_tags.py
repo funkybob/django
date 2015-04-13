@@ -4,7 +4,6 @@ from django.template.base import (
     Library, Node, Template, TemplateSyntaxError, TextNode, Variable,
     token_kwargs,
 )
-from django.utils import six
 from django.utils.safestring import mark_safe
 
 register = Library()
@@ -22,7 +21,7 @@ class BlockContext(object):
         self.blocks = defaultdict(list)
 
     def add_blocks(self, blocks):
-        for name, block in six.iteritems(blocks):
+        for name, block in blocks.items():
             self.blocks[name].insert(0, block)
 
     def pop(self, name):
@@ -151,7 +150,7 @@ class IncludeNode(Node):
                 template = context.template.engine.get_template(template)
             values = {
                 name: var.resolve(context)
-                for name, var in six.iteritems(self.extra_context)
+                for name, var in self.extra_context.items()
             }
             if self.isolated_context:
                 return template.render(context.new(values))

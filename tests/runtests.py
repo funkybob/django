@@ -15,7 +15,6 @@ from django.db import connection
 from django.test import TestCase, TransactionTestCase
 from django.test.utils import get_runner
 from django.utils import six
-from django.utils._os import upath
 from django.utils.deprecation import (
     RemovedInDjango20Warning, RemovedInDjango21Warning,
 )
@@ -23,7 +22,7 @@ from django.utils.deprecation import (
 warnings.simplefilter("error", RemovedInDjango20Warning)
 warnings.simplefilter("error", RemovedInDjango21Warning)
 
-RUNTESTS_DIR = os.path.abspath(os.path.dirname(upath(__file__)))
+RUNTESTS_DIR = os.path.abspath(os.path.dirname(__file__))
 
 TEMPLATE_DIR = os.path.join(RUNTESTS_DIR, 'templates')
 
@@ -275,7 +274,7 @@ def bisect_tests(bisection_label, options, test_labels):
             pass
 
     subprocess_args = [
-        sys.executable, upath(__file__), '--settings=%s' % options.settings]
+        sys.executable, os.path(__file__), '--settings=%s' % options.settings]
     if options.failfast:
         subprocess_args.append('--failfast')
     if options.verbosity:
@@ -333,7 +332,7 @@ def paired_tests(paired_test, options, test_labels):
             pass
 
     subprocess_args = [
-        sys.executable, upath(__file__), '--settings=%s' % options.settings]
+        sys.executable, os.path(__file__), '--settings=%s' % options.settings]
     if options.failfast:
         subprocess_args.append('--failfast')
     if options.verbosity:
@@ -396,16 +395,6 @@ if __name__ == "__main__":
         '--debug-sql', action='store_true', dest='debug_sql', default=False,
         help='Turn on the SQL query logger within tests')
     options = parser.parse_args()
-
-    # mock is a required dependency
-    try:
-        from django.test import mock  # NOQA
-    except ImportError:
-        print(
-            "Please install test dependencies first: \n"
-            "$ pip install -r requirements/py%s.txt" % sys.version_info.major
-        )
-        sys.exit(1)
 
     # Allow including a trailing slash on app_labels for tab completion convenience
     options.modules = [os.path.normpath(labels) for labels in options.modules]

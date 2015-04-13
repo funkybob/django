@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import os
 import tempfile
+from io import StringIO
 from wsgiref.util import FileWrapper
 
 from django import forms
@@ -18,7 +19,6 @@ from django.core.mail import EmailMessage
 from django.forms.models import BaseModelFormSet
 from django.http import HttpResponse, StreamingHttpResponse
 from django.utils.safestring import mark_safe
-from django.utils.six import StringIO
 
 from .models import (
     Actor, AdminOrderedAdminMethod, AdminOrderedCallable, AdminOrderedField,

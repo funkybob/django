@@ -9,7 +9,6 @@ from django.conf import settings
 from django.core.urlresolvers import translate_url
 from django.template import Context, Engine
 from django.utils import six
-from django.utils._os import upath
 from django.utils.encoding import smart_text
 from django.utils.formats import get_format, get_format_modules
 from django.utils.http import is_safe_url
@@ -208,7 +207,7 @@ def get_javascript_catalog(locale, domain, packages):
     # paths of requested packages
     for package in packages:
         p = importlib.import_module(package)
-        path = os.path.join(os.path.dirname(upath(p.__file__)), 'locale')
+        path = os.path.join(os.path.dirname(p.__file__), 'locale')
         paths.append(path)
     # add the filesystem paths listed in the LOCALE_PATHS setting
     paths.extend(reversed(settings.LOCALE_PATHS))

@@ -4,6 +4,8 @@ from __future__ import unicode_literals
 import logging
 import warnings
 
+from io import StringIO
+
 from admin_scripts.tests import AdminScriptTestCase
 
 from django.core import mail
@@ -15,7 +17,6 @@ from django.utils.encoding import force_text
 from django.utils.log import (
     AdminEmailHandler, CallbackFilter, RequireDebugFalse, RequireDebugTrue,
 )
-from django.utils.six import StringIO
 
 from .logconfig import MyEmailBackend
 

@@ -6,7 +6,6 @@ __all__ = ['luhn']
 
 import warnings
 
-from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 
 warnings.warn(
@@ -24,7 +23,7 @@ def luhn(candidate):
     algorithm (used in validation of, for example, credit cards).
     Both numeric and string candidates are accepted.
     """
-    if not isinstance(candidate, six.string_types):
+    if not isinstance(candidate, str):
         candidate = str(candidate)
     try:
         evens = sum(int(c) for c in candidate[-1::-2])

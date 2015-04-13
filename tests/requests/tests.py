@@ -3,8 +3,10 @@ from __future__ import unicode_literals
 
 import time
 from datetime import datetime, timedelta
+from http import cookies
 from io import BytesIO
 from itertools import chain
+from urllib.parse import urlencode as original_urlencode
 
 from django.core.exceptions import SuspiciousOperation
 from django.core.handlers.wsgi import LimitedStream, WSGIRequest
@@ -15,11 +17,8 @@ from django.http import (
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import FakePayload
 from django.test.utils import str_prefix
-from django.utils import six
 from django.utils.encoding import force_str
 from django.utils.http import cookie_date, urlencode
-from django.utils.six.moves import http_cookies
-from django.utils.six.moves.urllib.parse import urlencode as original_urlencode
 from django.utils.timezone import utc
 
 
@@ -154,8 +153,7 @@ class RequestsTests(SimpleTestCase):
     def test_wsgirequest_path_info(self):
         def wsgi_str(path_info):
             path_info = path_info.encode('utf-8')           # Actual URL sent by the browser (bytestring)
-            if six.PY3:
-                path_info = path_info.decode('iso-8859-1')  # Value in the WSGI environ dict (native string)
+            path_info = path_info.decode('iso-8859-1')  # Value in the WSGI environ dict (native string)
             return path_info
         # Regression for #19468
         request = WSGIRequest({'PATH_INFO': wsgi_str("/سلام/"), 'REQUEST_METHOD': 'get', 'wsgi.input': BytesIO(b'')})
@@ -224,7 +222,7 @@ class RequestsTests(SimpleTestCase):
         example_cookie = response.cookies['example']
         # A compat cookie may be in use -- check that it has worked
         # both as an output string, and using the cookie attributes
-        self.assertIn('; %s' % http_cookies.Morsel._reserved['httponly'], str(example_cookie))
+        self.assertIn('; %s' % cookies.Morsel._reserved['httponly'], str(example_cookie))
         self.assertTrue(example_cookie['httponly'])
 
     def test_unicode_cookie(self):

@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import datetime
 import pickle
 import warnings
+from io import StringIO
 from operator import attrgetter
 
 from django.contrib.auth.models import User
@@ -13,7 +14,6 @@ from django.db.models import signals
 from django.db.utils import ConnectionRouter
 from django.test import TestCase, override_settings
 from django.utils.encoding import force_text
-from django.utils.six import StringIO
 
 from .models import Book, Person, Pet, Review, UserProfile
 from .routers import AuthRouter, TestRouter, WriteRouter

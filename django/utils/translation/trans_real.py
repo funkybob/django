@@ -7,6 +7,7 @@ import re
 import sys
 import warnings
 from collections import OrderedDict
+from io import StringIO
 from threading import local
 
 from django.apps import apps
@@ -15,11 +16,9 @@ from django.conf.locale import LANG_INFO
 from django.core.exceptions import AppRegistryNotReady
 from django.core.signals import setting_changed
 from django.dispatch import receiver
-from django.utils import lru_cache, six
-from django.utils._os import upath
+from django.utils import lru_cache
 from django.utils.encoding import force_text
 from django.utils.safestring import SafeData, mark_safe
-from django.utils.six import StringIO
 from django.utils.translation import (
     LANGUAGE_SESSION_KEY, TranslatorCommentWarning, trim_whitespace,
 )
@@ -136,7 +135,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
     def _init_translation_catalog(self):
         """Creates a base catalog using global django translations."""
-        settingsfile = upath(sys.modules[settings.__module__].__file__)
+        settingsfile = sys.modules[settings.__module__].__file__
         localedir = os.path.join(os.path.dirname(settingsfile), 'locale')
         use_null_fallback = True
         if self.__language == settings.LANGUAGE_CODE:
@@ -272,10 +271,10 @@ def catalog():
     return _default
 
 
-def do_translate(message, translation_function):
+def gettext(message):
     """
     Translates 'message' using the given 'translation_function' name -- which
-    will be either gettext or ugettext. It uses the current thread to find the
+    will be gettext. It uses the current thread to find the
     translation object to use. If no current translation is activated, the
     message will be run through the default translation object.
     """
@@ -292,7 +291,7 @@ def do_translate(message, translation_function):
         _default = _default or translation(settings.LANGUAGE_CODE)
         translation_object = getattr(_active, "value", _default)
 
-        result = getattr(translation_object, translation_function)(eol_message)
+        result = translation_object.gettext(eol_message)
 
     if isinstance(message, SafeData):
         return mark_safe(result)
@@ -300,24 +299,9 @@ def do_translate(message, translation_function):
     return result
 
 
-def gettext(message):
-    """
-    Returns a string of the translation of the message.
-
-    Returns a string on Python 3 and an UTF-8-encoded bytestring on Python 2.
-    """
-    return do_translate(message, 'gettext')
-
-if six.PY3:
-    ugettext = gettext
-else:
-    def ugettext(message):
-        return do_translate(message, 'ugettext')
-
-
 def pgettext(context, message):
     msg_with_ctxt = "%s%s%s" % (context, CONTEXT_SEPARATOR, message)
-    result = ugettext(msg_with_ctxt)
+    result = gettext(msg_with_ctxt)
     if CONTEXT_SEPARATOR in result:
         # Translation not found
         # force unicode, because lazy version expects unicode
@@ -335,45 +319,25 @@ def gettext_noop(message):
     return message
 
 
-def do_ntranslate(singular, plural, number, translation_function):
+def ngettext(singular, plural, number):
     global _default
 
     t = getattr(_active, "value", None)
     if t is not None:
-        return getattr(t, translation_function)(singular, plural, number)
+        return t.ngettext(singular, plural, number)
     if _default is None:
         _default = translation(settings.LANGUAGE_CODE)
-    return getattr(_default, translation_function)(singular, plural, number)
-
-
-def ngettext(singular, plural, number):
-    """
-    Returns a string of the translation of either the singular or plural,
-    based on the number.
-
-    Returns a string on Python 3 and an UTF-8-encoded bytestring on Python 2.
-    """
-    return do_ntranslate(singular, plural, number, 'ngettext')
-
-if six.PY3:
-    ungettext = ngettext
-else:
-    def ungettext(singular, plural, number):
-        """
-        Returns a unicode strings of the translation of either the singular or
-        plural, based on the number.
-        """
-        return do_ntranslate(singular, plural, number, 'ungettext')
+    return _default.ngettext(singular, plural, number)
 
 
 def npgettext(context, singular, plural, number):
     msgs_with_ctxt = ("%s%s%s" % (context, CONTEXT_SEPARATOR, singular),
                       "%s%s%s" % (context, CONTEXT_SEPARATOR, plural),
                       number)
-    result = ungettext(*msgs_with_ctxt)
+    result = ngettext(*msgs_with_ctxt)
     if CONTEXT_SEPARATOR in result:
         # Translation not found
-        result = ungettext(singular, plural, number)
+        result = ngettext(singular, plural, number)
     return result
 
 
@@ -382,7 +346,7 @@ def all_locale_paths():
     Returns a list of paths to user-provides languages files.
     """
     globalpath = os.path.join(
-        os.path.dirname(upath(sys.modules[settings.__module__].__file__)), 'locale')
+        os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
     return [globalpath] + list(settings.LOCALE_PATHS)
 
 

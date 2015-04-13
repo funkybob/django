@@ -5,13 +5,10 @@ from django.forms import Form
 from django.forms.fields import BooleanField, IntegerField
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
-from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.html import html_safe
 from django.utils.safestring import mark_safe
-from django.utils.six.moves import range
-from django.utils.translation import ugettext as _, ungettext
+from django.utils.translation import gettext as _, ngettext
 
 __all__ = ('BaseFormSet', 'formset_factory', 'all_valid')
 
@@ -48,7 +45,6 @@ class ManagementForm(Form):
 
 
 @html_safe
-@python_2_unicode_compatible
 class BaseFormSet(object):
     """
     A collection of instances of the same Form class.
@@ -329,14 +325,14 @@ class BaseFormSet(object):
             if (self.validate_max and
                     self.total_form_count() - len(self.deleted_forms) > self.max_num) or \
                     self.management_form.cleaned_data[TOTAL_FORM_COUNT] > self.absolute_max:
-                raise ValidationError(ungettext(
+                raise ValidationError(ngettext(
                     "Please submit %d or fewer forms.",
                     "Please submit %d or fewer forms.", self.max_num) % self.max_num,
                     code='too_many_forms',
                 )
             if (self.validate_min and
                     self.total_form_count() - len(self.deleted_forms) < self.min_num):
-                raise ValidationError(ungettext(
+                raise ValidationError(ngettext(
                     "Please submit %d or more forms.",
                     "Please submit %d or more forms.", self.min_num) % self.min_num,
                     code='too_few_forms')
@@ -399,17 +395,17 @@ class BaseFormSet(object):
         # probably should be. It might make sense to render each form as a
         # table row with each field as a td.
         forms = ' '.join(form.as_table() for form in self)
-        return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
+        return mark_safe('\n'.join([str(self.management_form), forms]))
 
     def as_p(self):
         "Returns this formset rendered as HTML <p>s."
         forms = ' '.join(form.as_p() for form in self)
-        return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
+        return mark_safe('\n'.join([str(self.management_form), forms]))
 
     def as_ul(self):
         "Returns this formset rendered as HTML <li>s."
         forms = ' '.join(form.as_ul() for form in self)
-        return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
+        return mark_safe('\n'.join([str(self.management_form), forms]))
 
 
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,

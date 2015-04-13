@@ -5,6 +5,7 @@ import os
 import shutil
 import stat
 import unittest
+from io import StringIO
 
 from django.core.management import (
     CommandError, call_command, execute_from_command_line,
@@ -13,10 +14,8 @@ from django.core.management.utils import find_command
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.utils import translation
-from django.utils._os import upath
 from django.utils.encoding import force_text
-from django.utils.six import StringIO
-from django.utils.translation import ugettext
+from django.utils.translation import gettext
 
 has_msgfmt = find_command('msgfmt')
 
@@ -24,7 +23,7 @@ has_msgfmt = find_command('msgfmt')
 @unittest.skipUnless(has_msgfmt, 'msgfmt is mandatory for compilation tests')
 class MessageCompilationTests(SimpleTestCase):
 
-    test_dir = os.path.abspath(os.path.join(os.path.dirname(upath(__file__)), 'commands'))
+    test_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'commands'))
 
     def setUp(self):
         self._cwd = os.getcwd()
@@ -135,7 +134,7 @@ class MultipleLocaleCompilationTests(MessageCompilationTests):
 
 class ExcludedLocaleCompilationTests(MessageCompilationTests):
 
-    test_dir = os.path.abspath(os.path.join(os.path.dirname(upath(__file__)), 'exclude'))
+    test_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'exclude'))
 
     MO_FILE = 'locale/%s/LC_MESSAGES/django.mo'
 
@@ -206,12 +205,12 @@ class FuzzyTranslationTest(MessageCompilationTests):
         with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'locale')]):
             call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
             with translation.override(self.LOCALE):
-                self.assertEqual(ugettext('Lenin'), force_text('Ленин'))
-                self.assertEqual(ugettext('Vodka'), force_text('Vodka'))
+                self.assertEqual(gettext('Lenin'), force_text('Ленин'))
+                self.assertEqual(gettext('Vodka'), force_text('Vodka'))
 
     def test_fuzzy_compiling(self):
         with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'locale')]):
             call_command('compilemessages', locale=[self.LOCALE], fuzzy=True, stdout=StringIO())
             with translation.override(self.LOCALE):
-                self.assertEqual(ugettext('Lenin'), force_text('Ленин'))
-                self.assertEqual(ugettext('Vodka'), force_text('Водка'))
+                self.assertEqual(gettext('Lenin'), force_text('Ленин'))
+                self.assertEqual(gettext('Vodka'), force_text('Водка'))

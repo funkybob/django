@@ -15,7 +15,6 @@ from django.db import migrations, models
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.operations.base import Operation
 from django.utils import datetime_safe, six
-from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
 from django.utils.module_loading import module_dir
@@ -239,7 +238,7 @@ class MigrationWriter(object):
             pass
         else:
             try:
-                return upath(module_dir(migrations_module))
+                return module_dir(migrations_module)
             except ValueError:
                 pass
 
@@ -260,7 +259,7 @@ class MigrationWriter(object):
                 continue
             else:
                 try:
-                    base_dir = upath(module_dir(base_module))
+                    base_dir = module_dir(base_module)
                 except ValueError:
                     continue
                 else:

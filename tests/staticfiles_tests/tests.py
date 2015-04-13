@@ -20,13 +20,13 @@ from django.core.management import call_command
 from django.template import Context, Template
 from django.test import TestCase, override_settings
 from django.utils import six
-from django.utils._os import symlinks_supported, upath
+from django.utils._os import symlinks_supported
 from django.utils.encoding import force_text
 from django.utils.functional import empty
 
 from .storage import DummyStorage
 
-TEST_ROOT = os.path.dirname(upath(__file__))
+TEST_ROOT = os.path.dirname(__file__)
 
 TESTFILES_PATH = os.path.join(TEST_ROOT, 'apps', 'test', 'static', 'test')
 

@@ -8,7 +8,6 @@ from django.contrib.gis.geos.libgeos import GEOM_PTR
 from django.contrib.gis.geos.prototypes.errcheck import check_dbl, check_string
 from django.contrib.gis.geos.prototypes.geom import geos_char_p
 from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
-from django.utils.six.moves import range
 
 __all__ = ['geos_area', 'geos_distance', 'geos_length', 'geos_isvalidreason']
 

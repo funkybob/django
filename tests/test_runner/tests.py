@@ -4,6 +4,7 @@ Tests for django test runner
 from __future__ import unicode_literals
 
 import unittest
+from unittest import mock
 
 from admin_scripts.tests import AdminScriptTestCase
 
@@ -13,7 +14,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.db.backends.dummy.base import DatabaseCreation
 from django.test import (
-    TestCase, TransactionTestCase, mock, skipUnlessDBFeature, testcases,
+    TestCase, TransactionTestCase, skipUnlessDBFeature, testcases,
 )
 from django.test.runner import DiscoverRunner, dependency_ordered
 from django.test.testcases import connections_support_transactions

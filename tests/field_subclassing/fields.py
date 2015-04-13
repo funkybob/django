@@ -6,7 +6,7 @@ import warnings
 from django.db import models
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 
 # Catch warning about subfieldbase  -- remove in Django 2.0
 warnings.filterwarnings(
@@ -16,7 +16,6 @@ warnings.filterwarnings(
 )
 
 
-@python_2_unicode_compatible
 class Small(object):
     """
     A simple class to show that non-trivial Python objects can be used as
