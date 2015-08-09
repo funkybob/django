@@ -47,15 +47,6 @@ class I18nTagTests(SimpleTestCase):
         output = self.engine.render_to_string('i18n04', {'anton': b'\xc3\x85'})
         self.assertEqual(output, 'å')
 
-    @setup({'legacyi18n04': '{% load i18n %}'
-                            '{% blocktrans with anton|lower as berta %}{{ berta }}{% endblocktrans %}'})
-    def test_legacyi18n04(self):
-        """
-        simple translation of a variable and filter
-        """
-        output = self.engine.render_to_string('legacyi18n04', {'anton': b'\xc3\x85'})
-        self.assertEqual(output, 'å')
-
     @setup({'i18n05': '{% load i18n %}{% blocktrans %}xxx{{ anton }}xxx{% endblocktrans %}'})
     def test_i18n05(self):
         """
@@ -83,34 +74,14 @@ class I18nTagTests(SimpleTestCase):
         output = self.engine.render_to_string('i18n07', {'number': 1})
         self.assertEqual(output, 'singular')
 
-    @setup({'legacyi18n07': '{% load i18n %}'
-                            '{% blocktrans count number as counter %}singular{% plural %}'
-                            '{{ counter }} plural{% endblocktrans %}'})
-    def test_legacyi18n07(self):
-        """
-        translation of singular form
-        """
-        output = self.engine.render_to_string('legacyi18n07', {'number': 1})
-        self.assertEqual(output, 'singular')
-
     @setup({'i18n08': '{% load i18n %}'
-                      '{% blocktrans count number as counter %}singular{% plural %}'
+                      '{% blocktrans count counter=number %}singular{% plural %}'
                       '{{ counter }} plural{% endblocktrans %}'})
     def test_i18n08(self):
         """
         translation of plural form
         """
         output = self.engine.render_to_string('i18n08', {'number': 2})
-        self.assertEqual(output, '2 plural')
-
-    @setup({'legacyi18n08': '{% load i18n %}'
-                            '{% blocktrans count counter=number %}singular{% plural %}'
-                            '{{ counter }} plural{% endblocktrans %}'})
-    def test_legacyi18n08(self):
-        """
-        translation of plural form
-        """
-        output = self.engine.render_to_string('legacyi18n08', {'number': 2})
         self.assertEqual(output, '2 plural')
 
     @setup({'i18n09': '{% load i18n %}{% trans "Page not found" noop %}'})
@@ -220,19 +191,6 @@ class I18nTagTests(SimpleTestCase):
         output = self.engine.render_to_string('i18n22', {'andrew': mark_safe('a & b')})
         self.assertEqual(output, 'a & b')
 
-    @setup({'legacyi18n17': '{% load i18n %}'
-                            '{% blocktrans with anton|escape as berta %}{{ berta }}{% endblocktrans %}'})
-    def test_legacyi18n17(self):
-        output = self.engine.render_to_string('legacyi18n17', {'anton': 'α & β'})
-        self.assertEqual(output, 'α &amp; β')
-
-    @setup({'legacyi18n18': '{% load i18n %}'
-                            '{% blocktrans with anton|force_escape as berta %}'
-                            '{{ berta }}{% endblocktrans %}'})
-    def test_legacyi18n18(self):
-        output = self.engine.render_to_string('legacyi18n18', {'anton': 'α & β'})
-        self.assertEqual(output, 'α &amp; β')
-
     @setup({'i18n23': '{% load i18n %}{% trans "Page not found"|capfirst|slice:"6:" %}'})
     def test_i18n23(self):
         """
@@ -264,13 +222,6 @@ class I18nTagTests(SimpleTestCase):
         output = self.engine.render_to_string('i18n26', {'myextra_field': 'test', 'number': 1})
         self.assertEqual(output, 'singular test')
 
-    @setup({'legacyi18n26': '{% load i18n %}'
-                            '{% blocktrans with myextra_field as extra_field count number as counter %}'
-                            'singular {{ extra_field }}{% plural %}plural{% endblocktrans %}'})
-    def test_legacyi18n26(self):
-        output = self.engine.render_to_string('legacyi18n26', {'myextra_field': 'test', 'number': 1})
-        self.assertEqual(output, 'singular test')
-
     @setup({'i18n27': '{% load i18n %}{% blocktrans count counter=number %}'
                       '{{ counter }} result{% plural %}{{ counter }} results'
                       '{% endblocktrans %}'})
@@ -282,14 +233,6 @@ class I18nTagTests(SimpleTestCase):
             output = self.engine.render_to_string('i18n27', {'number': 1})
         self.assertEqual(output, '1 \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442')
 
-    @setup({'legacyi18n27': '{% load i18n %}'
-                            '{% blocktrans count number as counter %}{{ counter }} result'
-                            '{% plural %}{{ counter }} results{% endblocktrans %}'})
-    def test_legacyi18n27(self):
-        with translation.override('ru'):
-            output = self.engine.render_to_string('legacyi18n27', {'number': 1})
-        self.assertEqual(output, '1 \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442')
-
     @setup({'i18n28': '{% load i18n %}'
                       '{% blocktrans with a=anton b=berta %}{{ a }} + {{ b }}{% endblocktrans %}'})
     def test_i18n28(self):
@@ -297,13 +240,6 @@ class I18nTagTests(SimpleTestCase):
         simple translation of multiple variables
         """
         output = self.engine.render_to_string('i18n28', {'anton': 'α', 'berta': 'β'})
-        self.assertEqual(output, 'α + β')
-
-    @setup({'legacyi18n28': '{% load i18n %}'
-                            '{% blocktrans with anton as a and berta as b %}'
-                            '{{ a }} + {{ b }}{% endblocktrans %}'})
-    def test_legacyi18n28(self):
-        output = self.engine.render_to_string('legacyi18n28', {'anton': 'α', 'berta': 'β'})
         self.assertEqual(output, 'α + β')
 
     # retrieving language information

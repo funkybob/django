@@ -11,26 +11,11 @@ class WithTagTests(SimpleTestCase):
         output = self.engine.render_to_string('with01', {'dict': {'key': 50}})
         self.assertEqual(output, '50')
 
-    @setup({'legacywith01': '{% with dict.key as key %}{{ key }}{% endwith %}'})
-    def test_legacywith01(self):
-        output = self.engine.render_to_string('legacywith01', {'dict': {'key': 50}})
-        self.assertEqual(output, '50')
-
     @setup({'with02': '{{ key }}{% with key=dict.key %}'
                       '{{ key }}-{{ dict.key }}-{{ key }}'
                       '{% endwith %}{{ key }}'})
     def test_with02(self):
         output = self.engine.render_to_string('with02', {'dict': {'key': 50}})
-        if self.engine.string_if_invalid:
-            self.assertEqual(output, 'INVALID50-50-50INVALID')
-        else:
-            self.assertEqual(output, '50-50-50')
-
-    @setup({'legacywith02': '{{ key }}{% with dict.key as key %}'
-                            '{{ key }}-{{ dict.key }}-{{ key }}'
-                            '{% endwith %}{{ key }}'})
-    def test_legacywith02(self):
-        output = self.engine.render_to_string('legacywith02', {'dict': {'key': 50}})
         if self.engine.string_if_invalid:
             self.assertEqual(output, 'INVALID50-50-50INVALID')
         else:

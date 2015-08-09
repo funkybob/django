@@ -31,7 +31,7 @@ class LengthIsTests(SimpleTestCase):
         output = self.engine.render_to_string('length_is05', {'mystring': ''})
         self.assertEqual(output, 'Not Four')
 
-    @setup({'length_is06': '{% with var|length as my_length %}{{ my_length }}{% endwith %}'})
+    @setup({'length_is06': '{% with my_length=var|length %}{{ my_length }}{% endwith %}'})
     def test_length_is06(self):
         output = self.engine.render_to_string('length_is06', {'var': 'django'})
         self.assertEqual(output, '6')
