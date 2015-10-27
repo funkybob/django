@@ -5,7 +5,7 @@ The main QuerySet implementation. This provides the public API for the ORM.
 import copy
 import sys
 import warnings
-from collections import OrderedDict, deque
+from collections import OrderedDict, deque, namedtuple
 
 from django.conf import settings
 from django.core import exceptions
@@ -111,6 +111,25 @@ class ValuesIterable(BaseIterable):
 
         for row in compiler.results_iter():
             yield dict(zip(names, row))
+
+
+class NamedtupleIterable(BaseIterable):
+
+    def __iter__(self):
+        queryset = self.queryset
+        query = queryset.query
+        compiler = query.get_compiler(queryset.db)
+
+        field_names = list(query.values_select)
+        extra_names = list(query.extra_select)
+        annotation_names = list(query.annotation_select)
+
+        # extra(select=...) cols are always at the start of the row.
+        names = extra_names + field_names + annotation_names
+        record = namedtuple('{}Record'.format(queryset.model._meta.model_name), names)
+
+        for row in compiler.results_iter():
+            yield record._make(row)
 
 
 class ValuesListIterable(BaseIterable):
@@ -711,6 +730,11 @@ class QuerySet(object):
     def values(self, *fields):
         clone = self._values(*fields)
         clone._iterable_class = ValuesIterable
+        return clone
+
+    def namedtuples(self, *fields):
+        clone = self._values(*fields)
+        clone._iterable_class = NamedtupleIterable
         return clone
 
     def values_list(self, *fields, **kwargs):
