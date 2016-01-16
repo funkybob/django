@@ -8,6 +8,7 @@ import pickle
 import textwrap
 import unittest
 from importlib import import_module
+from io import StringIO
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -15,7 +16,6 @@ from django.db import DEFAULT_DB_ALIAS, connections
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import setup_test_environment, teardown_test_environment
 from django.utils.datastructures import OrderedSet
-from django.utils.six import StringIO
 
 try:
     import tblib.pickling_support
