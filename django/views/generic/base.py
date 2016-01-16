@@ -7,7 +7,6 @@ from django import http
 from django.core.exceptions import ImproperlyConfigured
 from django.template.response import TemplateResponse
 from django.urls import NoReverseMatch, reverse
-from django.utils import six
 from django.utils.decorators import classonlymethod
 
 logger = logging.getLogger('django.request')
@@ -40,7 +39,7 @@ class View(object):
         """
         # Go through keyword arguments, and either save their values to our
         # instance, or raise an error.
-        for key, value in six.iteritems(kwargs):
+        for key, value in kwargs.items():
             setattr(self, key, value)
 
     @classonlymethod
