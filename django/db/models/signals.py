@@ -1,6 +1,5 @@
 from django.apps import apps
 from django.dispatch import Signal
-from django.utils import six
 
 
 class_prepared = Signal(providing_args=["class"])
@@ -31,7 +30,7 @@ class ModelSignal(Signal):
                 )
 
     def connect(self, receiver, sender=None, weak=True, dispatch_uid=None):
-        if isinstance(sender, six.string_types):
+        if isinstance(sender, str):
             try:
                 app_label, model_name = sender.split('.')
             except ValueError:

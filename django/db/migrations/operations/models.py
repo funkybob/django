@@ -4,7 +4,6 @@ from django.db import models
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.state import ModelState
 from django.db.models.options import normalize_together
-from django.utils import six
 from django.utils.functional import cached_property
 
 from .fields import (
@@ -85,12 +84,12 @@ class CreateModel(ModelOperation):
         strings_to_check = [self.name]
         # Check we didn't inherit from the model
         for base in self.bases:
-            if isinstance(base, six.string_types):
+            if isinstance(base, str):
                 strings_to_check.append(base.split(".")[-1])
         # Check we have no FKs/M2Ms with it
         for fname, field in self.fields:
             if field.remote_field:
-                if isinstance(field.remote_field.model, six.string_types):
+                if isinstance(field.remote_field.model, str):
                     strings_to_check.append(field.remote_field.model.split(".")[-1])
         # Now go over all the strings and compare them
         for string in strings_to_check:

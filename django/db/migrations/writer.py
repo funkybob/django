@@ -424,20 +424,12 @@ class MigrationWriter(object):
             if math.isnan(value) or math.isinf(value):
                 return 'float("{}")'.format(value), set()
             return repr(value), set()
-        elif isinstance(value, six.integer_types + (bool, type(None))):
+        elif isinstance(value, (int, bool, type(None))):
             return repr(value), set()
-        elif isinstance(value, six.binary_type):
-            value_repr = repr(value)
-            if six.PY2:
-                # Prepend the `b` prefix since we're importing unicode_literals
-                value_repr = 'b' + value_repr
-            return value_repr, set()
-        elif isinstance(value, six.text_type):
-            value_repr = repr(value)
-            if six.PY2:
-                # Strip the `u` prefix since we're importing unicode_literals
-                value_repr = value_repr[1:]
-            return value_repr, set()
+        elif isinstance(value, bytes):
+            return repr(value), set()
+        elif isinstance(value, str):
+            return repr(value), set()
         # Decimal
         elif isinstance(value, decimal.Decimal):
             return repr(value), {"from decimal import Decimal"}

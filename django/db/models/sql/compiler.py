@@ -12,7 +12,6 @@ from django.db.models.sql.datastructures import EmptyResultSet
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError
-from django.utils.six.moves import zip
 
 
 class SQLCompiler(object):

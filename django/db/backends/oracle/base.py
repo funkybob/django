@@ -368,7 +368,7 @@ class OracleParam(object):
             # To get size right, we must consider bytes.
             self.force_bytes = convert_unicode(param, cursor.charset,
                                              strings_only)
-            if isinstance(self.force_bytes, six.string_types):
+            if isinstance(self.force_bytes, str):
                 # We could optimize by only converting up to 4000 bytes here
                 string_size = len(force_bytes(param, cursor.charset, strings_only))
         if hasattr(param, 'input_size'):
@@ -542,7 +542,7 @@ class FormatStylePlaceholderCursor(object):
         return CursorIterator(self.cursor)
 
 
-class CursorIterator(six.Iterator):
+class CursorIterator:
     """
     Cursor iterator wrapper that invokes our custom row factory.
     """
@@ -604,6 +604,6 @@ def to_unicode(s):
     Convert strings to Unicode objects (and return all other data types
     unchanged).
     """
-    if isinstance(s, six.string_types):
+    if isinstance(s, str):
         return force_text(s)
     return s

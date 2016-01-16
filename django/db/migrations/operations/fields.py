@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 from django.db.models.fields import NOT_PROVIDED
-from django.utils import six
 from django.utils.functional import cached_property
 
 from .base import Operation
@@ -210,9 +209,9 @@ class AlterField(FieldOperation):
             # set it equal to the other field side. Bandaid fix for AlterField
             # migrations that are part of a RenameModel change.
             if from_field.remote_field and from_field.remote_field.model:
-                if isinstance(from_field.remote_field.model, six.string_types):
+                if isinstance(from_field.remote_field.model, str):
                     from_field.remote_field.model = to_field.remote_field.model
-                elif to_field.remote_field and isinstance(to_field.remote_field.model, six.string_types):
+                elif to_field.remote_field and isinstance(to_field.remote_field.model, str):
                     to_field.remote_field.model = from_field.remote_field.model
             if not self.preserve_default:
                 to_field.default = self.field.default

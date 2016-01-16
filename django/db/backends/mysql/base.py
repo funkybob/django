@@ -240,8 +240,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             'conv': django_conversions,
             'charset': 'utf8',
         }
-        if six.PY2:
-            kwargs['use_unicode'] = True
         settings_dict = self.settings_dict
         if settings_dict['USER']:
             kwargs['user'] = settings_dict['USER']
@@ -263,7 +261,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def get_new_connection(self, conn_params):
         conn = Database.connect(**conn_params)
-        conn.encoders[SafeText] = conn.encoders[six.text_type]
+        conn.encoders[SafeText] = conn.encoders[str]
         conn.encoders[SafeBytes] = conn.encoders[bytes]
         return conn
 

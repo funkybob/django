@@ -4,7 +4,6 @@ from importlib import import_module
 
 from django.db import router
 from django.db.models.query import QuerySet
-from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -126,7 +125,7 @@ class BaseManager(object):
 
         new_methods = {}
         # Refs http://bugs.python.org/issue1785.
-        predicate = inspect.isfunction if six.PY3 else inspect.ismethod
+        predicate = inspect.isfunction
         for name, method in inspect.getmembers(queryset_class, predicate=predicate):
             # Only copy missing methods.
             if hasattr(cls, name):

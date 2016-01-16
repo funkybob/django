@@ -7,7 +7,7 @@ from django.db.backends import utils as backend_utils
 from django.db.models import fields
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import Q, refs_aggregate
-from django.utils import six, timezone
+from django.utils import timezone
 from django.utils.functional import cached_property
 
 
@@ -141,7 +141,7 @@ class BaseExpression(object):
     def _parse_expressions(self, *expressions):
         return [
             arg if hasattr(arg, 'resolve_expression') else (
-                F(arg) if isinstance(arg, six.string_types) else Value(arg)
+                F(arg) if isinstance(arg, str) else Value(arg)
             ) for arg in expressions
         ]
 

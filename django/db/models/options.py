@@ -10,7 +10,6 @@ from django.core.exceptions import FieldDoesNotExist
 from django.db import connections
 from django.db.models.fields import AutoField
 from django.db.models.fields.proxy import OrderWrt
-from django.utils import six
 from django.utils.datastructures import ImmutableList, OrderedSet
 from django.utils.encoding import (
     force_text, python_2_unicode_compatible, smart_text,
@@ -239,7 +238,7 @@ class Options(object):
             if self.parents:
                 # Promote the first parent link in lieu of adding yet another
                 # field.
-                field = next(six.itervalues(self.parents))
+                field = next(iter(self.parents.values()))
                 # Look for a local field with the same name as the
                 # first parent link. If a local field has already been
                 # created, use it instead of promoting the parent
@@ -310,7 +309,7 @@ class Options(object):
         """
         if self.proxy or self.swapped or not self.managed:
             return False
-        if isinstance(connection, six.string_types):
+        if isinstance(connection, str):
             connection = connections[connection]
         if self.required_db_vendor:
             return self.required_db_vendor == connection.vendor
@@ -572,7 +571,7 @@ class Options(object):
                 if f.is_relation and f.related_model is not None
             )
             for f in fields_with_relations:
-                if not isinstance(f.remote_field.model, six.string_types):
+                if not isinstance(f.remote_field.model, str):
                     related_objects_graph[f.remote_field.model._meta.concrete_model._meta].append(f)
 
         for model in all_models:
