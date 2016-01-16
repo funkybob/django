@@ -1,19 +1,18 @@
 from __future__ import unicode_literals
 
 import sys
+from http import cookies
 
-from django.utils import six
 from django.utils.encoding import force_str
-from django.utils.six.moves import http_cookies
 
 # Some versions of Python 2.7 and later won't need this encoding bug fix:
-_cookie_encodes_correctly = http_cookies.SimpleCookie().value_encode(';') == (';', '"\\073"')
+_cookie_encodes_correctly = cookies.SimpleCookie().value_encode(';') == (';', '"\\073"')
 # See ticket #13007, http://bugs.python.org/issue2193 and http://trac.edgewall.org/ticket/2256
-_tc = http_cookies.SimpleCookie()
+_tc = cookies.SimpleCookie()
 try:
     _tc.load(str('foo:bar=1'))
     _cookie_allows_colon_in_names = True
-except http_cookies.CookieError:
+except cookies.CookieError:
     _cookie_allows_colon_in_names = False
 
 # Cookie pickling bug is fixed in Python 2.7.9 and Python 3.4.3+
@@ -24,11 +23,11 @@ cookie_pickles_properly = (
 )
 
 if _cookie_encodes_correctly and _cookie_allows_colon_in_names and cookie_pickles_properly:
-    SimpleCookie = http_cookies.SimpleCookie
+    SimpleCookie = cookies.SimpleCookie
 else:
-    Morsel = http_cookies.Morsel
+    Morsel = cookies.Morsel
 
-    class SimpleCookie(http_cookies.SimpleCookie):
+    class SimpleCookie(cookies.SimpleCookie):
         if not cookie_pickles_properly:
             def __setitem__(self, key, value):
                 # Apply the fix from http://bugs.python.org/issue22775 where
@@ -67,8 +66,6 @@ else:
         if not _cookie_allows_colon_in_names:
             def load(self, rawdata):
                 self.bad_cookies = set()
-                if six.PY2 and isinstance(rawdata, six.text_type):
-                    rawdata = force_str(rawdata)
                 super(SimpleCookie, self).load(rawdata)
                 for key in self.bad_cookies:
                     del self[key]
@@ -81,21 +78,21 @@ else:
                     M = self.get(key, Morsel())
                     M.set(key, real_value, coded_value)
                     dict.__setitem__(self, key, M)
-                except http_cookies.CookieError:
+                except cookies.CookieError:
                     if not hasattr(self, 'bad_cookies'):
                         self.bad_cookies = set()
                     self.bad_cookies.add(key)
-                    dict.__setitem__(self, key, http_cookies.Morsel())
+                    dict.__setitem__(self, key, cookies.Morsel())
 
 
 def parse_cookie(cookie):
     if cookie == '':
         return {}
-    if not isinstance(cookie, http_cookies.BaseCookie):
+    if not isinstance(cookie, cookies.BaseCookie):
         try:
             c = SimpleCookie()
             c.load(cookie)
-        except http_cookies.CookieError:
+        except cookies.CookieError:
             # Invalid cookie
             return {}
     else:
