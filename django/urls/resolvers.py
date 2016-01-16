@@ -12,7 +12,7 @@ import re
 from importlib import import_module
 
 from django.core.exceptions import ImproperlyConfigured
-from django.utils import lru_cache, six
+from django.utils import lru_cache
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str, force_text
 from django.utils.functional import cached_property
@@ -94,13 +94,13 @@ class LocaleRegexProvider(object):
         """
         language_code = get_language()
         if language_code not in self._regex_dict:
-            regex = self._regex if isinstance(self._regex, six.string_types) else force_text(self._regex)
+            regex = self._regex if isinstance(self._regex, str) else force_text(self._regex)
             try:
                 compiled_regex = re.compile(regex, re.UNICODE)
             except re.error as e:
                 raise ImproperlyConfigured(
                     '"%s" is not a valid regular expression: %s' %
-                    (regex, six.text_type(e))
+                    (regex, str(e))
                 )
             self._regex_dict[language_code] = compiled_regex
         return self._regex_dict[language_code]
@@ -286,7 +286,7 @@ class RegexURLResolver(LocaleRegexProvider):
 
     @cached_property
     def urlconf_module(self):
-        if isinstance(self.urlconf_name, six.string_types):
+        if isinstance(self.urlconf_name, str):
             return import_module(self.urlconf_name)
         else:
             return self.urlconf_name
