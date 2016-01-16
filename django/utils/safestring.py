@@ -99,6 +99,9 @@ class SafeText(str, SafeData):
     encode = curry(_proxy_method, method=str.encode)
 
 
+SafeString = SafeText
+
+
 def mark_safe(s):
     """
     Explicitly mark a string as safe for (HTML) output purposes. The returned
