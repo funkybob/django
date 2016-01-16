@@ -1,5 +1,6 @@
 import logging
 import re
+from urllib.parse import urlparse
 
 from django import http
 from django.conf import settings
@@ -9,7 +10,6 @@ from django.urls import is_valid_path
 from django.utils.cache import get_conditional_response, set_response_etag
 from django.utils.encoding import force_text
 from django.utils.http import unquote_etag
-from django.utils.six.moves.urllib.parse import urlparse
 
 logger = logging.getLogger('django.request')
 

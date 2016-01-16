@@ -8,6 +8,7 @@ from __future__ import unicode_literals
 
 import logging
 import re
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.urls import get_callable
@@ -15,7 +16,6 @@ from django.utils.cache import patch_vary_headers
 from django.utils.crypto import constant_time_compare, get_random_string
 from django.utils.encoding import force_text
 from django.utils.http import is_same_domain
-from django.utils.six.moves.urllib.parse import urlparse
 
 logger = logging.getLogger('django.request')
 
