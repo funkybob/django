@@ -5,7 +5,6 @@ import warnings
 
 from django.apps import apps
 from django.template import Origin, TemplateDoesNotExist
-from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from .base import Loader as BaseLoader
@@ -38,9 +37,6 @@ class Loader(BaseLoader):
             source = resource_string(origin.app_name, origin.pkg_name)
         except Exception:
             raise TemplateDoesNotExist(origin)
-
-        if six.PY2:
-            source = source.decode(self.engine.file_charset)
 
         return source
 

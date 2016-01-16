@@ -7,7 +7,7 @@ from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation
 from functools import wraps
 from pprint import pformat
 
-from django.utils import formats, six
+from django.utils import formats
 from django.utils.dateformat import format, time_format
 from django.utils.encoding import force_text, iri_to_uri
 from django.utils.html import (
@@ -169,7 +169,7 @@ def floatformat(text, arg=-1):
         # and `exponent` from `Decimal.as_tuple()` directly.
         sign, digits, exponent = d.quantize(exp, ROUND_HALF_UP,
             Context(prec=prec)).as_tuple()
-        digits = [six.text_type(digit) for digit in reversed(digits)]
+        digits = [str(digit) for digit in reversed(digits)]
         while len(digits) <= abs(exponent):
             digits.append('0')
         digits.insert(-exponent, '.')
@@ -195,7 +195,7 @@ def linenumbers(value, autoescape=True):
     lines = value.split('\n')
     # Find the maximum width of the line count, for use with zero padding
     # string format command
-    width = six.text_type(len(six.text_type(len(lines))))
+    width = str(len(str(len(lines))))
     if not autoescape or isinstance(value, SafeData):
         for i, line in enumerate(lines):
             lines[i] = ("%0" + width + "d. %s") % (i + 1, line)
@@ -247,7 +247,7 @@ def stringformat(value, arg):
     of Python string formatting
     """
     try:
-        return ("%" + six.text_type(arg)) % value
+        return ("%" + str(arg)) % value
     except (ValueError, TypeError):
         return ""
 
@@ -651,7 +651,7 @@ def unordered_list(value, autoescape=True):
                 except StopIteration:
                     yield item, None
                     break
-                if not isinstance(next_item, six.string_types):
+                if not isinstance(next_item, str):
                     try:
                         iter(next_item)
                     except TypeError:

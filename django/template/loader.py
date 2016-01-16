@@ -1,4 +1,3 @@
-from django.utils import six
 from django.utils.deprecation import (
     DeprecationInstanceCheck, RemovedInDjango20Warning,
 )
@@ -72,6 +71,6 @@ def _engine_list(using=None):
     return engines.all() if using is None else [engines[using]]
 
 
-class LoaderOrigin(six.with_metaclass(DeprecationInstanceCheck, Origin)):
+class LoaderOrigin(Origin, metaclass=DeprecationInstanceCheck):
     alternative = 'django.template.Origin'
     deprecation_warning = RemovedInDjango20Warning

@@ -58,7 +58,6 @@ import re
 from django.template.context import (  # NOQA: imported for backwards compatibility
     BaseContext, Context, ContextPopException, RequestContext,
 )
-from django.utils import six
 from django.utils.deprecation import (
     DeprecationInstanceCheck, RemovedInDjango20Warning,
 )
@@ -162,7 +161,7 @@ class Origin(object):
             )
 
 
-class StringOrigin(six.with_metaclass(DeprecationInstanceCheck, Origin)):
+class StringOrigin(Origin, metaclass=DeprecationInstanceCheck):
     alternative = 'django.template.Origin'
     deprecation_warning = RemovedInDjango20Warning
 
@@ -791,7 +790,7 @@ class Variable(object):
         self.translate = False
         self.message_context = None
 
-        if not isinstance(var, six.string_types):
+        if not isinstance(var, str):
             raise TypeError(
                 "Variable must be a string or number, got %s" % type(var))
         try:
