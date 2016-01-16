@@ -1,8 +1,9 @@
 """
 Module for abstract serializer/unserializer base classes.
 """
+from io import StringIO
+
 from django.db import models
-from django.utils import six
 
 
 class SerializerDoesNotExist(KeyError):
@@ -66,7 +67,7 @@ class Serializer(object):
         """
         self.options = options
 
-        self.stream = options.pop("stream", six.StringIO())
+        self.stream = options.pop("stream", StringIO())
         self.selected_fields = options.pop("fields", None)
         self.use_natural_foreign_keys = options.pop('use_natural_foreign_keys', False)
         self.use_natural_primary_keys = options.pop('use_natural_primary_keys', False)
@@ -151,7 +152,7 @@ class Serializer(object):
             return self.stream.getvalue()
 
 
-class Deserializer(six.Iterator):
+class Deserializer:
     """
     Abstract base deserializer class.
     """
@@ -161,8 +162,8 @@ class Deserializer(six.Iterator):
         Init this serializer given a stream or a string
         """
         self.options = options
-        if isinstance(stream_or_string, six.string_types):
-            self.stream = six.StringIO(stream_or_string)
+        if isinstance(stream_or_string, str):
+            self.stream = StringIO(stream_or_string)
         else:
             self.stream = stream_or_string
 

@@ -1,4 +1,3 @@
-from django.utils import six
 
 
 class FileProxyMixin(object):
@@ -27,8 +26,7 @@ class FileProxyMixin(object):
     write = property(lambda self: self.file.write)
     writelines = property(lambda self: self.file.writelines)
     xreadlines = property(lambda self: self.file.xreadlines)
-    if six.PY3:
-        seekable = property(lambda self: self.file.seekable)
+    seekable = property(lambda self: self.file.seekable)
 
     def __iter__(self):
         return iter(self.file)

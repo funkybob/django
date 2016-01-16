@@ -54,7 +54,7 @@ class BaseHandler(object):
                 mw_instance = mw_class()
             except MiddlewareNotUsed as exc:
                 if settings.DEBUG:
-                    if six.text_type(exc):
+                    if str(exc):
                         logger.debug('MiddlewareNotUsed(%r): %s', middleware_path, exc)
                     else:
                         logger.debug('MiddlewareNotUsed: %r', middleware_path)
