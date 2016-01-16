@@ -33,13 +33,13 @@ import signal
 import sys
 import time
 import traceback
+import _thread as thread
 
 from django.apps import apps
 from django.conf import settings
 from django.core.signals import request_finished
 from django.utils import six
 from django.utils._os import npath
-from django.utils.six.moves import _thread as thread
 
 # This import does nothing, but it's necessary to avoid some race conditions
 # in the threading module. See http://code.djangoproject.com/ticket/2330 .

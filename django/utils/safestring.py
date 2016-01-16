@@ -4,7 +4,6 @@ without further escaping in HTML. Marking something as a "safe string" means
 that the producer of the string has already turned characters that should not
 be interpreted by the HTML engine (e.g. '<') into the appropriate entities.
 """
-from django.utils import six
 from django.utils.functional import Promise, curry
 
 
@@ -19,18 +18,11 @@ class EscapeBytes(bytes, EscapeData):
     pass
 
 
-class EscapeText(six.text_type, EscapeData):
+class EscapeText(str, EscapeData):
     """
     A unicode string object that should be HTML-escaped when output.
     """
     pass
-
-if six.PY3:
-    EscapeString = EscapeText
-else:
-    EscapeString = EscapeBytes
-    # backwards compatibility for Python 2
-    EscapeUnicode = EscapeText
 
 
 class SafeData(object):
@@ -76,7 +68,7 @@ class SafeBytes(bytes, SafeData):
     decode = curry(_proxy_method, method=bytes.decode)
 
 
-class SafeText(six.text_type, SafeData):
+class SafeText(str, SafeData):
     """
     A unicode (Python 2) / str (Python 3) subclass that has been specifically
     marked as "safe" for HTML output purposes.
@@ -104,14 +96,7 @@ class SafeText(six.text_type, SafeData):
         else:
             return SafeText(data)
 
-    encode = curry(_proxy_method, method=six.text_type.encode)
-
-if six.PY3:
-    SafeString = SafeText
-else:
-    SafeString = SafeBytes
-    # backwards compatibility for Python 2
-    SafeUnicode = SafeText
+    encode = curry(_proxy_method, method=str.encode)
 
 
 def mark_safe(s):
@@ -125,9 +110,9 @@ def mark_safe(s):
         return s
     if isinstance(s, bytes) or (isinstance(s, Promise) and s._delegate_bytes):
         return SafeBytes(s)
-    if isinstance(s, (six.text_type, Promise)):
+    if isinstance(s, (str, Promise)):
         return SafeText(s)
-    return SafeString(str(s))
+    return SafeText(str(s))
 
 
 def mark_for_escaping(s):
@@ -142,6 +127,6 @@ def mark_for_escaping(s):
         return s
     if isinstance(s, bytes) or (isinstance(s, Promise) and s._delegate_bytes):
         return EscapeBytes(s)
-    if isinstance(s, (six.text_type, Promise)):
+    if isinstance(s, (str, Promise)):
         return EscapeText(s)
-    return EscapeString(str(s))
+    return EscapeText(str(s))

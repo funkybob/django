@@ -7,6 +7,7 @@ import re
 import sys
 import warnings
 from collections import OrderedDict
+from io import StringIO
 from threading import local
 
 from django.apps import apps
@@ -15,11 +16,10 @@ from django.conf.locale import LANG_INFO
 from django.core.exceptions import AppRegistryNotReady
 from django.core.signals import setting_changed
 from django.dispatch import receiver
-from django.utils import lru_cache, six
+from django.utils import lru_cache
 from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.safestring import SafeData, mark_safe
-from django.utils.six import StringIO
 from django.utils.translation import (
     LANGUAGE_SESSION_KEY, TranslatorCommentWarning, trim_whitespace,
 )
@@ -314,11 +314,7 @@ def gettext(message):
     """
     return do_translate(message, 'gettext')
 
-if six.PY3:
-    ugettext = gettext
-else:
-    def ugettext(message):
-        return do_translate(message, 'ugettext')
+ugettext = gettext
 
 
 def pgettext(context, message):
@@ -361,15 +357,7 @@ def ngettext(singular, plural, number):
     """
     return do_ntranslate(singular, plural, number, 'ngettext')
 
-if six.PY3:
-    ungettext = ngettext
-else:
-    def ungettext(singular, plural, number):
-        """
-        Returns a unicode strings of the translation of either the singular or
-        plural, based on the number.
-        """
-        return do_ntranslate(singular, plural, number, 'ungettext')
+ungettext = ngettext
 
 
 def npgettext(context, singular, plural, number):

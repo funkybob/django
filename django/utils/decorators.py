@@ -1,13 +1,8 @@
 "Functions that help with dynamically creating decorators for views."
 
-try:
-    from contextlib import ContextDecorator
-except ImportError:
-    ContextDecorator = None
+from contextlib import ContextDecorator
 
 from functools import WRAPPER_ASSIGNMENTS, update_wrapper, wraps
-
-from django.utils import six
 
 
 class classonlymethod(classmethod):
@@ -124,10 +119,7 @@ def available_attrs(fn):
     This is required as a workaround for http://bugs.python.org/issue3445
     under Python 2.
     """
-    if six.PY3:
-        return WRAPPER_ASSIGNMENTS
-    else:
-        return tuple(a for a in WRAPPER_ASSIGNMENTS if hasattr(fn, a))
+    return WRAPPER_ASSIGNMENTS
 
 
 def make_middleware_decorator(middleware_class):

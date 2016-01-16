@@ -8,15 +8,15 @@ import sys
 import unicodedata
 from binascii import Error as BinasciiError
 from email.utils import formatdate
+from urllib.parse import (
+    quote, quote_plus, unquote, unquote_plus, urlencode as original_urlencode,
+    urlparse,
+)
 
 from django.utils import six
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_bytes, force_str, force_text
 from django.utils.functional import keep_lazy_text
-from django.utils.six.moves.urllib.parse import (
-    quote, quote_plus, unquote, unquote_plus, urlencode as original_urlencode,
-    urlparse,
-)
 
 ETAG_MATCH = re.compile(r'(?:W/)?"((?:\\.|[^"])*)"')
 
@@ -186,8 +186,6 @@ def base36_to_int(s):
     value = int(s, 36)
     # ... then do a final check that the value will fit into an int to avoid
     # returning a long (#15067). The long type was removed in Python 3.
-    if six.PY2 and value > sys.maxint:
-        raise ValueError("Base36 input too large")
     return value
 
 
@@ -198,11 +196,6 @@ def int_to_base36(i):
     char_set = '0123456789abcdefghijklmnopqrstuvwxyz'
     if i < 0:
         raise ValueError("Negative base36 conversion input.")
-    if six.PY2:
-        if not isinstance(i, six.integer_types):
-            raise TypeError("Non-integer base36 conversion input.")
-        if i > sys.maxint:
-            raise ValueError("Base36 conversion input too large.")
     if i < 36:
         return char_set[i]
     b36 = ''

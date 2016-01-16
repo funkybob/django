@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 
 import re
 
-from django.utils import six
 from django.utils.decorators import ContextDecorator
 from django.utils.encoding import force_text
 from django.utils.functional import lazy
@@ -97,12 +96,12 @@ def npgettext(context, singular, plural, number):
     return _trans.npgettext(context, singular, plural, number)
 
 gettext_lazy = lazy(gettext, str)
-ugettext_lazy = lazy(ugettext, six.text_type)
-pgettext_lazy = lazy(pgettext, six.text_type)
+ugettext_lazy = lazy(ugettext, str)
+pgettext_lazy = lazy(pgettext, str)
 
 
 def lazy_number(func, resultclass, number=None, **kwargs):
-    if isinstance(number, six.integer_types):
+    if isinstance(number, int):
         kwargs['number'] = number
         proxy = lazy(func, resultclass)(**kwargs)
     else:
@@ -142,11 +141,11 @@ def ngettext_lazy(singular, plural, number=None):
 
 
 def ungettext_lazy(singular, plural, number=None):
-    return lazy_number(ungettext, six.text_type, singular=singular, plural=plural, number=number)
+    return lazy_number(ungettext, str, singular=singular, plural=plural, number=number)
 
 
 def npgettext_lazy(context, singular, plural, number=None):
-    return lazy_number(npgettext, six.text_type, context=context, singular=singular, plural=plural, number=number)
+    return lazy_number(npgettext, str, context=context, singular=singular, plural=plural, number=number)
 
 
 def activate(language):
@@ -216,7 +215,7 @@ def _string_concat(*strings):
     constructed from multiple parts.
     """
     return ''.join(force_text(s) for s in strings)
-string_concat = lazy(_string_concat, six.text_type)
+string_concat = lazy(_string_concat, str)
 
 
 def get_language_info(lang_code):

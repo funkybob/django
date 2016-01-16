@@ -175,7 +175,7 @@ def get_default_timezone():
 
     This is the time zone defined by settings.TIME_ZONE.
     """
-    if isinstance(settings.TIME_ZONE, six.string_types) and pytz is not None:
+    if isinstance(settings.TIME_ZONE, str) and pytz is not None:
         return pytz.timezone(settings.TIME_ZONE)
     else:
         # This relies on os.environ['TZ'] being set to settings.TIME_ZONE.
@@ -232,7 +232,7 @@ def activate(timezone):
     """
     if isinstance(timezone, tzinfo):
         _active.value = timezone
-    elif isinstance(timezone, six.string_types) and pytz is not None:
+    elif isinstance(timezone, str) and pytz is not None:
         _active.value = pytz.timezone(timezone)
     else:
         raise ValueError("Invalid timezone: %r" % timezone)

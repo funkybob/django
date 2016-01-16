@@ -17,7 +17,6 @@ import datetime
 import re
 import time
 
-from django.utils import six
 from django.utils.dates import (
     MONTHS, MONTHS_3, MONTHS_ALT, MONTHS_AP, WEEKDAYS, WEEKDAYS_ABBR,
 )
@@ -179,7 +178,7 @@ class TimeFormat(Formatter):
             pass
         if name is None:
             name = self.format('O')
-        return six.text_type(name)
+        return str(name)
 
     def u(self):
         "Microseconds; i.e. '000000' to '999999'"
@@ -347,7 +346,7 @@ class DateFormat(TimeFormat):
 
     def y(self):
         "Year, 2 digits; e.g. '99'"
-        return six.text_type(self.data.year)[2:]
+        return str(self.data.year)[2:]
 
     def Y(self):
         "Year, 4 digits; e.g. '1999'"
