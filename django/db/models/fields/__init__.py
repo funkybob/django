@@ -30,9 +30,7 @@ from django.utils.deprecation import (
     RemovedInDjango20Warning, warn_about_renamed_method,
 )
 from django.utils.duration import duration_string
-from django.utils.encoding import (
-    force_bytes, force_text, python_2_unicode_compatible, smart_text,
-)
+from django.utils.encoding import force_bytes, force_text, smart_text
 from django.utils.functional import Promise, cached_property, curry
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils.itercompat import is_iterable
@@ -91,7 +89,6 @@ def _empty(of_cls):
 
 
 @total_ordering
-@python_2_unicode_compatible
 class Field(RegisterLookupMixin):
     """Base class for all field types"""
 

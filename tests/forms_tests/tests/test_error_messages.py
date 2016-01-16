@@ -10,7 +10,6 @@ from django.forms import (
     SplitDateTimeField, TimeField, URLField, ValidationError, utils,
 )
 from django.test import SimpleTestCase, TestCase
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 
 
@@ -218,7 +217,6 @@ class FormsErrorMessagesTestCase(SimpleTestCase, AssertFormErrorsMixin):
             def clean(self):
                 raise ValidationError("I like to be awkward.")
 
-        @python_2_unicode_compatible
         class CustomErrorList(utils.ErrorList):
             def __str__(self):
                 return self.as_divs()

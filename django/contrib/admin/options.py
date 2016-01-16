@@ -39,7 +39,7 @@ from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import reverse
 from django.utils import six
 from django.utils.decorators import method_decorator
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.html import escape, format_html
 from django.utils.http import urlencode, urlquote
 from django.utils.safestring import mark_safe
@@ -475,7 +475,6 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         return request.user.has_module_perms(self.opts.app_label)
 
 
-@python_2_unicode_compatible
 class ModelAdmin(BaseModelAdmin):
     "Encapsulates all admin options and functionality for a given model."
 

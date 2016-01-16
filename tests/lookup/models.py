@@ -8,7 +8,6 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class Alarm(models.Model):
@@ -26,7 +25,6 @@ class Author(models.Model):
         ordering = ('name', )
 
 
-@python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateTimeField()
@@ -47,7 +45,6 @@ class Tag(models.Model):
         ordering = ('name', )
 
 
-@python_2_unicode_compatible
 class Season(models.Model):
     year = models.PositiveSmallIntegerField()
     gt = models.IntegerField(null=True, blank=True)
@@ -56,7 +53,6 @@ class Season(models.Model):
         return six.text_type(self.year)
 
 
-@python_2_unicode_compatible
 class Game(models.Model):
     season = models.ForeignKey(Season, models.CASCADE, related_name='games')
     home = models.CharField(max_length=100)
@@ -66,7 +62,6 @@ class Game(models.Model):
         return "%s at %s" % (self.away, self.home)
 
 
-@python_2_unicode_compatible
 class Player(models.Model):
     name = models.CharField(max_length=100)
     games = models.ManyToManyField(Game, related_name='players')

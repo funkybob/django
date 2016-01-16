@@ -15,9 +15,7 @@ from django.templatetags.static import static
 from django.utils import datetime_safe, formats
 from django.utils.datastructures import MultiValueDict
 from django.utils.dates import MONTHS
-from django.utils.encoding import (
-    force_str, force_text, python_2_unicode_compatible,
-)
+from django.utils.encoding import force_str, force_text
 from django.utils.formats import get_format
 from django.utils.html import conditional_escape, format_html, html_safe
 from django.utils.safestring import mark_safe
@@ -37,7 +35,6 @@ MEDIA_TYPES = ('css', 'js')
 
 
 @html_safe
-@python_2_unicode_compatible
 class Media(object):
     def __init__(self, media=None, **kwargs):
         if media:
@@ -156,7 +153,6 @@ class MediaDefiningClass(type):
 
 
 @html_safe
-@python_2_unicode_compatible
 class SubWidget(object):
     """
     Some widgets are made of multiple HTML elements -- namely, RadioSelect.
@@ -603,7 +599,6 @@ class SelectMultiple(Select):
 
 
 @html_safe
-@python_2_unicode_compatible
 class ChoiceInput(SubWidget):
     """
     An object used by ChoiceFieldRenderer that represents a single
@@ -669,7 +664,6 @@ class CheckboxChoiceInput(ChoiceInput):
 
 
 @html_safe
-@python_2_unicode_compatible
 class ChoiceFieldRenderer(object):
     """
     An object used by RadioSelect to enable customization of radio widgets.

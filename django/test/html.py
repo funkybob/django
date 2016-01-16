@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 
 import re
 
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.html_parser import HTMLParseError, HTMLParser
 
 WHITESPACE = re.compile('\s+')
@@ -16,7 +16,6 @@ def normalize_whitespace(string):
     return WHITESPACE.sub(' ', string)
 
 
-@python_2_unicode_compatible
 class Element(object):
     def __init__(self, name, attributes):
         self.name = name
@@ -137,7 +136,6 @@ class Element(object):
         return str(self)
 
 
-@python_2_unicode_compatible
 class RootElement(Element):
     def __init__(self):
         super(RootElement, self).__init__(None, ())

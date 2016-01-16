@@ -6,12 +6,10 @@ from django.contrib.gis.geos import (
     LinearRing, LineString, Point, Polygon, fromstr,
 )
 from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.html import html_safe
 
 
 @html_safe
-@python_2_unicode_compatible
 class GEvent(object):
     """
     A Python wrapper for the Google GEvent object.
@@ -63,7 +61,6 @@ class GEvent(object):
 
 
 @html_safe
-@python_2_unicode_compatible
 class GOverlayBase(object):
     def __init__(self):
         self.events = []

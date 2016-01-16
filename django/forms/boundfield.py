@@ -4,9 +4,7 @@ import datetime
 
 from django.forms.utils import flatatt, pretty_name
 from django.forms.widgets import Textarea, TextInput
-from django.utils.encoding import (
-    force_text, python_2_unicode_compatible, smart_text,
-)
+from django.utils.encoding import force_text, smart_text
 from django.utils.html import conditional_escape, format_html, html_safe
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
@@ -18,7 +16,6 @@ UNSET = object()
 
 
 @html_safe
-@python_2_unicode_compatible
 class BoundField(object):
     "A Field plus data"
     def __init__(self, form, field, name):

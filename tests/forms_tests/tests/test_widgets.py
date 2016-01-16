@@ -11,7 +11,7 @@ from django.forms.widgets import (
 from django.test import SimpleTestCase, override_settings
 from django.urls import reverse
 from django.utils import six
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.safestring import SafeData
 
 from ..models import Article
@@ -178,7 +178,6 @@ class LiveWidgetTests(AdminSeleniumWebDriverTestCase):
         self.assertEqual(article.content, "\r\nTst\r\n")
 
 
-@python_2_unicode_compatible
 class FakeFieldFile(object):
     """
     Quacks like a FieldFile (has a .url and unicode representation), but

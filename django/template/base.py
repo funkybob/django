@@ -61,9 +61,7 @@ from django.template.context import (  # NOQA: imported for backwards compatibil
 from django.utils.deprecation import (
     DeprecationInstanceCheck, RemovedInDjango20Warning,
 )
-from django.utils.encoding import (
-    force_str, force_text, python_2_unicode_compatible,
-)
+from django.utils.encoding import force_str, force_text
 from django.utils.formats import localize
 from django.utils.html import conditional_escape, escape
 from django.utils.inspect import getargspec
@@ -121,7 +119,6 @@ class TemplateEncodingError(Exception):
     pass
 
 
-@python_2_unicode_compatible
 class VariableDoesNotExist(Exception):
 
     def __init__(self, msg, params=()):

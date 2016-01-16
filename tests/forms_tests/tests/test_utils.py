@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.forms.utils import ErrorDict, ErrorList, flatatt
 from django.test import SimpleTestCase
 from django.utils import six
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy
 
@@ -100,7 +100,6 @@ class FormsUtilsTestCase(SimpleTestCase):
             '</ul>'
         )
 
-        @python_2_unicode_compatible
         class VeryBadError:
             def __str__(self):
                 return "A very bad error."
