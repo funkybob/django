@@ -14,7 +14,6 @@ from django.forms.fields import Field, FileField
 # pretty_name is imported for backwards compatibility in Django 1.9
 from django.forms.utils import ErrorDict, ErrorList, pretty_name  # NOQA
 from django.forms.widgets import Media, MediaDefiningClass
-from django.utils import six
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, html_safe
@@ -190,7 +189,7 @@ class BaseForm(object):
                     top_errors.extend(
                         [_('(Hidden field %(name)s) %(error)s') % {'name': name, 'error': force_text(e)}
                          for e in bf_errors])
-                hidden_fields.append(six.text_type(bf))
+                hidden_fields.append(str(bf))
             else:
                 # Create a 'class="..."' attribute if the row should have any
                 # CSS classes applied.
@@ -215,7 +214,7 @@ class BaseForm(object):
                 output.append(normal_row % {
                     'errors': force_text(bf_errors),
                     'label': force_text(label),
-                    'field': six.text_type(bf),
+                    'field': str(bf),
                     'help_text': help_text,
                     'html_class_attr': html_class_attr,
                     'css_classes': css_classes,
@@ -475,7 +474,7 @@ class BaseForm(object):
         return [field for field in self if not field.is_hidden]
 
 
-class Form(six.with_metaclass(DeclarativeFieldsMetaclass, BaseForm)):
+class Form(BaseForm, metaclass=DeclarativeFieldsMetaclass):
     "A collection of Fields, plus their associated data."
     # This is a separate class from BaseForm in order to abstract the way
     # self.fields is specified. This class (Form) is the one that does the

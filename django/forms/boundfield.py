@@ -4,7 +4,6 @@ import datetime
 
 from django.forms.utils import flatatt, pretty_name
 from django.forms.widgets import Textarea, TextInput
-from django.utils import six
 from django.utils.encoding import (
     force_text, python_2_unicode_compatible, smart_text,
 )
@@ -60,7 +59,7 @@ class BoundField(object):
     def __getitem__(self, idx):
         # Prevent unnecessary reevaluation when accessing BoundField's attrs
         # from templates.
-        if not isinstance(idx, six.integer_types):
+        if not isinstance(idx, int):
             raise TypeError
         return list(self.__iter__())[idx]
 
