@@ -1,6 +1,4 @@
 # -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 import warnings
 
 from django.core.checks import Error, Warning as DjangoWarning
@@ -9,7 +7,6 @@ from django.db.models.fields.related import ForeignObject
 from django.test import ignore_warnings
 from django.test.testcases import SimpleTestCase, skipIfDBFeature
 from django.test.utils import isolate_apps, override_settings
-from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.version import get_docs_version
 
@@ -745,10 +742,8 @@ class RelativeFieldTests(SimpleTestCase):
             'with',  # a Python keyword
             'related_name\n',
             '',
+            '，',
         ]
-        # Python 2 crashes on non-ASCII strings.
-        if six.PY3:
-            invalid_related_names.append('，')
 
         class Parent(models.Model):
             pass
@@ -785,10 +780,8 @@ class RelativeFieldTests(SimpleTestCase):
             'ends_with_plus+',
             '_+',
             '+',
+            '試', '試驗+',
         ]
-        # Python 2 crashes on non-ASCII strings.
-        if six.PY3:
-            related_names.extend(['試', '試驗+'])
 
         class Parent(models.Model):
             pass

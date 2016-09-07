@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import datetime
 import json
 import os
 import re
 import unittest
+from urllib.parse import parse_qsl, urljoin, urlparse
 
 from django.contrib.admin import AdminSite, ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
@@ -32,8 +31,7 @@ from django.test import (
 )
 from django.test.utils import override_script_prefix, patch_logger
 from django.urls import NoReverseMatch, resolve, reverse
-from django.utils import formats, six, translation
-from django.utils._os import upath
+from django.utils import formats, translation
 from django.utils.cache import get_max_age
 from django.utils.deprecation import (
     RemovedInDjango20Warning, RemovedInDjango21Warning,
@@ -41,7 +39,6 @@ from django.utils.deprecation import (
 from django.utils.encoding import force_bytes, force_text, iri_to_uri
 from django.utils.html import escape
 from django.utils.http import urlencode
-from django.utils.six.moves.urllib.parse import parse_qsl, urljoin, urlparse
 
 from . import customadmin
 from .admin import CityAdmin, site, site2
@@ -926,8 +923,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
     # Put this app's and the shared tests templates dirs in DIRS to take precedence
     # over the admin's templates dir.
     'DIRS': [
-        os.path.join(os.path.dirname(upath(__file__)), 'templates'),
-        os.path.join(os.path.dirname(os.path.dirname(upath(__file__))), 'templates'),
+        os.path.join(os.path.dirname(__file__), 'templates'),
+        os.path.join(os.path.dirname(os.path.dirname(__file__)), 'templates'),
     ],
     'APP_DIRS': True,
     'OPTIONS': {
@@ -1964,7 +1961,7 @@ class AdminViewPermissionsTest(TestCase):
         # Can't use self.assertRedirects() because User.get_absolute_url() is silly.
         self.assertEqual(response.status_code, 302)
         # Domain may depend on contrib.sites tests also run
-        six.assertRegex(self, response.url, 'http://(testserver|example.com)/dummy/foo/')
+        self.assertRegex(response.url, 'http://(testserver|example.com)/dummy/foo/')
 
     def test_has_module_permission(self):
         """
@@ -2126,7 +2123,7 @@ class AdminViewDeletedObjectsTest(TestCase):
             )
         )
         response = self.client.get(reverse('admin:admin_views_villain_delete', args=(self.v1.pk,)))
-        six.assertRegex(self, response.content, pattern)
+        self.assertRegex(response.content, pattern)
 
     def test_cyclic(self):
         """
@@ -3708,7 +3705,7 @@ class AdminCustomQuerysetTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(ShortMessage.objects.count(), 1)
         # Message should contain non-ugly model verbose name. The ugly(!)
-        # instance representation is set by six.text_type()
+        # instance representation is set by str()
         self.assertContains(
             response,
             '<li class="success">The short message "<a href="%s">'
@@ -3755,7 +3752,7 @@ class AdminCustomQuerysetTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Paper.objects.count(), 1)
         # Message should contain non-ugly model verbose name. The ugly(!)
-        # instance representation is set by six.text_type()
+        # instance representation is set by str()
         self.assertContains(
             response,
             '<li class="success">The paper "<a href="%s">'
@@ -3813,8 +3810,8 @@ class AdminInlineFileUploadTest(TestCase):
             "pictures-TOTAL_FORMS": "2",
             "pictures-INITIAL_FORMS": "1",
             "pictures-MAX_NUM_FORMS": "0",
-            "pictures-0-id": six.text_type(self.picture.id),
-            "pictures-0-gallery": six.text_type(self.gallery.id),
+            "pictures-0-id": str(self.picture.id),
+            "pictures-0-gallery": str(self.gallery.id),
             "pictures-0-name": "Test Picture",
             "pictures-0-image": "",
             "pictures-1-id": "",

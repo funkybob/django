@@ -1,8 +1,6 @@
 """
 Management utility to create superusers.
 """
-from __future__ import unicode_literals
-
 import getpass
 import sys
 
@@ -13,7 +11,6 @@ from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS
 from django.utils.encoding import force_str
-from django.utils.six.moves import input
 from django.utils.text import capfirst
 
 

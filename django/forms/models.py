@@ -18,7 +18,6 @@ from django.forms.utils import ErrorList
 from django.forms.widgets import (
     HiddenInput, MultipleHiddenInput, SelectMultiple,
 )
-from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext, ugettext_lazy as _
@@ -217,7 +216,7 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
         # of ('foo',)
         for opt in ['fields', 'exclude', 'localized_fields']:
             value = getattr(opts, opt)
-            if isinstance(value, six.string_types) and value != ALL_FIELDS:
+            if isinstance(value, str) and value != ALL_FIELDS:
                 msg = ("%(model)s.Meta.%(opt)s cannot be a string. "
                        "Did you mean to type: ('%(value)s',)?" % {
                            'model': new_class.__name__,
@@ -247,7 +246,7 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
                                       opts.field_classes)
 
             # make sure opts.fields doesn't specify an invalid field
-            none_model_fields = [k for k, v in six.iteritems(fields) if not v]
+            none_model_fields = [k for k, v in fields.items() if not v]
             missing_fields = (set(none_model_fields) -
                               set(new_class.declared_fields.keys()))
             if missing_fields:
@@ -461,7 +460,7 @@ class BaseModelForm(BaseForm):
     save.alters_data = True
 
 
-class ModelForm(six.with_metaclass(ModelFormMetaclass, BaseModelForm)):
+class ModelForm(BaseModelForm, metaclass=ModelFormMetaclass):
     pass
 
 
@@ -731,7 +730,7 @@ class BaseModelFormSet(BaseFormSet):
             }
         else:
             return ugettext("Please correct the duplicate data for %(field)s, which must be unique.") % {
-                "field": get_text_list(unique_check, six.text_type(_("and"))),
+                "field": get_text_list(unique_check, str(_("and"))),
             }
 
     def get_date_error_message(self, date_check):
@@ -741,7 +740,7 @@ class BaseModelFormSet(BaseFormSet):
         ) % {
             'field_name': date_check[2],
             'date_field': date_check[3],
-            'lookup': six.text_type(date_check[1]),
+            'lookup': str(date_check[1]),
         }
 
     def get_form_error(self):
@@ -1308,7 +1307,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
 
     def prepare_value(self, value):
         if (hasattr(value, '__iter__') and
-                not isinstance(value, six.text_type) and
+                not isinstance(value, str) and
                 not hasattr(value, '_meta')):
             return [super(ModelMultipleChoiceField, self).prepare_value(v) for v in value]
         return super(ModelMultipleChoiceField, self).prepare_value(value)

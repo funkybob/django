@@ -1,17 +1,12 @@
 """HTML utilities suitable for global use."""
 
-from __future__ import unicode_literals
-
 import re
+from urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit
 
-from django.utils import six
 from django.utils.encoding import force_str, force_text
 from django.utils.functional import keep_lazy, keep_lazy_text
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.safestring import SafeData, SafeText, mark_safe
-from django.utils.six.moves.urllib.parse import (
-    parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit,
-)
 from django.utils.text import normalize_newlines
 
 from .html_parser import HTMLParseError, HTMLParser
@@ -35,7 +30,7 @@ simple_url_2_re = re.compile(r'^www\.|^(?!http)\w[^@]+\.(com|edu|gov|int|mil|net
 simple_email_re = re.compile(r'^\S+@\S+\.\S+$')
 
 
-@keep_lazy(six.text_type, SafeText)
+@keep_lazy(str, SafeText)
 def escape(text):
     """
     Returns the given text with ampersands, quotes and angle brackets encoded
@@ -68,7 +63,7 @@ _js_escapes = {
 _js_escapes.update((ord('%c' % z), '\\u%04X' % z) for z in range(32))
 
 
-@keep_lazy(six.text_type, SafeText)
+@keep_lazy(str, SafeText)
 def escapejs(value):
     """Hex encodes characters for use in JavaScript strings."""
     return mark_safe(force_text(value).translate(_js_escapes))
@@ -94,7 +89,7 @@ def format_html(format_string, *args, **kwargs):
     of str.format or % interpolation to build up small HTML fragments.
     """
     args_safe = map(conditional_escape, args)
-    kwargs_safe = {k: conditional_escape(v) for (k, v) in six.iteritems(kwargs)}
+    kwargs_safe = {k: conditional_escape(v) for (k, v) in kwargs.items()}
     return mark_safe(format_string.format(*args_safe, **kwargs_safe))
 
 
@@ -364,22 +359,12 @@ def html_safe(klass):
             "can't apply @html_safe to %s because it defines "
             "__html__()." % klass.__name__
         )
-    if six.PY2:
-        if '__unicode__' not in klass.__dict__:
-            raise ValueError(
-                "can't apply @html_safe to %s because it doesn't "
-                "define __unicode__()." % klass.__name__
-            )
-        klass_unicode = klass.__unicode__
-        klass.__unicode__ = lambda self: mark_safe(klass_unicode(self))
-        klass.__html__ = lambda self: unicode(self)  # NOQA: unicode undefined on PY3
-    else:
-        if '__str__' not in klass.__dict__:
-            raise ValueError(
-                "can't apply @html_safe to %s because it doesn't "
-                "define __str__()." % klass.__name__
-            )
-        klass_str = klass.__str__
-        klass.__str__ = lambda self: mark_safe(klass_str(self))
-        klass.__html__ = lambda self: str(self)
+    if '__str__' not in klass.__dict__:
+        raise ValueError(
+            "can't apply @html_safe to %s because it doesn't "
+            "define __str__()." % klass.__name__
+        )
+    klass_str = klass.__str__
+    klass.__str__ = lambda self: mark_safe(klass_str(self))
+    klass.__html__ = lambda self: str(self)
     return klass

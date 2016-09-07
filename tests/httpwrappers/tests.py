@@ -1,12 +1,11 @@
 # -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 import copy
 import json
 import os
 import pickle
 import unittest
 import uuid
+from http.cookies import SimpleCookie
 
 from django.core.exceptions import SuspiciousOperation
 from django.core.serializers.json import DjangoJSONEncoder
@@ -15,12 +14,10 @@ from django.db import close_old_connections
 from django.http import (
     BadHeaderError, HttpResponse, HttpResponseNotAllowed,
     HttpResponseNotModified, HttpResponsePermanentRedirect,
-    HttpResponseRedirect, JsonResponse, QueryDict, SimpleCookie,
+    HttpResponseRedirect, JsonResponse, QueryDict,
     StreamingHttpResponse, parse_cookie,
 )
 from django.test import SimpleTestCase
-from django.utils import six
-from django.utils._os import upath
 from django.utils.encoding import force_str
 from django.utils.functional import lazystr
 
@@ -58,13 +55,11 @@ class QueryDictTests(SimpleTestCase):
     def test_immutable_basic_operations(self):
         q = QueryDict()
         self.assertEqual(q.getlist('foo'), [])
-        if six.PY2:
-            self.assertIs(q.has_key('foo'), False)
         self.assertNotIn('foo', q)
-        self.assertEqual(list(six.iteritems(q)), [])
-        self.assertEqual(list(six.iterlists(q)), [])
-        self.assertEqual(list(six.iterkeys(q)), [])
-        self.assertEqual(list(six.itervalues(q)), [])
+        self.assertEqual(list(q.items()), [])
+        self.assertEqual(list(q.lists()), [])
+        self.assertEqual(list(q.keys()), [])
+        self.assertEqual(list(q.values()), [])
         self.assertEqual(len(q), 0)
         self.assertEqual(q.urlencode(), '')
 
@@ -88,17 +83,13 @@ class QueryDictTests(SimpleTestCase):
         with self.assertRaises(AttributeError):
             q.appendlist('foo', ['bar'])
 
-        if six.PY2:
-            self.assertTrue(q.has_key('foo'))
         self.assertIn('foo', q)
-        if six.PY2:
-            self.assertFalse(q.has_key('bar'))
         self.assertNotIn('bar', q)
 
-        self.assertEqual(list(six.iteritems(q)), [('foo', 'bar')])
-        self.assertEqual(list(six.iterlists(q)), [('foo', ['bar'])])
-        self.assertEqual(list(six.iterkeys(q)), ['foo'])
-        self.assertEqual(list(six.itervalues(q)), ['bar'])
+        self.assertEqual(list(q.items()), [('foo', 'bar')])
+        self.assertEqual(list(q.lists()), [('foo', ['bar'])])
+        self.assertEqual(list(q.keys()), ['foo'])
+        self.assertEqual(list(q.values()), ['bar'])
         self.assertEqual(len(q), 1)
 
         with self.assertRaises(AttributeError):
@@ -153,18 +144,12 @@ class QueryDictTests(SimpleTestCase):
         q.appendlist('foo', 'another')
         self.assertEqual(q.getlist('foo'), ['bar', 'baz', 'another'])
         self.assertEqual(q['foo'], 'another')
-        if six.PY2:
-            self.assertTrue(q.has_key('foo'))
         self.assertIn('foo', q)
 
-        self.assertListEqual(sorted(six.iteritems(q)),
-                             [('foo', 'another'), ('name', 'john')])
-        self.assertListEqual(sorted(six.iterlists(q)),
-                             [('foo', ['bar', 'baz', 'another']), ('name', ['john'])])
-        self.assertListEqual(sorted(six.iterkeys(q)),
-                             ['foo', 'name'])
-        self.assertListEqual(sorted(six.itervalues(q)),
-                             ['another', 'john'])
+        self.assertListEqual(sorted(q.items()), [('foo', 'another'), ('name', 'john')])
+        self.assertListEqual(sorted(q.lists()), [('foo', ['bar', 'baz', 'another']), ('name', ['john'])])
+        self.assertListEqual(sorted(q.keys()), ['foo', 'name'])
+        self.assertListEqual(sorted(q.values()), ['another', 'john'])
 
         q.update({'foo': 'hello'})
         self.assertEqual(q['foo'], 'hello')
@@ -202,16 +187,12 @@ class QueryDictTests(SimpleTestCase):
         with self.assertRaises(AttributeError):
             q.appendlist('foo', ['bar'])
 
-        if six.PY2:
-            self.assertIs(q.has_key('vote'), True)
         self.assertIn('vote', q)
-        if six.PY2:
-            self.assertIs(q.has_key('foo'), False)
         self.assertNotIn('foo', q)
-        self.assertEqual(list(six.iteritems(q)), [('vote', 'no')])
-        self.assertEqual(list(six.iterlists(q)), [('vote', ['yes', 'no'])])
-        self.assertEqual(list(six.iterkeys(q)), ['vote'])
-        self.assertEqual(list(six.itervalues(q)), ['no'])
+        self.assertEqual(list(q.items()), [('vote', 'no')])
+        self.assertEqual(list(q.lists()), [('vote', ['yes', 'no'])])
+        self.assertEqual(list(q.keys()), ['vote'])
+        self.assertEqual(list(q.values()), ['no'])
         self.assertEqual(len(q), 1)
 
         with self.assertRaises(AttributeError):
@@ -226,19 +207,6 @@ class QueryDictTests(SimpleTestCase):
             q.setdefault('foo', 'bar')
         with self.assertRaises(AttributeError):
             q.__delitem__('vote')
-
-    if six.PY2:
-        def test_invalid_input_encoding(self):
-            """
-            QueryDicts must be able to handle invalid input encoding (in this
-            case, bad UTF-8 encoding), falling back to ISO-8859-1 decoding.
-
-            This test doesn't apply under Python 3 because the URL is a string
-            and not a bytestring.
-            """
-            q = QueryDict(str(b'foo=bar&foo=\xff'))
-            self.assertEqual(q['foo'], '\xff')
-            self.assertEqual(q.getlist('foo'), ['bar', '\xff'])
 
     def test_pickle(self):
         q = QueryDict()
@@ -262,11 +230,11 @@ class QueryDictTests(SimpleTestCase):
         """#13572 - QueryDict with a non-default encoding"""
         q = QueryDict(str('cur=%A4'), encoding='iso-8859-15')
         self.assertEqual(q.encoding, 'iso-8859-15')
-        self.assertEqual(list(six.iteritems(q)), [('cur', '€')])
+        self.assertEqual(list(q.items()), [('cur', '€')])
         self.assertEqual(q.urlencode(), 'cur=%A4')
         q = q.copy()
         self.assertEqual(q.encoding, 'iso-8859-15')
-        self.assertEqual(list(six.iteritems(q)), [('cur', '€')])
+        self.assertEqual(list(q.items()), [('cur', '€')])
         self.assertEqual(q.urlencode(), 'cur=%A4')
         self.assertEqual(copy.copy(q).encoding, 'iso-8859-15')
         self.assertEqual(copy.deepcopy(q).encoding, 'iso-8859-15')
@@ -587,7 +555,7 @@ class StreamingHttpResponseTests(SimpleTestCase):
         chunks = list(r)
         self.assertEqual(chunks, [b'hello', b'world'])
         for chunk in chunks:
-            self.assertIsInstance(chunk, six.binary_type)
+            self.assertIsInstance(chunk, bytes)
 
         # and the response can only be iterated once.
         self.assertEqual(list(r), [])
@@ -604,7 +572,7 @@ class StreamingHttpResponseTests(SimpleTestCase):
         # '\xc3\xa9' == unichr(233).encode('utf-8')
         self.assertEqual(chunks, [b'hello', b'caf\xc3\xa9'])
         for chunk in chunks:
-            self.assertIsInstance(chunk, six.binary_type)
+            self.assertIsInstance(chunk, bytes)
 
         # streaming responses don't have a `content` attribute.
         self.assertFalse(hasattr(r, 'content'))
@@ -626,7 +594,7 @@ class StreamingHttpResponseTests(SimpleTestCase):
         # message like a regular response does. it only gives us the headers.
         r = StreamingHttpResponse(iter(['hello', 'world']))
         self.assertEqual(
-            six.binary_type(r), b'Content-Type: text/html; charset=utf-8')
+            bytes(r), b'Content-Type: text/html; charset=utf-8')
 
         # and this won't consume its content.
         self.assertEqual(list(r), [b'hello', b'world'])
@@ -655,7 +623,7 @@ class FileCloseTests(SimpleTestCase):
         request_finished.connect(close_old_connections)
 
     def test_response(self):
-        filename = os.path.join(os.path.dirname(upath(__file__)), 'abc.txt')
+        filename = os.path.join(os.path.dirname(__file__), 'abc.txt')
 
         # file isn't closed until we close the response.
         file1 = open(filename)
@@ -673,7 +641,7 @@ class FileCloseTests(SimpleTestCase):
         self.assertTrue(file2.closed)
 
     def test_streaming_response(self):
-        filename = os.path.join(os.path.dirname(upath(__file__)), 'abc.txt')
+        filename = os.path.join(os.path.dirname(__file__), 'abc.txt')
 
         # file isn't closed until we close the response.
         file1 = open(filename)
@@ -800,15 +768,6 @@ class CookieTests(unittest.TestCase):
         c = SimpleCookie()
         c.load({'name': 'val'})
         self.assertEqual(c['name'].value, 'val')
-
-    @unittest.skipUnless(six.PY2, "PY3 throws an exception on invalid cookie keys.")
-    def test_bad_cookie(self):
-        """
-        Regression test for #18403
-        """
-        r = HttpResponse()
-        r.set_cookie("a:.b/", 1)
-        self.assertEqual(len(r.cookies.bad_cookies), 1)
 
     def test_pickle(self):
         rawdata = 'Customer="WILE_E_COYOTE"; Path=/acme; Version=1'

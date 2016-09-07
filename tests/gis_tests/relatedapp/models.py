@@ -1,5 +1,3 @@
-from django.utils.encoding import python_2_unicode_compatible
-
 from ..models import models
 
 
@@ -12,7 +10,6 @@ class SimpleModel(models.Model):
         required_db_features = ['gis_enabled']
 
 
-@python_2_unicode_compatible
 class Location(SimpleModel):
     point = models.PointField()
 
@@ -20,7 +17,6 @@ class Location(SimpleModel):
         return self.point.wkt
 
 
-@python_2_unicode_compatible
 class City(SimpleModel):
     name = models.CharField(max_length=50)
     state = models.CharField(max_length=2)
@@ -39,7 +35,6 @@ class DirectoryEntry(SimpleModel):
     location = models.ForeignKey(AugmentedLocation, models.CASCADE)
 
 
-@python_2_unicode_compatible
 class Parcel(SimpleModel):
     name = models.CharField(max_length=30)
     city = models.ForeignKey(City, models.CASCADE)

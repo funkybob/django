@@ -1,5 +1,6 @@
+from functools import lru_cache
+
 from django.core.exceptions import ImproperlyConfigured
-from django.utils import lru_cache, six
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
@@ -52,7 +53,7 @@ class Engine(object):
         self.template_builtins = self.get_template_builtins(self.builtins)
 
     @staticmethod
-    @lru_cache.lru_cache()
+    @lru_cache()
     def get_default():
         """
         When only one DjangoTemplates backend is configured, returns it.
@@ -120,7 +121,7 @@ class Engine(object):
         else:
             args = []
 
-        if isinstance(loader, six.string_types):
+        if isinstance(loader, str):
             loader_class = import_string(loader)
             return loader_class(self, *args)
         else:

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import difflib
 import json
 import posixpath
@@ -12,6 +10,8 @@ from contextlib import contextmanager
 from copy import copy
 from functools import wraps
 from unittest.util import safe_repr
+from urllib.parse import unquote, urljoin, urlparse, urlsplit, urlunsplit
+from urllib.request import url2pathname
 
 from django.apps import apps
 from django.conf import settings
@@ -34,14 +34,9 @@ from django.test.utils import (
     CaptureQueriesContext, ContextList, compare_xml, modify_settings,
     override_settings,
 )
-from django.utils import six
 from django.utils.decorators import classproperty
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
-from django.utils.six.moves.urllib.parse import (
-    unquote, urljoin, urlparse, urlsplit, urlunsplit,
-)
-from django.utils.six.moves.urllib.request import url2pathname
 from django.views.static import serve
 
 __all__ = ('TestCase', 'TransactionTestCase',
@@ -701,8 +696,8 @@ class SimpleTestCase(unittest.TestCase):
             standardMsg = '%s != %s' % (
                 safe_repr(dom1, True), safe_repr(dom2, True))
             diff = ('\n' + '\n'.join(difflib.ndiff(
-                six.text_type(dom1).splitlines(),
-                six.text_type(dom2).splitlines(),
+                str(dom1).splitlines(),
+                str(dom2).splitlines(),
             )))
             standardMsg = self._truncateMessage(standardMsg, diff)
             self.fail(self._formatMessage(msg, standardMsg))
@@ -739,7 +734,7 @@ class SimpleTestCase(unittest.TestCase):
             data = json.loads(raw)
         except ValueError:
             self.fail("First argument is not valid JSON: %r" % raw)
-        if isinstance(expected_data, six.string_types):
+        if isinstance(expected_data, str):
             try:
                 expected_data = json.loads(expected_data)
             except ValueError:
@@ -756,7 +751,7 @@ class SimpleTestCase(unittest.TestCase):
             data = json.loads(raw)
         except ValueError:
             self.fail("First argument is not valid JSON: %r" % raw)
-        if isinstance(expected_data, six.string_types):
+        if isinstance(expected_data, str):
             try:
                 expected_data = json.loads(expected_data)
             except ValueError:
@@ -779,8 +774,8 @@ class SimpleTestCase(unittest.TestCase):
                 standardMsg = '%s != %s' % (safe_repr(xml1, True), safe_repr(xml2, True))
                 diff = ('\n' + '\n'.join(
                     difflib.ndiff(
-                        six.text_type(xml1).splitlines(),
-                        six.text_type(xml2).splitlines(),
+                        str(xml1).splitlines(),
+                        str(xml2).splitlines(),
                     )
                 ))
                 standardMsg = self._truncateMessage(standardMsg, diff)
@@ -952,7 +947,7 @@ class TransactionTestCase(SimpleTestCase):
                          inhibit_post_migrate=inhibit_post_migrate)
 
     def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True, msg=None):
-        items = six.moves.map(transform, qs)
+        items = map(transform, qs)
         if not ordered:
             return self.assertEqual(Counter(items), Counter(values), msg=msg)
         values = list(values)

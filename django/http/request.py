@@ -5,6 +5,7 @@ import re
 import sys
 from io import BytesIO
 from itertools import chain
+from urllib.parse import quote, urlencode, urljoin, urlsplit
 
 from django.conf import settings
 from django.core import signing
@@ -13,15 +14,11 @@ from django.core.exceptions import (
 )
 from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser, MultiPartParserError
-from django.utils import six
 from django.utils.datastructures import ImmutableList, MultiValueDict
 from django.utils.encoding import (
     escape_uri_path, force_bytes, force_str, force_text, iri_to_uri,
 )
 from django.utils.http import is_same_domain, limited_parse_qsl
-from django.utils.six.moves.urllib.parse import (
-    quote, urlencode, urljoin, urlsplit,
-)
 
 RAISE_ERROR = object()
 host_validation_re = re.compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?$")
@@ -271,7 +268,7 @@ class HttpRequest(object):
             try:
                 self._body = self.read()
             except IOError as e:
-                six.reraise(UnreadablePostError, UnreadablePostError(*e.args), sys.exc_info()[2])
+                raise UnreadablePostError(*e.args).with_traceback(sys.exc_info()[2])
             self._stream = BytesIO(self._body)
         return self._body
 
@@ -330,14 +327,14 @@ class HttpRequest(object):
         try:
             return self._stream.read(*args, **kwargs)
         except IOError as e:
-            six.reraise(UnreadablePostError, UnreadablePostError(*e.args), sys.exc_info()[2])
+            raise UnreadablePostError(*e.args).with_traceback(sys.exc_info()[2])
 
     def readline(self, *args, **kwargs):
         self._read_started = True
         try:
             return self._stream.readline(*args, **kwargs)
         except IOError as e:
-            six.reraise(UnreadablePostError, UnreadablePostError(*e.args), sys.exc_info()[2])
+            raise UnreadablePostError(*e.args).with_traceback(sys.exc_info()[2])
 
     def xreadlines(self):
         while True:
@@ -383,24 +380,15 @@ class QueryDict(MultiValueDict):
             'fields_limit': settings.DATA_UPLOAD_MAX_NUMBER_FIELDS,
             'encoding': encoding,
         }
-        if six.PY3:
-            if isinstance(query_string, bytes):
-                # query_string normally contains URL-encoded data, a subset of ASCII.
-                try:
-                    query_string = query_string.decode(encoding)
-                except UnicodeDecodeError:
-                    # ... but some user agents are misbehaving :-(
-                    query_string = query_string.decode('iso-8859-1')
-            for key, value in limited_parse_qsl(query_string, **parse_qsl_kwargs):
-                self.appendlist(key, value)
-        else:
-            for key, value in limited_parse_qsl(query_string, **parse_qsl_kwargs):
-                try:
-                    value = value.decode(encoding)
-                except UnicodeDecodeError:
-                    value = value.decode('iso-8859-1')
-                self.appendlist(force_text(key, encoding, errors='replace'),
-                                value)
+        if isinstance(query_string, bytes):
+            # query_string normally contains URL-encoded data, a subset of ASCII.
+            try:
+                query_string = query_string.decode(encoding)
+            except UnicodeDecodeError:
+                # ... but some user agents are misbehaving :-(
+                query_string = query_string.decode('iso-8859-1')
+        for key, value in limited_parse_qsl(query_string, **parse_qsl_kwargs):
+            self.appendlist(key, value)
         self._mutable = mutable
 
     @classmethod
@@ -442,14 +430,14 @@ class QueryDict(MultiValueDict):
 
     def __copy__(self):
         result = self.__class__('', mutable=True, encoding=self.encoding)
-        for key, value in six.iterlists(self):
+        for key, value in iter(self.lists()):
             result.setlist(key, value)
         return result
 
     def __deepcopy__(self, memo):
         result = self.__class__('', mutable=True, encoding=self.encoding)
         memo[id(self)] = result
-        for key, value in six.iterlists(self):
+        for key, value in iter(self.lists()):
             result.setlist(copy.deepcopy(key, memo), copy.deepcopy(value, memo))
         return result
 
@@ -533,7 +521,7 @@ def bytes_to_text(s, encoding):
     Returns any non-basestring objects without change.
     """
     if isinstance(s, bytes):
-        return six.text_type(s, encoding, 'replace')
+        return str(s, encoding, 'replace')
     else:
         return s
 

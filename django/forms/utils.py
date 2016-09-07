@@ -5,8 +5,8 @@ import sys
 
 from django.conf import settings
 from django.core.exceptions import ValidationError  # backwards compatibility
-from django.utils import six, timezone
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils import timezone
+from django.utils.encoding import force_text
 from django.utils.html import escape, format_html, format_html_join, html_safe
 from django.utils.translation import ugettext_lazy as _
 
@@ -50,7 +50,6 @@ def flatatt(attrs):
 
 
 @html_safe
-@python_2_unicode_compatible
 class ErrorDict(dict):
     """
     A collection of errors that knows how to display itself in various formats.
@@ -83,7 +82,6 @@ class ErrorDict(dict):
 
 
 @html_safe
-@python_2_unicode_compatible
 class ErrorList(UserList, list):
     """
     A collection of errors that knows how to display itself in various formats.
@@ -174,11 +172,11 @@ def from_current_timezone(value):
                 'may be ambiguous or it may not exist.'
             )
             params = {'datetime': value, 'current_timezone': current_timezone}
-            six.reraise(ValidationError, ValidationError(
+            ValidationError(
                 message,
                 code='ambiguous_timezone',
                 params=params,
-            ), sys.exc_info()[2])
+            ).with_traceback(sys.exc_info()[2])
     return value
 
 

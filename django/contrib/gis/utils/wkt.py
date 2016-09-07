@@ -3,7 +3,6 @@
 """
 import warnings
 
-from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 
 
@@ -30,7 +29,7 @@ def precision_wkt(geom, prec):
 
     if isinstance(prec, int):
         num_fmt = '%%.%df' % prec
-    elif isinstance(prec, six.string_types):
+    elif isinstance(prec, str):
         num_fmt = prec
     else:
         raise TypeError

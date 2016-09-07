@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import os
 import socket
 import unittest
@@ -11,7 +9,6 @@ from django.conf import settings
 from django.contrib.gis.geoip import HAS_GEOIP
 from django.contrib.gis.geos import HAS_GEOS, GEOSGeometry
 from django.test import ignore_warnings
-from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 
@@ -39,7 +36,7 @@ class GeoIPTest(unittest.TestCase):
         # Naive check to see if there is DNS available to use.
         # Used to conditionally skip fqdn geoip checks.
         # See #25407 for details.
-        ErrClass = socket.error if six.PY2 else OSError
+        ErrClass = OSError
         try:
             socket.gethostbyname(domain)
             return True
@@ -70,7 +67,7 @@ class GeoIPTest(unittest.TestCase):
         for bad in bad_params:
             with self.assertRaises(GeoIPException):
                 GeoIP(cache=bad)
-            if isinstance(bad, six.string_types):
+            if isinstance(bad, str):
                 e = GeoIPException
             else:
                 e = TypeError

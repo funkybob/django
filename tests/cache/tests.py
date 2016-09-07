@@ -2,11 +2,11 @@
 
 # Unit tests for cache framework
 # Uses whatever cache backend is set in the test settings file.
-from __future__ import unicode_literals
 
 import copy
 import io
 import os
+import pickle
 import re
 import shutil
 import tempfile
@@ -37,7 +37,7 @@ from django.test import (
     ignore_warnings, mock, override_settings,
 )
 from django.test.signals import setting_changed
-from django.utils import six, timezone, translation
+from django.utils import timezone, translation
 from django.utils.cache import (
     get_cache_key, learn_cache_key, patch_cache_control,
     patch_response_headers, patch_vary_headers,
@@ -48,10 +48,6 @@ from django.views.decorators.cache import cache_page
 
 from .models import Poll, expensive_calculation
 
-try:    # Use the same idiom as in cache backends
-    from django.utils.six.moves import cPickle as pickle
-except ImportError:
-    import pickle
 
 
 # functions/classes for complex data type tests
@@ -932,11 +928,7 @@ class BaseCacheTests(object):
         self.assertEqual(cache.get_or_set('mykey', my_callable()), 'value')
 
     def test_get_or_set_version(self):
-        msg = (
-            "get_or_set() missing 1 required positional argument: 'default'"
-            if six.PY3
-            else 'get_or_set() takes at least 3 arguments'
-        )
+        msg = "get_or_set() missing 1 required positional argument: 'default'"
         cache.get_or_set('brian', 1979, version=2)
         with self.assertRaisesMessage(TypeError, msg):
             cache.get_or_set('brian')
@@ -986,7 +978,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         self._perform_cull_test(caches['zero_cull'], 50, 18)
 
     def test_second_call_doesnt_crash(self):
-        out = six.StringIO()
+        out = io.StringIO()
         management.call_command('createcachetable', stdout=out)
         self.assertEqual(out.getvalue(), "Cache table 'test cache table' already exists.\n" * len(settings.CACHES))
 
@@ -996,7 +988,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         LOCATION='createcachetable_dry_run_mode'
     ))
     def test_createcachetable_dry_run_mode(self):
-        out = six.StringIO()
+        out = io.StringIO()
         management.call_command('createcachetable', dry_run=True, stdout=out)
         output = out.getvalue()
         self.assertTrue(output.startswith("CREATE TABLE"))
@@ -1007,7 +999,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         specifying the table name).
         """
         self.drop_table()
-        out = six.StringIO()
+        out = io.StringIO()
         management.call_command(
             'createcachetable',
             'test cache table',

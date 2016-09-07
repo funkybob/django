@@ -1,6 +1,4 @@
 # -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 import datetime
 import decimal
 import gettext as gettext_module
@@ -19,8 +17,7 @@ from django.test import (
     RequestFactory, SimpleTestCase, TestCase, ignore_warnings,
     override_settings,
 )
-from django.utils import six, translation
-from django.utils._os import upath
+from django.utils import translation
 from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.formats import (
     date_format, get_format, get_format_modules, iter_format_modules, localize,
@@ -28,7 +25,6 @@ from django.utils.formats import (
 )
 from django.utils.numberformat import format as nformat
 from django.utils.safestring import SafeBytes, SafeString, SafeText, mark_safe
-from django.utils.six import PY3
 from django.utils.translation import (
     LANGUAGE_SESSION_KEY, activate, check_for_language, deactivate,
     get_language, get_language_bidi, get_language_from_request,
@@ -40,7 +36,7 @@ from django.utils.translation import (
 from .forms import CompanyForm, I18nForm, SelectDateForm
 from .models import Company, TestModel
 
-here = os.path.dirname(os.path.abspath(upath(__file__)))
+here = os.path.dirname(os.path.abspath(__file__))
 extended_locale_paths = settings.LOCALE_PATHS + [
     os.path.join(here, 'other', 'locale'),
 ]
@@ -146,38 +142,11 @@ class TranslationTests(SimpleTestCase):
         s4 = ugettext_lazy('Some other string')
         self.assertNotEqual(s, s4)
 
-    @skipUnless(six.PY2, "No more bytestring translations on PY3")
-    def test_bytestrings(self):
-        """gettext() returns a bytestring if input is bytestring."""
-
-        # Using repr() to check translated text and type
-        self.assertEqual(repr(gettext(b"Time")), repr(b"Time"))
-        self.assertEqual(repr(gettext("Time")), repr("Time"))
-
-        with translation.override('de', deactivate=True):
-            self.assertEqual(repr(gettext(b"Time")), repr(b"Zeit"))
-            self.assertEqual(repr(gettext("Time")), repr(b"Zeit"))
-
-    @skipUnless(six.PY2, "No more bytestring translations on PY3")
-    def test_lazy_and_bytestrings(self):
-        # On Python 2, (n)gettext_lazy should not transform a bytestring to unicode
-        self.assertEqual(gettext_lazy(b"test").upper(), b"TEST")
-        self.assertEqual((ngettext_lazy(b"%d test", b"%d tests") % 1).upper(), b"1 TEST")
-
-        # Other versions of lazy functions always return unicode
-        self.assertEqual(ugettext_lazy(b"test").upper(), "TEST")
-        self.assertEqual((ungettext_lazy(b"%d test", b"%d tests") % 1).upper(), "1 TEST")
-        self.assertEqual(pgettext_lazy(b"context", b"test").upper(), "TEST")
-        self.assertEqual(
-            (npgettext_lazy(b"context", b"%d test", b"%d tests") % 1).upper(),
-            "1 TEST"
-        )
-
     def test_lazy_pickle(self):
         s1 = ugettext_lazy("test")
-        self.assertEqual(six.text_type(s1), "test")
+        self.assertEqual(str(s1), "test")
         s2 = pickle.loads(pickle.dumps(s1))
-        self.assertEqual(six.text_type(s2), "test")
+        self.assertEqual(str(s2), "test")
 
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_ungettext_lazy(self):
@@ -215,32 +184,18 @@ class TranslationTests(SimpleTestCase):
             self.assertEqual(complex_nonlazy % {'num': 4, 'name': 'Jim'}, 'Hallo Jim, 4 guten Resultate')
             self.assertEqual(complex_deferred % {'name': 'Jim', 'num': 1}, 'Hallo Jim, 1 gutes Resultat')
             self.assertEqual(complex_deferred % {'name': 'Jim', 'num': 5}, 'Hallo Jim, 5 guten Resultate')
-            with six.assertRaisesRegex(self, KeyError, 'Your dictionary lacks key.*'):
+            with self.assertRaisesRegex(KeyError, 'Your dictionary lacks key.*'):
                 complex_deferred % {'name': 'Jim'}
             self.assertEqual(complex_str_nonlazy % {'num': 4, 'name': 'Jim'}, str('Hallo Jim, 4 guten Resultate'))
             self.assertEqual(complex_str_deferred % {'name': 'Jim', 'num': 1}, str('Hallo Jim, 1 gutes Resultat'))
             self.assertEqual(complex_str_deferred % {'name': 'Jim', 'num': 5}, str('Hallo Jim, 5 guten Resultate'))
-            with six.assertRaisesRegex(self, KeyError, 'Your dictionary lacks key.*'):
+            with self.assertRaisesRegex(KeyError, 'Your dictionary lacks key.*'):
                 complex_str_deferred % {'name': 'Jim'}
             self.assertEqual(complex_context_nonlazy % {'num': 4, 'name': 'Jim'}, 'Willkommen Jim, 4 guten Resultate')
             self.assertEqual(complex_context_deferred % {'name': 'Jim', 'num': 1}, 'Willkommen Jim, 1 gutes Resultat')
             self.assertEqual(complex_context_deferred % {'name': 'Jim', 'num': 5}, 'Willkommen Jim, 5 guten Resultate')
-            with six.assertRaisesRegex(self, KeyError, 'Your dictionary lacks key.*'):
+            with self.assertRaisesRegex(KeyError, 'Your dictionary lacks key.*'):
                 complex_context_deferred % {'name': 'Jim'}
-
-    @skipUnless(six.PY2, "PY3 doesn't have distinct int and long types")
-    def test_ungettext_lazy_long(self):
-        """
-        Regression test for #22820: int and long should be treated alike in ungettext_lazy.
-        """
-        result = ungettext_lazy('%(name)s has %(num)d good result', '%(name)s has %(num)d good results', 4)
-        self.assertEqual(result % {'name': 'Joe', 'num': 4}, "Joe has 4 good results")
-        # Now with a long
-        result = ungettext_lazy(
-            '%(name)s has %(num)d good result', '%(name)s has %(num)d good results',
-            long(4)   # NOQA: long undefined on PY3
-        )
-        self.assertEqual(result % {'name': 'Joe', 'num': 4}, "Joe has 4 good results")
 
     def test_ungettext_lazy_bool(self):
         self.assertTrue(ungettext_lazy('%d good result', '%d good results'))
@@ -422,9 +377,9 @@ class TranslationTests(SimpleTestCase):
     @ignore_warnings(category=RemovedInDjango21Warning)
     def test_string_concat(self):
         """
-        six.text_type(string_concat(...)) should not raise a TypeError - #4796
+        str(string_concat(...)) should not raise a TypeError - #4796
         """
-        self.assertEqual('django', six.text_type(string_concat("dja", "ngo")))
+        self.assertEqual('django', str(string_concat("dja", "ngo")))
 
     def test_empty_value(self):
         """
@@ -545,7 +500,7 @@ class FormattingTests(SimpleTestCase):
         self.d = datetime.date(2009, 12, 31)
         self.dt = datetime.datetime(2009, 12, 31, 20, 50)
         self.t = datetime.time(10, 15, 48)
-        self.l = 10000 if PY3 else long(10000)  # NOQA: long undefined on PY3
+        self.l = 10000
         self.ctxt = Context({
             'n': self.n,
             't': self.t,
@@ -1630,7 +1585,7 @@ class TestLanguageInfo(SimpleTestCase):
         self.assertIs(li['bidi'], False)
 
     def test_unknown_language_code(self):
-        six.assertRaisesRegex(self, KeyError, r"Unknown language code xx\.", get_language_info, 'xx')
+        self.assertRaisesRegex(KeyError, r"Unknown language code xx\.", get_language_info, 'xx')
         with translation.override('xx'):
             # A language with no translation catalogs should fallback to the
             # untranslated string.
@@ -1644,7 +1599,7 @@ class TestLanguageInfo(SimpleTestCase):
         self.assertIs(li['bidi'], False)
 
     def test_unknown_language_code_and_country_code(self):
-        six.assertRaisesRegex(self, KeyError, r"Unknown language code xx-xx and xx\.", get_language_info, 'xx-xx')
+        self.assertRaisesRegex(KeyError, r"Unknown language code xx-xx and xx\.", get_language_info, 'xx-xx')
 
     def test_fallback_language_code(self):
         """

@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import gettext
 import os
 from datetime import datetime, timedelta
@@ -19,7 +17,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import CharField, DateField, DateTimeField
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
-from django.utils import six, translation
+from django.utils import translation
 
 from . import models
 from .widgetadmin import site as widget_admin_site
@@ -188,7 +186,7 @@ class AdminFormfieldForDBFieldTests(SimpleTestCase):
         ma = AdvisorAdmin(models.Advisor, admin.site)
         f = ma.formfield_for_dbfield(models.Advisor._meta.get_field('companies'), request=None)
         self.assertEqual(
-            six.text_type(f.help_text),
+            str(f.help_text),
             'Hold down "Control", or "Command" on a Mac, to select more than one.'
         )
 

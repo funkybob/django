@@ -1,10 +1,7 @@
-from django.utils.encoding import python_2_unicode_compatible
-
 from ..admin import admin
 from ..models import models
 
 
-@python_2_unicode_compatible
 class City(models.Model):
     name = models.CharField(max_length=30)
     point = models.PointField()

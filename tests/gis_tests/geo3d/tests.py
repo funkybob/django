@@ -9,7 +9,6 @@ from django.contrib.gis.db.models.functions import (
 )
 from django.contrib.gis.geos import GEOSGeometry, LineString, Point, Polygon
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
-from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from .models import (
@@ -17,7 +16,7 @@ from .models import (
     MultiPoint3D, Point2D, Point3D, Polygon2D, Polygon3D,
 )
 
-data_path = os.path.realpath(os.path.join(os.path.dirname(upath(__file__)), '..', 'data'))
+data_path = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'data'))
 city_file = os.path.join(data_path, 'cities', 'cities.shp')
 vrt_file = os.path.join(data_path, 'test_vrt', 'test_vrt.vrt')
 

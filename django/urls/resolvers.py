@@ -5,8 +5,6 @@ RegexURLResolver is the main class here. Its resolve() method takes a URL (as
 a string) and returns a ResolverMatch object which provides access to all
 attributes of the resolved URL match.
 """
-from __future__ import unicode_literals
-
 import functools
 import re
 import threading
@@ -16,7 +14,6 @@ from django.conf import settings
 from django.core.checks import Warning
 from django.core.checks.urls import check_resolver
 from django.core.exceptions import ImproperlyConfigured
-from django.utils import lru_cache, six
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str, force_text
 from django.utils.functional import cached_property
@@ -62,7 +59,7 @@ class ResolverMatch(object):
         )
 
 
-@lru_cache.lru_cache(maxsize=None)
+@functools.lru_cache(maxsize=None)
 def get_resolver(urlconf=None):
     if urlconf is None:
         from django.conf import settings
@@ -70,7 +67,7 @@ def get_resolver(urlconf=None):
     return RegexURLResolver(r'^/', urlconf)
 
 
-@lru_cache.lru_cache(maxsize=None)
+@functools.lru_cache(maxsize=None)
 def get_ns_resolver(ns_pattern, resolver):
     # Build a namespaced resolver for the given parent URLconf pattern.
     # This makes it possible to have captured parameters in the parent
@@ -98,13 +95,13 @@ class LocaleRegexProvider(object):
         """
         language_code = get_language()
         if language_code not in self._regex_dict:
-            regex = self._regex if isinstance(self._regex, six.string_types) else force_text(self._regex)
+            regex = self._regex if isinstance(self._regex, str) else force_text(self._regex)
             try:
                 compiled_regex = re.compile(regex, re.UNICODE)
             except re.error as e:
                 raise ImproperlyConfigured(
                     '"%s" is not a valid regular expression: %s' %
-                    (regex, six.text_type(e))
+                    (regex, str(e))
                 )
             self._regex_dict[language_code] = compiled_regex
         return self._regex_dict[language_code]
@@ -196,11 +193,8 @@ class RegexURLPattern(LocaleRegexProvider):
             callback = callback.func
         if not hasattr(callback, '__name__'):
             return callback.__module__ + "." + callback.__class__.__name__
-        elif six.PY3:
-            return callback.__module__ + "." + callback.__qualname__
         else:
-            # PY2 does not support __qualname__
-            return callback.__module__ + "." + callback.__name__
+            return callback.__module__ + "." + callback.__qualname__
 
 
 class RegexURLResolver(LocaleRegexProvider):
@@ -379,7 +373,7 @@ class RegexURLResolver(LocaleRegexProvider):
 
     @cached_property
     def urlconf_module(self):
-        if isinstance(self.urlconf_name, six.string_types):
+        if isinstance(self.urlconf_name, str):
             return import_module(self.urlconf_name)
         else:
             return self.urlconf_name

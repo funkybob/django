@@ -16,7 +16,6 @@ from django.core.serializers.python import (
     Deserializer as PythonDeserializer, Serializer as PythonSerializer,
 )
 from django.db import models
-from django.utils import six
 
 # Use the C (faster) implementation if possible
 try:
@@ -70,7 +69,7 @@ def Deserializer(stream_or_string, **options):
     """
     if isinstance(stream_or_string, bytes):
         stream_or_string = stream_or_string.decode('utf-8')
-    if isinstance(stream_or_string, six.string_types):
+    if isinstance(stream_or_string, str):
         stream = StringIO(stream_or_string)
     else:
         stream = stream_or_string
@@ -81,4 +80,4 @@ def Deserializer(stream_or_string, **options):
         raise
     except Exception as e:
         # Map to deserializer error
-        six.reraise(DeserializationError, DeserializationError(e), sys.exc_info()[2])
+        raise DeserializationError(e).with_traceback(sys.exc_info()[2])

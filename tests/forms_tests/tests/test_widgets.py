@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.forms import (
     CheckboxSelectMultiple, ClearableFileInput, RadioSelect, TextInput,
@@ -10,8 +8,7 @@ from django.forms.widgets import (
 )
 from django.test import SimpleTestCase, override_settings
 from django.urls import reverse
-from django.utils import six
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.safestring import SafeData
 
 from ..models import Article
@@ -85,7 +82,7 @@ beatle J R Ringo False""")
         # You can create your own custom renderers for RadioSelect to use.
         class MyRenderer(RadioFieldRenderer):
             def render(self):
-                return '<br />\n'.join(six.text_type(choice) for choice in self)
+                return '<br />\n'.join(str(choice) for choice in self)
         w = RadioSelect(choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')), renderer=MyRenderer)
         self.assertHTMLEqual(
             w.render('beatle', 'G'),
@@ -194,7 +191,6 @@ class LiveWidgetTests(AdminSeleniumTestCase):
         self.assertEqual(article.content, "\r\nTst\r\n")
 
 
-@python_2_unicode_compatible
 class FakeFieldFile(object):
     """
     Quacks like a FieldFile (has a .url and unicode representation), but

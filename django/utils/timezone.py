@@ -3,12 +3,12 @@ Timezone-related classes and functions.
 """
 
 from datetime import datetime, timedelta, tzinfo
+from functools import lru_cache
 from threading import local
 
 import pytz
 
 from django.conf import settings
-from django.utils import lru_cache, six
 from django.utils.decorators import ContextDecorator
 
 __all__ = [
@@ -68,7 +68,7 @@ def get_fixed_timezone(offset):
 
 # In order to avoid accessing settings at compile time,
 # wrap the logic in a function and cache the result.
-@lru_cache.lru_cache()
+@lru_cache()
 def get_default_timezone():
     """
     Returns the default time zone as a tzinfo instance.
@@ -128,7 +128,7 @@ def activate(timezone):
     """
     if isinstance(timezone, tzinfo):
         _active.value = timezone
-    elif isinstance(timezone, six.string_types):
+    elif isinstance(timezone, str):
         _active.value = pytz.timezone(timezone)
     else:
         raise ValueError("Invalid timezone: %r" % timezone)

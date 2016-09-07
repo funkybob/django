@@ -1,7 +1,6 @@
 from datetime import date
 
 from django.conf import settings
-from django.utils import six
 from django.utils.crypto import constant_time_compare, salted_hmac
 from django.utils.http import base36_to_int, int_to_base36
 
@@ -67,8 +66,8 @@ class PasswordResetTokenGenerator(object):
         # Ensure results are consistent across DB backends
         login_timestamp = '' if user.last_login is None else user.last_login.replace(microsecond=0, tzinfo=None)
         return (
-            six.text_type(user.pk) + user.password +
-            six.text_type(login_timestamp) + six.text_type(timestamp)
+            str(user.pk) + user.password +
+            str(login_timestamp) + str(timestamp)
         )
 
     def _num_days(self, dt):

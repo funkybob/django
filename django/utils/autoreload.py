@@ -33,13 +33,11 @@ import signal
 import sys
 import time
 import traceback
+import _thread as thread
 
 from django.apps import apps
 from django.conf import settings
 from django.core.signals import request_finished
-from django.utils import six
-from django.utils._os import npath
-from django.utils.six.moves import _thread as thread
 
 # This import does nothing, but it's necessary to avoid some race conditions
 # in the threading module. See http://code.djangoproject.com/ticket/2330 .
@@ -109,7 +107,7 @@ def gen_filenames(only_new=False):
                                  'conf', 'locale'),
                     'locale']
         for app_config in reversed(list(apps.get_app_configs())):
-            basedirs.append(os.path.join(npath(app_config.path), 'locale'))
+            basedirs.append(os.path.join(app_config.path, 'locale'))
         basedirs.extend(settings.LOCALE_PATHS)
         basedirs = [os.path.abspath(basedir) for basedir in basedirs
                     if os.path.isdir(basedir)]
@@ -246,7 +244,7 @@ def check_errors(fn):
 def raise_last_exception():
     global _exception
     if _exception is not None:
-        six.reraise(*_exception)
+        raise _exception[1]
 
 
 def ensure_echo_on():

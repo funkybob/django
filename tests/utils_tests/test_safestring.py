@@ -1,8 +1,6 @@
-from __future__ import unicode_literals
-
 from django.template import Context, Template
 from django.test import SimpleTestCase, ignore_warnings
-from django.utils import html, six, text
+from django.utils import html, text
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_bytes
 from django.utils.functional import lazy, lazystr
@@ -13,7 +11,7 @@ from django.utils.safestring import (
 lazybytes = lazy(force_bytes, bytes)
 
 
-class customescape(six.text_type):
+class customescape(str):
     def __html__(self):
         # implement specific and obviously wrong escaping
         # in order to be able to tell for sure when it runs

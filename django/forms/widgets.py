@@ -2,8 +2,6 @@
 HTML Widget classes
 """
 
-from __future__ import unicode_literals
-
 import copy
 import datetime
 import re
@@ -12,18 +10,15 @@ from itertools import chain
 from django.conf import settings
 from django.forms.utils import flatatt, to_current_timezone
 from django.templatetags.static import static
-from django.utils import datetime_safe, formats, six
+from django.utils import datetime_safe, formats
 from django.utils.dates import MONTHS
 from django.utils.deprecation import (
     RemovedInDjango20Warning, RenameMethodsBase,
 )
-from django.utils.encoding import (
-    force_str, force_text, python_2_unicode_compatible,
-)
+from django.utils.encoding import force_str, force_text
 from django.utils.formats import get_format
 from django.utils.html import conditional_escape, format_html, html_safe
 from django.utils.safestring import mark_safe
-from django.utils.six.moves import range
 from django.utils.translation import ugettext_lazy
 
 __all__ = (
@@ -40,7 +35,6 @@ MEDIA_TYPES = ('css', 'js')
 
 
 @html_safe
-@python_2_unicode_compatible
 class Media(object):
     def __init__(self, media=None, **kwargs):
         if media:
@@ -158,7 +152,6 @@ class MediaDefiningClass(type):
 
 
 @html_safe
-@python_2_unicode_compatible
 class SubWidget(object):
     """
     Some widgets are made of multiple HTML elements -- namely, RadioSelect.
@@ -182,7 +175,7 @@ class RenameWidgetMethods(MediaDefiningClass, RenameMethodsBase):
     )
 
 
-class Widget(six.with_metaclass(RenameWidgetMethods)):
+class Widget(metaclass=RenameWidgetMethods):
     needs_multipart_form = False  # Determines does this widget need multipart form
     is_localized = False
     is_required = False
@@ -508,7 +501,7 @@ class CheckboxInput(Widget):
         value = data.get(name)
         # Translate true and false strings to boolean values.
         values = {'true': True, 'false': False}
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             value = values.get(value.lower(), value)
         return bool(value)
 
@@ -628,7 +621,6 @@ class SelectMultiple(Select):
 
 
 @html_safe
-@python_2_unicode_compatible
 class ChoiceInput(SubWidget):
     """
     An object used by ChoiceFieldRenderer that represents a single
@@ -698,7 +690,6 @@ class CheckboxChoiceInput(ChoiceInput):
 
 
 @html_safe
-@python_2_unicode_compatible
 class ChoiceFieldRenderer(object):
     """
     An object used by RadioSelect to enable customization of radio widgets.
@@ -1028,7 +1019,7 @@ class SelectDateWidget(Widget):
             year_val, month_val, day_val = value.year, value.month, value.day
         except AttributeError:
             year_val = month_val = day_val = None
-            if isinstance(value, six.string_types):
+            if isinstance(value, str):
                 if settings.USE_L10N:
                     try:
                         input_format = get_format('DATE_INPUT_FORMATS')[0]

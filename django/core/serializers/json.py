@@ -15,7 +15,6 @@ from django.core.serializers.base import DeserializationError
 from django.core.serializers.python import (
     Deserializer as PythonDeserializer, Serializer as PythonSerializer,
 )
-from django.utils import six
 from django.utils.duration import duration_iso_string
 from django.utils.functional import Promise
 from django.utils.timezone import is_aware
@@ -72,7 +71,7 @@ def Deserializer(stream_or_string, **options):
     """
     Deserialize a stream or string of JSON data.
     """
-    if not isinstance(stream_or_string, (bytes, six.string_types)):
+    if not isinstance(stream_or_string, (bytes, str)):
         stream_or_string = stream_or_string.read()
     if isinstance(stream_or_string, bytes):
         stream_or_string = stream_or_string.decode('utf-8')
@@ -84,7 +83,7 @@ def Deserializer(stream_or_string, **options):
         raise
     except Exception as e:
         # Map to deserializer error
-        six.reraise(DeserializationError, DeserializationError(e), sys.exc_info()[2])
+        raise DeserializationError(e).with_traceback(sys.exc_info()[2])
 
 
 class DjangoJSONEncoder(json.JSONEncoder):
@@ -116,6 +115,6 @@ class DjangoJSONEncoder(json.JSONEncoder):
         elif isinstance(o, uuid.UUID):
             return str(o)
         elif isinstance(o, Promise):
-            return six.text_type(o)
+            return str(o)
         else:
             return super(DjangoJSONEncoder, self).default(o)

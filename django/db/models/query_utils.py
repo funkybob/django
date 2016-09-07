@@ -9,10 +9,10 @@ from __future__ import unicode_literals
 
 import inspect
 from collections import namedtuple
+from functools import lru_cache
 
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
-from django.utils.lru_cache import lru_cache
 
 # PathInfo is used when converting lookups (fk__somecol). The contents
 # describe the relation in Model terms (model Options and Fields for both

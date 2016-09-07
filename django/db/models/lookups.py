@@ -9,7 +9,6 @@ from django.db.models.fields import DateTimeField, Field, IntegerField
 from django.db.models.query_utils import RegisterLookupMixin
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property
-from django.utils.six.moves import range
 
 
 class Lookup(object):

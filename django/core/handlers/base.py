@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import logging
 import sys
 import types
@@ -10,7 +8,6 @@ from django.core import signals
 from django.core.exceptions import ImproperlyConfigured, MiddlewareNotUsed
 from django.db import connections, transaction
 from django.urls import get_resolver, get_urlconf, set_urlconf
-from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.module_loading import import_string
 
@@ -58,7 +55,7 @@ class BaseHandler(object):
                     mw_instance = mw_class()
                 except MiddlewareNotUsed as exc:
                     if settings.DEBUG:
-                        if six.text_type(exc):
+                        if str(exc):
                             logger.debug('MiddlewareNotUsed(%r): %s', middleware_path, exc)
                         else:
                             logger.debug('MiddlewareNotUsed: %r', middleware_path)
@@ -82,7 +79,7 @@ class BaseHandler(object):
                     mw_instance = middleware(handler)
                 except MiddlewareNotUsed as exc:
                     if settings.DEBUG:
-                        if six.text_type(exc):
+                        if str(exc):
                             logger.debug('MiddlewareNotUsed(%r): %s', middleware_path, exc)
                         else:
                             logger.debug('MiddlewareNotUsed: %r', middleware_path)

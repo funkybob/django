@@ -1,10 +1,9 @@
-from __future__ import unicode_literals
-
 import os
 import shutil
 import sys
 import tempfile
 import unittest
+from io import StringIO
 
 from django.conf import settings
 from django.contrib.staticfiles import finders, storage
@@ -13,7 +12,6 @@ from django.contrib.staticfiles.management.commands.collectstatic import \
 from django.core.cache.backends.base import BaseCache
 from django.core.management import call_command
 from django.test import override_settings
-from django.utils import six
 from django.utils.encoding import force_text
 
 from .cases import CollectionTestCase
@@ -192,7 +190,7 @@ class TestHashedFiles(object):
         fails. Regression test for #18986.
         """
         finders.get_finder.cache_clear()
-        err = six.StringIO()
+        err = StringIO()
         with self.assertRaises(Exception):
             call_command('collectstatic', interactive=False, verbosity=0, stderr=err)
         self.assertEqual("Post-processing 'faulty.css' failed!\n\n", err.getvalue())
@@ -289,7 +287,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         self.patched_settings = self.settings(
             STATICFILES_DIRS=settings.STATICFILES_DIRS + [temp_dir])
         self.patched_settings.enable()
-        self.addCleanup(shutil.rmtree, six.text_type(temp_dir))
+        self.addCleanup(shutil.rmtree, str(temp_dir))
 
     def tearDown(self):
         self.patched_settings.disable()

@@ -2,8 +2,6 @@
 This module allows importing AbstractBaseUser even when django.contrib.auth is
 not in INSTALLED_APPS.
 """
-from __future__ import unicode_literals
-
 import unicodedata
 
 from django.contrib.auth import password_validation
@@ -13,7 +11,7 @@ from django.contrib.auth.hashers import (
 from django.db import models
 from django.utils.crypto import get_random_string, salted_hmac
 from django.utils.deprecation import CallableFalse, CallableTrue
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -48,7 +46,6 @@ class BaseUserManager(models.Manager):
         return self.get(**{self.model.USERNAME_FIELD: username})
 
 
-@python_2_unicode_compatible
 class AbstractBaseUser(models.Model):
     password = models.CharField(_('password'), max_length=128)
     last_login = models.DateTimeField(_('last login'), blank=True, null=True)

@@ -2,16 +2,11 @@ import sys
 import threading
 import warnings
 import weakref
+from weakref import WeakMethod
 
-from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.inspect import func_accepts_kwargs
-from django.utils.six.moves import range
 
-if six.PY2:
-    from .weakref_backports import WeakMethod
-else:
-    from weakref import WeakMethod
 
 
 def _make_id(target):
@@ -109,11 +104,8 @@ class Signal(object):
             if hasattr(receiver, '__self__') and hasattr(receiver, '__func__'):
                 ref = WeakMethod
                 receiver_object = receiver.__self__
-            if six.PY3:
-                receiver = ref(receiver)
-                weakref.finalize(receiver_object, self._remove_receiver)
-            else:
-                receiver = ref(receiver, self._remove_receiver)
+            receiver = ref(receiver)
+            weakref.finalize(receiver_object, self._remove_receiver)
 
         with self.lock:
             self._clear_dead_receivers()

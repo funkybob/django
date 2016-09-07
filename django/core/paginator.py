@@ -2,7 +2,6 @@ import collections
 import warnings
 from math import ceil
 
-from django.utils import six
 from django.utils.functional import cached_property
 
 
@@ -98,7 +97,7 @@ class Paginator(object):
         Returns a 1-based range of pages for iterating through within
         a template for loop.
         """
-        return six.moves.range(1, self.num_pages + 1)
+        return range(1, self.num_pages + 1)
 
     def _check_object_list_is_ordered(self):
         """
@@ -129,7 +128,7 @@ class Page(collections.Sequence):
         return len(self.object_list)
 
     def __getitem__(self, index):
-        if not isinstance(index, (slice,) + six.integer_types):
+        if not isinstance(index, (slice, int)):
             raise TypeError
         # The object_list is converted to a list so that if it was a QuerySet
         # it won't be a database hit per __getitem__.

@@ -1,6 +1,4 @@
 #! -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import base64
 import errno
 import hashlib
@@ -10,7 +8,7 @@ import shutil
 import sys
 import tempfile as sys_tempfile
 import unittest
-from io import BytesIO
+from io import BytesIO, StringIO
 
 from django.core.files import temp as tempfile
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -18,7 +16,6 @@ from django.http.multipartparser import MultiPartParser, parse_header
 from django.test import SimpleTestCase, TestCase, client, override_settings
 from django.utils.encoding import force_bytes
 from django.utils.http import urlquote
-from django.utils.six import PY2, StringIO
 
 from . import uploadhandler
 from .models import FileModel
@@ -107,7 +104,7 @@ class FileUploadTests(TestCase):
     def test_big_base64_newlines_upload(self):
         self._test_base64_upload(
             # encodestring is a deprecated alias on Python 3
-            "Big data" * 68000, encode=base64.encodestring if PY2 else base64.encodebytes)
+            "Big data" * 68000, encode=base64.encodebytes)
 
     def test_unicode_file_name(self):
         tdir = sys_tempfile.mkdtemp()

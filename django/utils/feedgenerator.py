@@ -21,16 +21,14 @@ Sample usage:
 For definitions of the different versions of RSS, see:
 http://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss
 """
-from __future__ import unicode_literals
-
 import datetime
 import warnings
+from io import StringIO
+from urllib.parse import urlparse
 
-from django.utils import datetime_safe, six
+from django.utils import datetime_safe
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, iri_to_uri
-from django.utils.six import StringIO
-from django.utils.six.moves.urllib.parse import urlparse
 from django.utils.timezone import utc
 from django.utils.xmlutils import SimplerXMLGenerator
 
@@ -46,8 +44,6 @@ def rfc2822_date(date):
     dow = days[date.weekday()]
     month = months[date.month - 1]
     time_str = date.strftime('%s, %%d %s %%Y %%H:%%M:%%S ' % (dow, month))
-    if six.PY2:             # strftime returns a byte string in Python 2
-        time_str = time_str.decode('utf-8')
     offset = date.utcoffset()
     # Historically, this function assumes that naive datetimes are in UTC.
     if offset is None:
@@ -62,8 +58,6 @@ def rfc3339_date(date):
     # Support datetime objects older than 1900
     date = datetime_safe.new_datetime(date)
     time_str = date.strftime('%Y-%m-%dT%H:%M:%S')
-    if six.PY2:             # strftime returns a byte string in Python 2
-        time_str = time_str.decode('utf-8')
     offset = date.utcoffset()
     # Historically, this function assumes that naive datetimes are in UTC.
     if offset is None:

@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 from django.db import utils
 from django.db.backends.base.features import BaseDatabaseFeatures
-from django.utils import six
 from django.utils.functional import cached_property
 
 from .base import Database
@@ -49,11 +48,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def can_share_in_memory_db(self):
-        return (
-            six.PY3 and
-            Database.__name__ == 'sqlite3.dbapi2' and
-            Database.sqlite_version_info >= (3, 7, 13)
-        )
+        return Database.__name__ == 'sqlite3.dbapi2' and Database.sqlite_version_info >= (3, 7, 13)
 
     @cached_property
     def supports_stddev(self):

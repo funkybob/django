@@ -6,6 +6,8 @@ import time
 import warnings
 from contextlib import contextmanager
 from functools import wraps
+from io import StringIO
+from types import SimpleNamespace
 from unittest import TestCase, skipIf, skipUnless
 from xml.dom.minidom import Node, parseString
 
@@ -20,16 +22,10 @@ from django.db.models.options import Options
 from django.template import Template
 from django.test.signals import setting_changed, template_rendered
 from django.urls import get_script_prefix, set_script_prefix
-from django.utils import six
 from django.utils.decorators import available_attrs
 from django.utils.encoding import force_str
 from django.utils.translation import deactivate
 
-if six.PY3:
-    from types import SimpleNamespace
-else:
-    class SimpleNamespace(object):
-        pass
 
 try:
     import jinja2
@@ -66,7 +62,7 @@ class ContextList(list):
     in a list of context objects.
     """
     def __getitem__(self, key):
-        if isinstance(key, six.string_types):
+        if isinstance(key, str):
             for subcontext in self:
                 if key in subcontext:
                     return subcontext[key]
@@ -477,7 +473,7 @@ class modify_settings(override_settings):
                 value = list(getattr(settings, name, []))
             for action, items in operations.items():
                 # items my be a single value or an iterable.
-                if isinstance(items, six.string_types):
+                if isinstance(items, str):
                     items = [items]
                 if action == 'append':
                     value = value + [item for item in items if item not in value]
@@ -609,7 +605,7 @@ def strip_quotes(want, got):
 
 
 def str_prefix(s):
-    return s % {'_': '' if six.PY3 else 'u'}
+    return s % {'_': ''}
 
 
 class CaptureQueriesContext(object):
@@ -727,7 +723,7 @@ def captured_output(stream_name):
     Note: This function and the following ``captured_std*`` are copied
           from CPython's ``test.support`` module."""
     orig_stdout = getattr(sys, stream_name)
-    setattr(sys, stream_name, six.StringIO())
+    setattr(sys, stream_name, StringIO())
     try:
         yield getattr(sys, stream_name)
     finally:
@@ -839,7 +835,7 @@ class LoggingCaptureMixin(object):
     def setUp(self):
         self.logger = logging.getLogger('django')
         self.old_stream = self.logger.handlers[0].stream
-        self.logger_output = six.StringIO()
+        self.logger_output = StringIO()
         self.logger.handlers[0].stream = self.logger_output
 
     def tearDown(self):

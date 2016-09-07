@@ -8,7 +8,6 @@ from django.contrib.auth.decorators import (
 from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
 from django.middleware.clickjacking import XFrameOptionsMiddleware
 from django.test import SimpleTestCase
-from django.utils import six
 from django.utils.decorators import method_decorator
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
@@ -162,9 +161,9 @@ class DecoratorsTest(TestCase):
         with self.assertRaises(RemovedInDjango20Warning):
             def noop_text(text):
                 return force_text(text)
-            noop_text = allow_lazy(noop_text, six.text_type)
+            noop_text = allow_lazy(noop_text, str)
             rendered = noop_text(ugettext_lazy("I am a text"))
-            self.assertEqual(type(rendered), six.text_type)
+            self.assertEqual(type(rendered), str)
             self.assertEqual(rendered, "I am a text")
 
 

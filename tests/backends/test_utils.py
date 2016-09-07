@@ -1,7 +1,6 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.db.utils import load_backend
 from django.test import SimpleTestCase
-from django.utils import six
 
 
 class TestLoadBackend(SimpleTestCase):
@@ -11,6 +10,6 @@ class TestLoadBackend(SimpleTestCase):
             "Try using 'django.db.backends.XXX', where XXX is one of:\n"
             "    'mysql', 'oracle', 'postgresql', 'sqlite3'\n"
             "Error was: No module named %s"
-        ) % "foo.base" if six.PY2 else "'foo'"
+        ) % "'foo'"
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             load_backend('foo')

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 # This coding header is significant for tests, as the debug view is parsing
 # files to search for such a header to decode the source file content
-from __future__ import unicode_literals
-
 import importlib
 import inspect
 import os
@@ -19,7 +17,6 @@ from django.template import TemplateDoesNotExist
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import LoggingCaptureMixin, patch_logger
 from django.urls import reverse
-from django.utils import six
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import SimpleLazyObject
 from django.views.debug import (
@@ -35,8 +32,7 @@ from ..views import (
     sensitive_method_view, sensitive_view,
 )
 
-if six.PY3:
-    from .py3_test_debug import Py3ExceptionReporterTests  # NOQA
+from .py3_test_debug import Py3ExceptionReporterTests  # NOQA
 
 PY36 = sys.version_info >= (3, 6)
 
@@ -431,7 +427,6 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertEqual(len(html) // 1024 // 128, 0)  # still fit in 128Kb
         self.assertIn('&lt;trimmed %d bytes string&gt;' % (large + repr_of_str_adds,), html)
 
-    @skipIf(six.PY2, 'Bug manifests on PY3 only')
     def test_unfrozen_importlib(self):
         """
         importlib is not a frozen app, but its loader thinks it's frozen which

@@ -1,14 +1,12 @@
-from __future__ import unicode_literals
-
 import os
 import sys
+from imp import reload
 from importlib import import_module
 
 from django.apps import apps
 from django.conf import settings
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
-from django.utils import six
 
 from .exceptions import (
     AmbiguityError, BadMigrationError, InconsistentMigrationHistory,
@@ -99,7 +97,7 @@ class MigrationLoader(object):
                     continue
                 # Force a reload if it's already loaded (tests need this)
                 if was_loaded:
-                    six.moves.reload_module(module)
+                    reload(module)
             self.migrated_apps.add(app_config.label)
             directory = os.path.dirname(module.__file__)
             # Scan for .py files
@@ -270,7 +268,7 @@ class MigrationLoader(object):
                     exc_value.__cause__ = exc
                     if not hasattr(exc, '__traceback__'):
                         exc.__traceback__ = sys.exc_info()[2]
-                    six.reraise(NodeNotFoundError, exc_value, sys.exc_info()[2])
+                    raise exc_value.with_traceback(sys.exc_info()[2])
             raise exc
 
     def check_consistent_history(self, connection):

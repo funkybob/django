@@ -11,7 +11,6 @@ from django.apps import apps
 from django.conf import settings
 from django.core.serializers import base
 from django.db import DEFAULT_DB_ALIAS, models
-from django.utils import six
 from django.utils.encoding import force_text, is_protected_type
 
 
@@ -115,7 +114,7 @@ def Deserializer(object_list, **options):
         field_names = field_names_cache[Model]
 
         # Handle each field
-        for (field_name, field_value) in six.iteritems(d["fields"]):
+        for (field_name, field_value) in iter(d["fields"].items()):
 
             if ignore and field_name not in field_names:
                 # skip fields no longer on model
@@ -133,7 +132,7 @@ def Deserializer(object_list, **options):
                 model = field.remote_field.model
                 if hasattr(model._default_manager, 'get_by_natural_key'):
                     def m2m_convert(value):
-                        if hasattr(value, '__iter__') and not isinstance(value, six.text_type):
+                        if hasattr(value, '__iter__') and not isinstance(value, str):
                             return model._default_manager.db_manager(db).get_by_natural_key(*value).pk
                         else:
                             return force_text(model._meta.pk.to_python(value), strings_only=True)
@@ -156,7 +155,7 @@ def Deserializer(object_list, **options):
                         default_manager = model._default_manager
                         field_name = field.remote_field.field_name
                         if hasattr(default_manager, 'get_by_natural_key'):
-                            if hasattr(field_value, '__iter__') and not isinstance(field_value, six.text_type):
+                            if hasattr(field_value, '__iter__') and not isinstance(field_value, str):
                                 obj = default_manager.db_manager(db).get_by_natural_key(*field_value)
                                 value = getattr(obj, field.remote_field.field_name)
                                 # If this is a natural foreign key to an object that

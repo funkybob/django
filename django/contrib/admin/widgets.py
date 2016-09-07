@@ -1,8 +1,6 @@
 """
 Form Widget classes specific to the Django admin site.
 """
-from __future__ import unicode_literals
-
 import copy
 
 from django import forms
@@ -12,7 +10,6 @@ from django.forms.widgets import RadioFieldRenderer
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
-from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.html import format_html, format_html_join, smart_urlquote
 from django.utils.safestring import mark_safe
@@ -130,7 +127,7 @@ def url_params_from_lookup_dict(lookups):
             elif isinstance(v, bool):
                 v = ('0', '1')[v]
             else:
-                v = six.text_type(v)
+                v = str(v)
             items.append((k, v))
         params.update(dict(items))
     return params

@@ -38,9 +38,8 @@ from django.http import Http404, HttpResponseRedirect
 from django.http.response import HttpResponseBase
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import reverse
-from django.utils import six
 from django.utils.decorators import method_decorator
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.html import escape, format_html
 from django.utils.http import urlencode, urlquote
 from django.utils.safestring import mark_safe
@@ -93,7 +92,7 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
 csrf_protect_m = method_decorator(csrf_protect)
 
 
-class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
+class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
     """Functionality common to both ModelAdmin and InlineAdmin."""
 
     raw_id_fields = ()
@@ -481,7 +480,6 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         return request.user.has_module_perms(self.opts.app_label)
 
 
-@python_2_unicode_compatible
 class ModelAdmin(BaseModelAdmin):
     "Encapsulates all admin options and functionality for a given model."
 
@@ -806,7 +804,7 @@ class ModelAdmin(BaseModelAdmin):
         tuple (name, description).
         """
         choices = [] + default_choices
-        for func, name, description in six.itervalues(self.get_actions(request)):
+        for func, name, description in self.get_actions(request).values():
             choice = (name, description % model_format_dict(self.opts))
             choices.append(choice)
         return choices
@@ -1069,8 +1067,8 @@ class ModelAdmin(BaseModelAdmin):
                 attr = obj._meta.pk.attname
             value = obj.serializable_value(attr)
             popup_response_data = json.dumps({
-                'value': six.text_type(value),
-                'obj': six.text_type(obj),
+                'value': str(value),
+                'obj': str(obj),
             })
             return SimpleTemplateResponse('admin/popup_response.html', {
                 'popup_response_data': popup_response_data,
@@ -1125,9 +1123,9 @@ class ModelAdmin(BaseModelAdmin):
             new_value = obj.serializable_value(attr)
             popup_response_data = json.dumps({
                 'action': 'change',
-                'value': six.text_type(value),
-                'obj': six.text_type(obj),
-                'new_value': six.text_type(new_value),
+                'value': str(value),
+                'obj': str(obj),
+                'new_value': str(new_value),
             })
             return SimpleTemplateResponse('admin/popup_response.html', {
                 'popup_response_data': popup_response_data,

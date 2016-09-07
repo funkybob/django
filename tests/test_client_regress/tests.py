@@ -2,8 +2,6 @@
 """
 Regression tests for the Test Client, especially the customized assertions.
 """
-from __future__ import unicode_literals
-
 import itertools
 import os
 
@@ -21,7 +19,6 @@ from django.test import (
 from django.test.client import RedirectCycleError, RequestFactory, encode_file
 from django.test.utils import ContextList, str_prefix
 from django.urls import NoReverseMatch, reverse
-from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.translation import ugettext_lazy
 
@@ -891,7 +888,7 @@ class TemplateExceptionTests(SimpleTestCase):
 
     @override_settings(TEMPLATES=[{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'bad_templates')],
+        'DIRS': [os.path.join(os.path.dirname(__file__), 'bad_templates')],
     }])
     def test_bad_404_template(self):
         "Errors found when rendering 404 error templates are re-raised"

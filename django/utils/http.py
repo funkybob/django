@@ -9,17 +9,16 @@ import unicodedata
 import warnings
 from binascii import Error as BinasciiError
 from email.utils import formatdate
+from urllib.parse import (
+    quote, quote_plus, unquote, unquote_plus, urlencode as original_urlencode,
+    urlparse,
+)
 
 from django.core.exceptions import TooManyFieldsSent
-from django.utils import six
 from django.utils.datastructures import MultiValueDict
 from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_bytes, force_str, force_text
 from django.utils.functional import keep_lazy_text
-from django.utils.six.moves.urllib.parse import (
-    quote, quote_plus, unquote, unquote_plus, urlencode as original_urlencode,
-    urlparse,
-)
 
 # based on RFC 7232, Appendix C
 ETAG_MATCH = re.compile(r'''
@@ -166,7 +165,7 @@ def parse_http_date(date):
         result = datetime.datetime(year, month, day, hour, min, sec)
         return calendar.timegm(result.utctimetuple())
     except Exception:
-        six.reraise(ValueError, ValueError("%r is not a valid date" % date), sys.exc_info()[2])
+        ValueError("%r is not a valid date" % date).with_traceback(sys.exc_info()[2])
 
 
 def parse_http_date_safe(date):
@@ -194,8 +193,6 @@ def base36_to_int(s):
     value = int(s, 36)
     # ... then do a final check that the value will fit into an int to avoid
     # returning a long (#15067). The long type was removed in Python 3.
-    if six.PY2 and value > sys.maxint:
-        raise ValueError("Base36 input too large")
     return value
 
 
@@ -206,11 +203,6 @@ def int_to_base36(i):
     char_set = '0123456789abcdefghijklmnopqrstuvwxyz'
     if i < 0:
         raise ValueError("Negative base36 conversion input.")
-    if six.PY2:
-        if not isinstance(i, six.integer_types):
-            raise TypeError("Non-integer base36 conversion input.")
-        if i > sys.maxint:
-            raise ValueError("Base36 conversion input too large.")
     if i < 36:
         return char_set[i]
     b36 = ''
@@ -298,11 +290,6 @@ def is_safe_url(url, host=None, allowed_hosts=None, require_https=False):
         url = url.strip()
     if not url:
         return False
-    if six.PY2:
-        try:
-            url = force_text(url)
-        except UnicodeDecodeError:
-            return False
     if allowed_hosts is None:
         allowed_hosts = set()
     if host:
@@ -390,13 +377,9 @@ def limited_parse_qsl(qs, keep_blank_values=False, encoding='utf-8',
             else:
                 continue
         if len(nv[1]) or keep_blank_values:
-            if six.PY3:
-                name = nv[0].replace('+', ' ')
-                name = unquote(name, encoding=encoding, errors=errors)
-                value = nv[1].replace('+', ' ')
-                value = unquote(value, encoding=encoding, errors=errors)
-            else:
-                name = unquote(nv[0].replace(b'+', b' '))
-                value = unquote(nv[1].replace(b'+', b' '))
+            name = nv[0].replace('+', ' ')
+            name = unquote(name, encoding=encoding, errors=errors)
+            value = nv[1].replace('+', ' ')
+            value = unquote(value, encoding=encoding, errors=errors)
             r.append((name, value))
     return r

@@ -9,8 +9,6 @@ from django.apps import apps
 from django.conf import settings
 from django.template import Context, Engine
 from django.urls import translate_url
-from django.utils import six
-from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.formats import get_format
@@ -80,7 +78,7 @@ def get_formats():
         result[attr] = get_format(attr)
     formats = {}
     for k, v in result.items():
-        if isinstance(v, (six.string_types, int)):
+        if isinstance(v, (str, int)):
             formats[k] = force_text(v)
         elif isinstance(v, (tuple, list)):
             formats[k] = [force_text(value) for value in v]
@@ -219,7 +217,7 @@ def get_javascript_catalog(locale, domain, packages):
     # paths of requested packages
     for package in packages:
         p = importlib.import_module(package)
-        path = os.path.join(os.path.dirname(upath(p.__file__)), 'locale')
+        path = os.path.join(os.path.dirname(p.__file__), 'locale')
         paths.append(path)
 
     trans = DjangoTranslation(locale, domain=domain, localedirs=paths)
@@ -240,10 +238,10 @@ def get_javascript_catalog(locale, domain, packages):
     maxcnts = {}
     catalog = {}
     trans_fallback_cat = trans._fallback._catalog if trans._fallback else {}
-    for key, value in itertools.chain(six.iteritems(trans_cat), six.iteritems(trans_fallback_cat)):
+    for key, value in itertools.chain(trans_cat.items(), trans_fallback_cat.items()):
         if key == '' or key in catalog:
             continue
-        if isinstance(key, six.string_types):
+        if isinstance(key, str):
             catalog[key] = value
         elif isinstance(key, tuple):
             msgid = key[0]
@@ -268,7 +266,7 @@ def _get_locale(request):
 def _parse_packages(packages):
     if packages is None:
         packages = list(DEFAULT_PACKAGES)
-    elif isinstance(packages, six.string_types):
+    elif isinstance(packages, str):
         packages = packages.split('+')
     return packages
 
@@ -388,10 +386,10 @@ class JavaScriptCatalog(View):
         catalog = {}
         trans_cat = self.translation._catalog
         trans_fallback_cat = self.translation._fallback._catalog if self.translation._fallback else {}
-        for key, value in itertools.chain(six.iteritems(trans_cat), six.iteritems(trans_fallback_cat)):
+        for key, value in itertools.chain(trans_cat.items(), trans_fallback_cat.items()):
             if key == '' or key in catalog:
                 continue
-            if isinstance(key, six.string_types):
+            if isinstance(key, str):
                 catalog[key] = value
             elif isinstance(key, tuple):
                 msgid = key[0]

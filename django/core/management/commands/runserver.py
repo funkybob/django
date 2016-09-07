@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import errno
 import os
 import re
@@ -10,7 +8,7 @@ from datetime import datetime
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.core.servers.basehttp import get_internal_wsgi_application, run
-from django.utils import autoreload, six
+from django.utils import autoreload
 from django.utils.encoding import force_text, get_system_encoding
 
 
@@ -123,8 +121,6 @@ class Command(BaseCommand):
         # requires_migrations_check attribute.
         self.check_migrations()
         now = datetime.now().strftime('%B %d, %Y - %X')
-        if six.PY2:
-            now = now.decode(get_system_encoding())
         self.stdout.write(now)
         self.stdout.write((
             "Django version %(version)s, using settings %(settings)r\n"

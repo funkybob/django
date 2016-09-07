@@ -1,14 +1,12 @@
 # -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 import re
+from io import StringIO
 from unittest import skipUnless
 
 from django.core.management import call_command
 from django.db import connection
 from django.test import TestCase, mock, skipUnlessDBFeature
 from django.utils.encoding import force_text
-from django.utils.six import PY3, StringIO
 
 from .models import ColumnTypes
 
@@ -217,11 +215,8 @@ class InspectDBTestCase(TestCase):
         self.assertIn("field_field_0 = models.IntegerField(db_column='%s__')" % base_name, output)
         self.assertIn("field_field_1 = models.IntegerField(db_column='__field')", output)
         self.assertIn("prc_x = models.IntegerField(db_column='prc(%) x')", output)
-        if PY3:
-            # Python 3 allows non-ASCII identifiers
-            self.assertIn("tamaño = models.IntegerField()", output)
-        else:
-            self.assertIn("tama_o = models.IntegerField(db_column='tama\\xf1o')", output)
+        # Python 3 allows non-ASCII identifiers
+        self.assertIn("tamaño = models.IntegerField()", output)
 
     def test_table_name_introspection(self):
         """

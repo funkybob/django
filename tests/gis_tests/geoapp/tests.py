@@ -1,7 +1,6 @@
-from __future__ import unicode_literals
-
 import re
 import tempfile
+from io import StringIO
 
 from django.contrib.gis import gdal
 from django.contrib.gis.db.models import Extent, MakeLine, Union
@@ -12,7 +11,6 @@ from django.contrib.gis.geos import (
 from django.core.management import call_command
 from django.db import connection
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
-from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from ..utils import no_oracle, oracle, postgis, skipUnlessGISLookup, spatialite
@@ -201,7 +199,7 @@ class GeoModelTest(TestCase):
         """
         Test a dumpdata/loaddata cycle with geographic data.
         """
-        out = six.StringIO()
+        out = StringIO()
         original_data = list(City.objects.all().order_by('name'))
         call_command('dumpdata', 'geoapp.City', stdout=out)
         result = out.getvalue()
@@ -754,7 +752,7 @@ class GeoQuerySetTest(TestCase):
         for bad_args in ((), range(3), range(5)):
             with self.assertRaises(ValueError):
                 Country.objects.snap_to_grid(*bad_args)
-        for bad_args in (('1.0',), (1.0, None), tuple(map(six.text_type, range(4)))):
+        for bad_args in (('1.0',), (1.0, None), tuple(map(str, range(4)))):
             with self.assertRaises(TypeError):
                 Country.objects.snap_to_grid(*bad_args)
 

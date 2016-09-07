@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import re
 
 from django.forms import RegexField, ValidationError
 from django.test import SimpleTestCase
-from django.utils import six
 
 
 class RegexFieldTest(SimpleTestCase):
@@ -46,8 +43,8 @@ class RegexFieldTest(SimpleTestCase):
         f = RegexField('^[0-9]+$', min_length=5, max_length=10)
         with self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 5 characters (it has 3).'"):
             f.clean('123')
-        six.assertRaisesRegex(
-            self, ValidationError,
+        self.assertRaisesRegex(
+            ValidationError,
             r"'Ensure this value has at least 5 characters \(it has 3\)\.',"
             r" u?'Enter a valid value\.'",
             f.clean, 'abc'

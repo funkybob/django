@@ -9,7 +9,6 @@ from django.apps import apps
 from django.db import migrations
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.serializer import serializer_factory
-from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.inspect import get_func_args
 from django.utils.module_loading import module_dir
@@ -237,7 +236,7 @@ class MigrationWriter(object):
             pass
         else:
             try:
-                return upath(module_dir(migrations_module))
+                return module_dir(migrations_module)
             except ValueError:
                 pass
 
@@ -258,7 +257,7 @@ class MigrationWriter(object):
                 continue
             else:
                 try:
-                    base_dir = upath(module_dir(base_module))
+                    base_dir = module_dir(base_module)
                 except ValueError:
                     continue
                 else:

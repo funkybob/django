@@ -19,8 +19,6 @@ from django.db.migrations.state import ProjectState
 from django.db.migrations.utils import get_migration_name_timestamp
 from django.db.migrations.writer import MigrationWriter
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.six import iteritems
-from django.utils.six.moves import zip
 
 
 class Command(BaseCommand):
@@ -116,7 +114,7 @@ class Command(BaseCommand):
         # If app_labels is specified, filter out conflicting migrations for unspecified apps
         if app_labels:
             conflicts = {
-                app_label: conflict for app_label, conflict in iteritems(conflicts)
+                app_label: conflict for app_label, conflict in conflicts.items()
                 if app_label in app_labels
             }
 

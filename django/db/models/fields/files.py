@@ -11,7 +11,6 @@ from django.core.files.storage import default_storage
 from django.core.validators import validate_image_file_extension
 from django.db.models import signals
 from django.db.models.fields import Field
-from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_str, force_text
 from django.utils.translation import ugettext_lazy as _
@@ -184,7 +183,7 @@ class FileDescriptor(object):
         # subclasses might also want to subclass the attribute class]. This
         # object understands how to convert a path to a file, and also how to
         # handle None.
-        if isinstance(file, six.string_types) or file is None:
+        if isinstance(file, str) or file is None:
             attr = self.field.attr_class(instance, self.field, file)
             instance.__dict__[self.field.name] = attr
 
@@ -272,7 +271,7 @@ class FileField(Field):
         # Need to convert File objects provided via a form to unicode for database insertion
         if value is None:
             return None
-        return six.text_type(value)
+        return str(value)
 
     def pre_save(self, model_instance, add):
         "Returns field's value just before saving."

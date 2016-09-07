@@ -1,8 +1,6 @@
 """
 Testing some internals of the template processing. These are *not* examples to be copied in user code.
 """
-from __future__ import unicode_literals
-
 from unittest import TestCase
 
 from django.template import Library, TemplateSyntaxError
@@ -10,7 +8,6 @@ from django.template.base import (
     TOKEN_BLOCK, FilterExpression, Parser, Token, Variable,
 )
 from django.template.defaultfilters import register as filter_library
-from django.utils import six
 
 
 class ParserTests(TestCase):
@@ -72,7 +69,7 @@ class ParserTests(TestCase):
             Variable("article._hidden")
 
         # Variables should raise on non string type
-        with six.assertRaisesRegex(self, TypeError, "Variable must be a string or number, got <(class|type) 'dict'>"):
+        with self.assertRaisesRegex(TypeError, "Variable must be a string or number, got <(class|type) 'dict'>"):
             Variable({})
 
     def test_filter_args_count(self):

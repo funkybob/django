@@ -4,8 +4,6 @@ SQLite3 backend for django.
 Works with either the pysqlite2 module or the sqlite3 module in the
 standard library.
 """
-from __future__ import unicode_literals
-
 import datetime
 import decimal
 import re
@@ -17,7 +15,8 @@ from django.conf import settings
 from django.db import utils
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.utils import six, timezone
+from django.db.backends.base.validation import BaseDatabaseValidation
+from django.utils import timezone
 from django.utils.dateparse import (
     parse_date, parse_datetime, parse_duration, parse_time,
 )
@@ -74,9 +73,6 @@ Database.register_converter(str("decimal"), decoder(backend_utils.typecast_decim
 
 Database.register_adapter(datetime.datetime, adapt_datetime_warn_on_aware_datetime)
 Database.register_adapter(decimal.Decimal, backend_utils.rev_typecast_decimal)
-if six.PY2:
-    Database.register_adapter(str, lambda s: s.decode('utf-8'))
-    Database.register_adapter(SafeBytes, lambda s: s.decode('utf-8'))
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):
@@ -446,12 +442,12 @@ def _sqlite_format_dtdelta(conn, lhs, rhs):
         - A string representing a datetime
     """
     try:
-        if isinstance(lhs, six.integer_types):
+        if isinstance(lhs, int):
             lhs = str(decimal.Decimal(lhs) / decimal.Decimal(1000000))
         real_lhs = parse_duration(lhs)
         if real_lhs is None:
             real_lhs = backend_utils.typecast_timestamp(lhs)
-        if isinstance(rhs, six.integer_types):
+        if isinstance(rhs, int):
             rhs = str(decimal.Decimal(rhs) / decimal.Decimal(1000000))
         real_rhs = parse_duration(rhs)
         if real_rhs is None:

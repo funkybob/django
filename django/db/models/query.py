@@ -21,7 +21,7 @@ from django.db.models.fields import AutoField
 from django.db.models.functions import Trunc
 from django.db.models.query_utils import InvalidQuery, Q
 from django.db.models.sql.constants import CURSOR
-from django.utils import six, timezone
+from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property, partition
 from django.utils.version import get_version
@@ -263,7 +263,7 @@ class QuerySet(object):
         """
         Retrieves an item or slice from the set of results.
         """
-        if not isinstance(k, (slice,) + six.integer_types):
+        if not isinstance(k, (slice, int)):
             raise TypeError
         assert ((not isinstance(k, slice) and (k >= 0)) or
                 (isinstance(k, slice) and (k.start is None or k.start >= 0) and
@@ -483,7 +483,7 @@ class QuerySet(object):
                 obj, created = self._create_object_from_params(lookup, params)
                 if created:
                     return obj, created
-            for k, v in six.iteritems(defaults):
+            for k, v in iter(defaults.items()):
                 setattr(obj, k, v() if callable(v) else v)
             obj.save(using=self.db)
         return obj, False
@@ -504,7 +504,7 @@ class QuerySet(object):
                 return self.get(**lookup), False
             except self.model.DoesNotExist:
                 pass
-            six.reraise(*exc_info)
+            raise exc_info[1]
 
     def _extract_model_params(self, defaults, **kwargs):
         """
@@ -1146,7 +1146,7 @@ class InstanceCheckMeta(type):
         return isinstance(instance, QuerySet) and instance.query.is_empty()
 
 
-class EmptyQuerySet(six.with_metaclass(InstanceCheckMeta)):
+class EmptyQuerySet(metaclass=InstanceCheckMeta):
     """
     Marker class usable for checking if a queryset is empty by .none():
         isinstance(qs.none(), EmptyQuerySet) -> True

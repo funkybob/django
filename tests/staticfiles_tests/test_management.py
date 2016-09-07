@@ -1,10 +1,9 @@
-from __future__ import unicode_literals
-
 import codecs
 import os
 import shutil
 import tempfile
 import unittest
+from io import StringIO
 
 from admin_scripts.tests import AdminScriptTestCase
 
@@ -15,7 +14,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.test import mock, override_settings
 from django.test.utils import extend_sys_path
-from django.utils import six
 from django.utils._os import symlinks_supported
 from django.utils.encoding import force_text
 from django.utils.functional import empty
@@ -39,7 +37,7 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
     Test ``findstatic`` management command.
     """
     def _get_file(self, filepath):
-        path = call_command('findstatic', filepath, all=False, verbosity=0, stdout=six.StringIO())
+        path = call_command('findstatic', filepath, all=False, verbosity=0, stdout=StringIO())
         with codecs.open(force_text(path), "r", "utf-8") as f:
             return f.read()
 
@@ -47,7 +45,7 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
         """
         Test that findstatic returns all candidate files if run without --first and -v1.
         """
-        result = call_command('findstatic', 'test/file.txt', verbosity=1, stdout=six.StringIO())
+        result = call_command('findstatic', 'test/file.txt', verbosity=1, stdout=StringIO())
         lines = [l.strip() for l in result.split('\n')]
         self.assertEqual(len(lines), 3)  # three because there is also the "Found <file> here" line
         self.assertIn('project', force_text(lines[1]))
@@ -57,7 +55,7 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
         """
         Test that findstatic returns all candidate files if run without --first and -v0.
         """
-        result = call_command('findstatic', 'test/file.txt', verbosity=0, stdout=six.StringIO())
+        result = call_command('findstatic', 'test/file.txt', verbosity=0, stdout=StringIO())
         lines = [l.strip() for l in result.split('\n')]
         self.assertEqual(len(lines), 2)
         self.assertIn('project', force_text(lines[0]))
@@ -68,7 +66,7 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
         Test that findstatic returns all candidate files if run without --first and -v2.
         Also, test that findstatic returns the searched locations with -v2.
         """
-        result = call_command('findstatic', 'test/file.txt', verbosity=2, stdout=six.StringIO())
+        result = call_command('findstatic', 'test/file.txt', verbosity=2, stdout=StringIO())
         lines = [l.strip() for l in result.split('\n')]
         self.assertIn('project', force_text(lines[1]))
         self.assertIn('apps', force_text(lines[2]))
@@ -90,7 +88,7 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
 class TestConfiguration(StaticFilesTestCase):
     def test_location_empty(self):
         msg = 'without having set the STATIC_ROOT setting to a filesystem path'
-        err = six.StringIO()
+        err = StringIO()
         for root in ['', None]:
             with override_settings(STATIC_ROOT=root):
                 with self.assertRaisesMessage(ImproperlyConfigured, msg):
@@ -167,7 +165,7 @@ class TestCollectionClear(CollectionTestCase):
         self.assertFileNotFound('cleared.txt')
 
     def test_dir_not_exists(self, **kwargs):
-        shutil.rmtree(six.text_type(settings.STATIC_ROOT))
+        shutil.rmtree(str(settings.STATIC_ROOT))
         super(TestCollectionClear, self).run_collectstatic(clear=True)
 
     @override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.PathNotImplementedStorage')
@@ -185,12 +183,12 @@ class TestInteractiveMessages(CollectionTestCase):
     def mock_input(stdout):
         def _input(msg):
             # Python 2 reads bytes from the console output, use bytes for the StringIO
-            stdout.write(msg.encode('utf-8') if six.PY2 else msg)
+            stdout.write(msg)
             return 'yes'
         return _input
 
     def test_warning_when_clearing_staticdir(self):
-        stdout = six.StringIO()
+        stdout = StringIO()
         self.run_collectstatic()
         with mock.patch('django.contrib.staticfiles.management.commands.collectstatic.input',
                         side_effect=self.mock_input(stdout)):
@@ -201,7 +199,7 @@ class TestInteractiveMessages(CollectionTestCase):
         self.assertIn(self.delete_warning_msg, output)
 
     def test_warning_when_overwriting_files_in_staticdir(self):
-        stdout = six.StringIO()
+        stdout = StringIO()
         self.run_collectstatic()
         with mock.patch('django.contrib.staticfiles.management.commands.collectstatic.input',
                         side_effect=self.mock_input(stdout)):
@@ -211,8 +209,8 @@ class TestInteractiveMessages(CollectionTestCase):
         self.assertNotIn(self.delete_warning_msg, output)
 
     def test_no_warning_when_staticdir_does_not_exist(self):
-        stdout = six.StringIO()
-        shutil.rmtree(six.text_type(settings.STATIC_ROOT))
+        stdout = StringIO()
+        shutil.rmtree(str(settings.STATIC_ROOT))
         call_command('collectstatic', interactive=True, stdout=stdout)
         output = force_text(stdout.getvalue())
         self.assertNotIn(self.overwrite_warning_msg, output)
@@ -220,11 +218,11 @@ class TestInteractiveMessages(CollectionTestCase):
         self.assertIn(self.files_copied_msg, output)
 
     def test_no_warning_for_empty_staticdir(self):
-        stdout = six.StringIO()
+        stdout = StringIO()
         static_dir = tempfile.mkdtemp(prefix='collectstatic_empty_staticdir_test')
         with override_settings(STATIC_ROOT=static_dir):
             call_command('collectstatic', interactive=True, stdout=stdout)
-        shutil.rmtree(six.text_type(static_dir))
+        shutil.rmtree(str(static_dir))
         output = force_text(stdout.getvalue())
         self.assertNotIn(self.overwrite_warning_msg, output)
         self.assertNotIn(self.delete_warning_msg, output)
@@ -349,7 +347,7 @@ class TestCollectionOverwriteWarning(CollectionTestCase):
         the command at highest verbosity, which is why we can't
         just call e.g. BaseCollectionTestCase.run_collectstatic()
         """
-        out = six.StringIO()
+        out = StringIO()
         call_command('collectstatic', interactive=False, verbosity=3, stdout=out, **kwargs)
         return force_text(out.getvalue())
 

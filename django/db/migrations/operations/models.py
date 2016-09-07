@@ -1,10 +1,7 @@
-from __future__ import unicode_literals
-
 from django.db import models
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.state import ModelState
 from django.db.models.options import normalize_together
-from django.utils import six
 from django.utils.functional import cached_property
 
 from .fields import (
@@ -58,7 +55,7 @@ class CreateModel(ModelOperation):
         _check_for_duplicates('fields', (name for name, _ in self.fields))
         _check_for_duplicates('bases', (
             base._meta.label_lower if hasattr(base, '_meta') else
-            base.lower() if isinstance(base, six.string_types) else base
+            base.lower() if isinstance(base, str) else base
             for base in self.bases
         ))
         _check_for_duplicates('managers', (name for name, _ in self.managers))
@@ -130,7 +127,7 @@ class CreateModel(ModelOperation):
         Take either a model class or an "app_label.ModelName" string
         and return (app_label, object_name).
         """
-        if isinstance(model, six.string_types):
+        if isinstance(model, str):
             return model.split(".", 1)
         else:
             return model._meta.app_label, model._meta.object_name

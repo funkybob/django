@@ -1,12 +1,9 @@
-from __future__ import unicode_literals
-
 import sys
 import unittest
 from contextlib import contextmanager
 
 from django.test import LiveServerTestCase, tag
 from django.utils.module_loading import import_string
-from django.utils.six import with_metaclass
 from django.utils.text import capfirst
 
 
@@ -56,7 +53,7 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
 
 
 @tag('selenium')
-class SeleniumTestCase(with_metaclass(SeleniumTestCaseBase, LiveServerTestCase)):
+class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
     implicit_wait = 10
 
     @classmethod

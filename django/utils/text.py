@@ -3,21 +3,15 @@ from __future__ import unicode_literals
 import re
 import unicodedata
 from gzip import GzipFile
+from html import entities
 from io import BytesIO
 
-from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.functional import (
     SimpleLazyObject, keep_lazy, keep_lazy_text, lazy,
 )
 from django.utils.safestring import SafeText, mark_safe
-from django.utils.six.moves import html_entities
 from django.utils.translation import pgettext, ugettext as _, ugettext_lazy
-
-if six.PY2:
-    # Import force_unicode even though this module doesn't use it, because some
-    # people rely on it being here.
-    from django.utils.encoding import force_unicode  # NOQA
 
 
 # Capitalizes the first letter of a string.
@@ -375,12 +369,12 @@ def _replace_entity(match):
                 c = int(text[1:], 16)
             else:
                 c = int(text)
-            return six.unichr(c)
+            return chr(c)
         except ValueError:
             return match.group(0)
     else:
         try:
-            return six.unichr(html_entities.name2codepoint[text])
+            return chr(entities.name2codepoint[text])
         except (ValueError, KeyError):
             return match.group(0)
 
@@ -413,7 +407,7 @@ def unescape_string_literal(s):
     return s[1:-1].replace(r'\%s' % quote, quote).replace(r'\\', '\\')
 
 
-@keep_lazy(six.text_type, SafeText)
+@keep_lazy(str, SafeText)
 def slugify(value, allow_unicode=False):
     """
     Convert to ASCII if 'allow_unicode' is False. Convert spaces to hyphens.
@@ -444,4 +438,4 @@ def _format_lazy(format_string, *args, **kwargs):
     and/or kwargs might be lazy.
     """
     return format_string.format(*args, **kwargs)
-format_lazy = lazy(_format_lazy, six.text_type)
+format_lazy = lazy(_format_lazy, str)

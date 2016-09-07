@@ -4,8 +4,6 @@ A series of tests to establish that the command-line management tools work as
 advertised - especially with regards to the handling of the
 DJANGO_SETTINGS_MODULE and default settings.py files.
 """
-from __future__ import unicode_literals
-
 import codecs
 import os
 import re
@@ -15,6 +13,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from io import StringIO
 
 import django
 from django import conf, get_version
@@ -28,11 +27,9 @@ from django.db.migrations.recorder import MigrationRecorder
 from django.test import (
     LiveServerTestCase, SimpleTestCase, TestCase, mock, override_settings,
 )
-from django.utils._os import npath, upath
 from django.utils.encoding import force_text
-from django.utils.six import PY2, PY3, StringIO
 
-custom_templates_dir = os.path.join(os.path.dirname(upath(__file__)), 'custom_templates')
+custom_templates_dir = os.path.join(os.path.dirname(__file__), 'custom_templates')
 
 PY36 = sys.version_info >= (3, 6)
 SYSTEM_CHECK_MSG = 'System check identified no issues'
@@ -132,7 +129,7 @@ class AdminScriptTestCase(unittest.TestCase):
     def run_test(self, script, args, settings_file=None, apps=None):
         base_dir = os.path.dirname(self.test_dir)
         # The base dir for Django's tests is one level up.
-        tests_dir = os.path.dirname(os.path.dirname(upath(__file__)))
+        tests_dir = os.path.dirname(os.path.dirname(__file__))
         # The base dir for Django is one level above the test dir. We don't use
         # `import django` to figure that out, so we don't pick up a Django
         # from site-packages or similar.
@@ -156,7 +153,7 @@ class AdminScriptTestCase(unittest.TestCase):
         python_path = [base_dir, django_dir, tests_dir]
         python_path.extend(ext_backend_base_dirs)
         # Use native strings for better compatibility
-        test_environ[str(python_path_var_name)] = npath(os.pathsep.join(python_path))
+        test_environ[str(python_path_var_name)] = os.pathsep.join(python_path)
         test_environ[str('PYTHONWARNINGS')] = str('')
 
         # Move to the test directory and run
@@ -172,7 +169,7 @@ class AdminScriptTestCase(unittest.TestCase):
         return out, err
 
     def run_django_admin(self, args, settings_file=None):
-        script_dir = os.path.abspath(os.path.join(os.path.dirname(upath(django.__file__)), 'bin'))
+        script_dir = os.path.abspath(os.path.join(os.path.dirname(django.__file__), 'bin'))
         return self.run_test(os.path.join(script_dir, 'django-admin.py'), args, settings_file)
 
     def run_manage(self, args, settings_file=None):
@@ -182,7 +179,7 @@ class AdminScriptTestCase(unittest.TestCase):
             except OSError:
                 pass
 
-        conf_dir = os.path.dirname(upath(conf.__file__))
+        conf_dir = os.path.dirname(conf.__file__)
         template_manage_py = os.path.join(conf_dir, 'project_template', 'manage.py-tpl')
 
         test_manage_py = os.path.join(self.test_dir, 'manage.py')
@@ -619,21 +616,6 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
             content = f.read()
             self.assertIn("class SettingsTestConfig(AppConfig)", content)
             self.assertIn("name = 'settings_test'", content)
-            if not PY3:
-                self.assertIn(unicode_literals_import, content)
-        if not PY3:
-            with open(os.path.join(app_path, 'models.py'), 'r') as fp:
-                content = fp.read()
-            self.assertIn(unicode_literals_import, content)
-            with open(os.path.join(app_path, 'views.py'), 'r') as fp:
-                content = fp.read()
-            self.assertIn(unicode_literals_import, content)
-            with open(os.path.join(app_path, 'admin.py'), 'r') as fp:
-                content = fp.read()
-            self.assertIn(unicode_literals_import, content)
-            with open(os.path.join(app_path, 'tests.py'), 'r') as fp:
-                content = fp.read()
-            self.assertIn(unicode_literals_import, content)
 
     def test_setup_environ_custom_template(self):
         "directory: startapp creates the correct directory with a custom template"
@@ -646,7 +628,6 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         self.assertTrue(os.path.exists(app_path))
         self.assertTrue(os.path.exists(os.path.join(app_path, 'api.py')))
 
-    @unittest.skipIf(PY2, "Python 2 doesn't support Unicode package names.")
     def test_startapp_unicode_name(self):
         "directory: startapp creates the correct directory with unicode characters"
         args = ['startapp', 'こんにちは']
@@ -1913,18 +1894,11 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
             self.addCleanup(shutil.rmtree, testproject_dir, True)
 
             out, err = self.run_django_admin(args)
-            if PY2:
-                self.assertOutput(
-                    err,
-                    "Error: '%s' is not a valid project name. Please make "
-                    "sure the name begins with a letter or underscore." % bad_name
-                )
-            else:
-                self.assertOutput(
-                    err,
-                    "Error: '%s' is not a valid project name. Please make "
-                    "sure the name is a valid identifier." % bad_name
-                )
+            self.assertOutput(
+                err,
+                "Error: '%s' is not a valid project name. Please make "
+                "sure the name is a valid identifier." % bad_name
+            )
             self.assertFalse(os.path.exists(testproject_dir))
 
     def test_simple_project_different_directory(self):

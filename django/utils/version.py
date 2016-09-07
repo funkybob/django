@@ -1,10 +1,7 @@
-from __future__ import unicode_literals
-
 import datetime
 import os
 import subprocess
-
-from django.utils.lru_cache import lru_cache
+from functools import lru_cache
 
 
 def get_version(version=None):

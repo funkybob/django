@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import os.path
 import sys
 import tempfile
 import types
 import unittest
 from contextlib import contextmanager
+from io import StringIO
 
 from django.template import Context, TemplateDoesNotExist
 from django.template.engine import Engine
 from django.test import SimpleTestCase, ignore_warnings, override_settings
-from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import lazystr
 
@@ -74,7 +72,6 @@ class CachedLoaderTests(SimpleTestCase):
         self.assertIsInstance(e, TemplateDoesNotExist)
         self.assertEqual(e.args[0], 'debug-template-missing.html')
 
-    @unittest.skipIf(six.PY2, "Python 2 doesn't set extra exception attributes")
     def test_cached_exception_no_traceback(self):
         """
         When a TemplateDoesNotExist instance is cached, the cached instance
@@ -174,9 +171,6 @@ class EggLoaderTests(SimpleTestCase):
         resources: A dictionary of template names mapped to file-like objects.
         """
 
-        if six.PY2:
-            name = name.encode('utf-8')
-
         class MockLoader(object):
             pass
 
@@ -225,7 +219,7 @@ class EggLoaderTests(SimpleTestCase):
 
     def test_get_template(self):
         templates = {
-            os.path.normcase('templates/y.html'): six.StringIO("y"),
+            os.path.normcase('templates/y.html'): StringIO("y"),
         }
 
         with self.create_egg('egg', templates):
@@ -243,7 +237,7 @@ class EggLoaderTests(SimpleTestCase):
     def test_load_template_source(self):
         loader = self.engine.template_loaders[0]
         templates = {
-            os.path.normcase('templates/y.html'): six.StringIO("y"),
+            os.path.normcase('templates/y.html'): StringIO("y"),
         }
 
         with self.create_egg('egg', templates):
@@ -267,7 +261,7 @@ class EggLoaderTests(SimpleTestCase):
         Template loading fails if the egg is not in INSTALLED_APPS.
         """
         templates = {
-            os.path.normcase('templates/y.html'): six.StringIO("y"),
+            os.path.normcase('templates/y.html'): StringIO("y"),
         }
 
         with self.create_egg('egg', templates):

@@ -5,7 +5,6 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.test import TestCase
-from django.utils.six import PY3
 
 
 class TokenGeneratorTest(TestCase):
@@ -53,15 +52,3 @@ class TokenGeneratorTest(TestCase):
 
         p2 = Mocked(date.today() + timedelta(settings.PASSWORD_RESET_TIMEOUT_DAYS + 1))
         self.assertFalse(p2.check_token(user, tk1))
-
-    @unittest.skipIf(PY3, "Unnecessary test with Python 3")
-    def test_date_length(self):
-        """
-        Make sure we don't allow overly long dates, causing a potential DoS.
-        """
-        user = User.objects.create_user('ima1337h4x0r', 'test4@example.com', 'p4ssw0rd')
-        p0 = PasswordResetTokenGenerator()
-
-        # This will put a 14-digit base36 timestamp into the token, which is too large.
-        with self.assertRaises(ValueError):
-            p0._make_token_with_timestamp(user, 175455491841851871349)

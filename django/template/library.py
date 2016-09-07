@@ -2,7 +2,6 @@ import functools
 import warnings
 from importlib import import_module
 
-from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.html import conditional_escape
 from django.utils.inspect import getargspec
@@ -230,7 +229,7 @@ class InclusionNode(TagHelperNode):
                 t = self.filename
             elif isinstance(getattr(self.filename, 'template', None), Template):
                 t = self.filename.template
-            elif not isinstance(self.filename, six.string_types) and is_iterable(self.filename):
+            elif not isinstance(self.filename, str) and is_iterable(self.filename):
                 t = context.template.engine.select_template(self.filename)
             else:
                 t = context.template.engine.get_template(self.filename)

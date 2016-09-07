@@ -11,6 +11,8 @@ import binascii
 import cgi
 import sys
 
+from urllib.parse import unquote
+
 from django.conf import settings
 from django.core.exceptions import (
     RequestDataTooBig, SuspiciousMultipartForm, TooManyFieldsSent,
@@ -18,10 +20,8 @@ from django.core.exceptions import (
 from django.core.files.uploadhandler import (
     SkipFile, StopFutureHandlers, StopUpload,
 )
-from django.utils import six
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text
-from django.utils.six.moves.urllib.parse import unquote
 from django.utils.text import unescape_entities
 
 __all__ = ('MultiPartParser', 'MultiPartParserError', 'InputStreamExhausted')
@@ -41,7 +41,7 @@ RAW = "raw"
 FILE = "file"
 FIELD = "field"
 
-_BASE64_DECODE_ERROR = TypeError if six.PY2 else binascii.Error
+_BASE64_DECODE_ERROR = binascii.Error
 
 
 class MultiPartParser(object):
@@ -87,7 +87,7 @@ class MultiPartParser(object):
             # This means we shouldn't continue...raise an error.
             raise MultiPartParserError("Invalid content length: %r" % content_length)
 
-        if isinstance(boundary, six.text_type):
+        if isinstance(boundary, str):
             boundary = boundary.encode('ascii')
         self._boundary = boundary
         self._input_data = input_data
@@ -253,7 +253,7 @@ class MultiPartParser(object):
                                 except Exception as e:
                                     # Since this is only a chunk, any error is an unfixable error.
                                     msg = "Could not decode base64 data: %r" % e
-                                    six.reraise(MultiPartParserError, MultiPartParserError(msg), sys.exc_info()[2])
+                                    raise MultiPartParserError().with_traceback(sys.exc_info()[2])
 
                             for i, handler in enumerate(handlers):
                                 chunk_length = len(chunk)
@@ -314,7 +314,7 @@ class MultiPartParser(object):
                 handler.file.close()
 
 
-class LazyStream(six.Iterator):
+class LazyStream:
     """
     The LazyStream wrapper allows one to get and "unget" bytes from a stream.
 
@@ -431,7 +431,7 @@ class LazyStream(six.Iterator):
             )
 
 
-class ChunkIter(six.Iterator):
+class ChunkIter:
     """
     An iterable that will yield chunks of data. Given a file-like object as the
     constructor, this object will yield chunks of read operations from that
@@ -455,7 +455,7 @@ class ChunkIter(six.Iterator):
         return self
 
 
-class InterBoundaryIter(six.Iterator):
+class InterBoundaryIter:
     """
     A Producer that will iterate over boundaries.
     """
@@ -473,7 +473,7 @@ class InterBoundaryIter(six.Iterator):
             raise StopIteration()
 
 
-class BoundaryIter(six.Iterator):
+class BoundaryIter:
     """
     A Producer that is sensitive to boundaries.
 
@@ -684,10 +684,7 @@ def parse_header(line):
             value = p[i + 1:].strip()
             if has_encoding:
                 encoding, lang, value = value.split(b"'")
-                if six.PY3:
-                    value = unquote(value.decode(), encoding=encoding.decode())
-                else:
-                    value = unquote(value).decode(encoding)
+                value = unquote(value.decode(), encoding=encoding.decode())
             if len(value) >= 2 and value[:1] == value[-1:] == b'"':
                 value = value[1:-1]
                 value = value.replace(b'\\\\', b'\\').replace(b'\\"', b'"')

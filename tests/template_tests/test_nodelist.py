@@ -2,7 +2,6 @@ from unittest import TestCase
 
 from django.template import Context, Engine
 from django.template.base import TextNode, VariableNode
-from django.utils import six
 
 
 class NodelistTest(TestCase):
@@ -43,8 +42,7 @@ class TextNodeTest(TestCase):
         ]:
             template = engine.from_string(temptext)
             texts = template.nodelist.get_nodes_by_type(TextNode)
-            if six.PY3:
-                reprtext = reprtext.replace("u'", "'")
+            reprtext = reprtext.replace("u'", "'")
             self.assertEqual(repr(texts[0]), reprtext)
 
 

@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import asyncore
 import base64
 import mimetypes
@@ -13,6 +11,7 @@ import tempfile
 import threading
 from email.header import Header
 from email.mime.text import MIMEText
+from io import StringIO
 from smtplib import SMTP, SMTPAuthenticationError, SMTPException
 from ssl import SSLError
 
@@ -25,20 +24,11 @@ from django.core.mail.backends import console, dummy, filebased, locmem, smtp
 from django.core.mail.message import BadHeaderError, sanitize_address
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import requires_tz_support
-from django.utils._os import upath
 from django.utils.encoding import force_bytes, force_text
-from django.utils.six import PY3, StringIO, binary_type
 from django.utils.translation import ugettext_lazy
 
-if PY3:
-    from email.utils import parseaddr
-    from email import message_from_bytes, message_from_binary_file
-else:
-    from email.Utils import parseaddr
-    from email import (
-        message_from_string as message_from_bytes,
-        message_from_file as message_from_binary_file,
-    )
+from email.utils import parseaddr
+from email import message_from_bytes, message_from_binary_file
 
 
 class HeadersCheckMixin(object):
@@ -51,7 +41,7 @@ class HeadersCheckMixin(object):
         string with the contents of an email message.
         :param headers: should be a set of (header-name, header-value) tuples.
         """
-        if isinstance(message, binary_type):
+        if isinstance(message, bytes):
             message = message_from_bytes(message)
         msg_headers = set(message.items())
         self.assertTrue(headers.issubset(msg_headers), msg='Message is missing '
@@ -406,7 +396,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
                 email = EmailMessage('subject', 'body', 'from@example.com', ['to@example.com'])
                 self.assertEqual(mimetypes.guess_type(basename)[0], real_mimetype)
                 self.assertEqual(email.attachments, [])
-                file_path = os.path.join(os.path.dirname(upath(__file__)), 'attachments', basename)
+                file_path = os.path.join(os.path.dirname(__file__), 'attachments', basename)
                 email.attach_file(file_path, mimetype=mimetype)
                 self.assertEqual(len(email.attachments), 1)
                 self.assertIn(basename, email.attachments[0])
@@ -644,16 +634,10 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             sanitize_address(('A name', 'to@example.com'), 'ascii'),
             'A name <to@example.com>'
         )
-        if PY3:
-            self.assertEqual(
-                sanitize_address(('A name', 'to@example.com'), 'utf-8'),
-                '=?utf-8?q?A_name?= <to@example.com>'
-            )
-        else:
-            self.assertEqual(
-                sanitize_address(('A name', 'to@example.com'), 'utf-8'),
-                'A name <to@example.com>'
-            )
+        self.assertEqual(
+            sanitize_address(('A name', 'to@example.com'), 'utf-8'),
+            '=?utf-8?q?A_name?= <to@example.com>'
+        )
 
         # Unicode characters are are supported in RFC-6532.
         self.assertEqual(
@@ -1152,18 +1136,16 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
         self.active_lock = threading.Lock()
         self.sink_lock = threading.Lock()
 
-    if not PY3:
-        def handle_accept(self):
-            # copy of Python 2.7 smtpd.SMTPServer.handle_accept with hardcoded
-            # SMTPChannel replaced by self.channel_class
-            pair = self.accept()
-            if pair is not None:
-                conn, addr = pair
-                self.channel_class(self, conn, addr)
+    def handle_accept(self):
+        # copy of Python 2.7 smtpd.SMTPServer.handle_accept with hardcoded
+        # SMTPChannel replaced by self.channel_class
+        pair = self.accept()
+        if pair is not None:
+            conn, addr = pair
+            self.channel_class(self, conn, addr)
 
     def process_message(self, peer, mailfrom, rcpttos, data):
-        if PY3:
-            data = data.encode('utf-8')
+        data = data.encode('utf-8')
         m = message_from_bytes(data)
         maddr = parseaddr(m.get('from'))[1]
 
@@ -1435,8 +1417,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
 
             self.assertTrue(msg)
 
-            if PY3:
-                msg = msg.decode('utf-8')
+            msg = msg.decode('utf-8')
             # Ensure that the message only contains CRLF and not combinations of CRLF, LF, and CR.
             msg = msg.replace('\r\n', '')
             self.assertNotIn('\r', msg)

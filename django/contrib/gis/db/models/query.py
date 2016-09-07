@@ -14,7 +14,6 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import RawSQL
 from django.db.models.fields import Field
 from django.db.models.query import QuerySet
-from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 
 
@@ -115,7 +114,7 @@ class GeoQuerySet(QuerySet):
         if not backend.geojson:
             raise NotImplementedError('Only PostGIS and SpatiaLite support GeoJSON serialization.')
 
-        if not isinstance(precision, six.integer_types):
+        if not isinstance(precision, int):
             raise TypeError('Precision keyword must be set with an integer.')
 
         options = 0
@@ -264,7 +263,7 @@ class GeoQuerySet(QuerySet):
           - 2 arguments: X and Y sizes to snap the grid to.
           - 4 arguments: X, Y sizes and the X, Y origins.
         """
-        if False in [isinstance(arg, (float,) + six.integer_types) for arg in args]:
+        if False in [isinstance(arg, (float, int)) for arg in args]:
             raise TypeError('Size argument(s) for the grid must be a float or integer values.')
 
         nargs = len(args)
@@ -304,7 +303,7 @@ class GeoQuerySet(QuerySet):
                         digits used in output (defaults to 8).
         """
         relative = int(bool(relative))
-        if not isinstance(precision, six.integer_types):
+        if not isinstance(precision, int):
             raise TypeError('SVG precision keyword argument must be an integer.')
         s = {
             'desc': 'SVG',
@@ -347,7 +346,7 @@ class GeoQuerySet(QuerySet):
         Transforms the given geometry field to the given SRID.  If no SRID is
         provided, the transformation will default to using 4326 (WGS84).
         """
-        if not isinstance(srid, six.integer_types):
+        if not isinstance(srid, int):
             raise TypeError('An integer SRID must be provided.')
         field_name = kwargs.get('field_name')
         self._spatial_setup('transform', field_name=field_name)
@@ -439,13 +438,13 @@ class GeoQuerySet(QuerySet):
             default_args, geo_field = self._spatial_setup(
                 att, desc=settings['desc'], field_name=field_name,
                 geo_field_type=settings.get('geo_field_type'))
-            for k, v in six.iteritems(default_args):
+            for k, v in default_args.items():
                 settings['procedure_args'].setdefault(k, v)
         else:
             geo_field = settings['geo_field']
 
         # The attribute to attach to the model.
-        if not isinstance(model_att, six.string_types):
+        if not isinstance(model_att, str):
             model_att = att
 
         # Special handling for any argument that is a geometry.
@@ -592,7 +591,7 @@ class GeoQuerySet(QuerySet):
                     if not backend.geography:
                         if not isinstance(geo_field, PointField):
                             raise ValueError('Spherical distance calculation only supported on PointFields.')
-                        if not str(Geometry(six.memoryview(params[0].ewkb)).geom_type) == 'Point':
+                        if not str(Geometry(memoryview(params[0].ewkb)).geom_type) == 'Point':
                             raise ValueError(
                                 'Spherical distance calculation only supported with '
                                 'Point Geometry parameters'

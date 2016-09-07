@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import datetime
 import decimal
 import functools
@@ -10,6 +8,7 @@ import re
 import sys
 import tokenize
 import unittest
+from io import StringIO
 
 import custom_migration_operations.more_operations
 import custom_migration_operations.operations
@@ -22,8 +21,7 @@ from django.db.migrations.writer import (
     MigrationWriter, OperationWriter, SettingsReference,
 )
 from django.test import SimpleTestCase, ignore_warnings, mock
-from django.utils import datetime_safe, six
-from django.utils._os import upath
+from django.utils import datetime_safe
 from django.utils.deconstruct import deconstructible
 from django.utils.encoding import force_str
 from django.utils.functional import SimpleLazyObject
@@ -44,7 +42,7 @@ class Money(decimal.Decimal):
     def deconstruct(self):
         return (
             '%s.%s' % (self.__class__.__module__, self.__class__.__name__),
-            [six.text_type(self)],
+            [str(self)],
             {}
         )
 
@@ -439,7 +437,7 @@ class WriterTests(SimpleTestCase):
         self.assertEqual(string, "migrations.test_writer.EmailValidator(message='hello')")
 
         validator = deconstructible(path="custom.EmailValidator")(EmailValidator)(message="hello")
-        with six.assertRaisesRegex(self, ImportError, "No module named '?custom'?"):
+        with self.assertRaisesRegex(ImportError, "No module named '?custom'?"):
             MigrationWriter.serialize(validator)
 
         validator = deconstructible(path="django.core.validators.EmailValidator2")(EmailValidator)(message="hello")
@@ -462,15 +460,6 @@ class WriterTests(SimpleTestCase):
         string, imports = MigrationWriter.serialize(range)
         self.assertEqual(string, 'range')
         self.assertEqual(imports, set())
-
-    @unittest.skipUnless(six.PY2, "Only applies on Python 2")
-    def test_serialize_direct_function_reference(self):
-        """
-        Ticket #22436: You cannot use a function straight from its body
-        (e.g. define the method and use it in the same body)
-        """
-        with self.assertRaises(ValueError):
-            self.serialize_round_trip(TestModel1.thing)
 
     def test_serialize_local_function_reference(self):
         """
@@ -553,7 +542,7 @@ class WriterTests(SimpleTestCase):
         self.assertIn("Migration", result)
         # In order to preserve compatibility with Python 3.2 unicode literals
         # prefix shouldn't be added to strings.
-        tokens = tokenize.generate_tokens(six.StringIO(str(output)).readline)
+        tokens = tokenize.generate_tokens(StringIO(str(output)).readline)
         for token_type, token_source, (srow, scol), __, line in tokens:
             if token_type == tokenize.STRING:
                 self.assertFalse(
@@ -574,7 +563,7 @@ class WriterTests(SimpleTestCase):
             'migrations.migrations_test_apps.without_init_file',
         ]
 
-        base_dir = os.path.dirname(os.path.dirname(upath(__file__)))
+        base_dir = os.path.dirname(os.path.dirname(__file__))
 
         for app in test_apps:
             with self.modify_settings(INSTALLED_APPS={'append': app}):

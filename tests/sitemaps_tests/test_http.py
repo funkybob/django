@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import os
 from datetime import date
 from unittest import skipUnless
@@ -10,7 +8,6 @@ from django.contrib.sitemaps import GenericSitemap, Sitemap
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.test import modify_settings, override_settings
-from django.utils._os import upath
 from django.utils.formats import localize
 from django.utils.translation import activate, deactivate
 
@@ -32,7 +29,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 
     @override_settings(TEMPLATES=[{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'templates')],
+        'DIRS': [os.path.join(os.path.dirname(__file__), 'templates')],
     }])
     def test_simple_sitemap_custom_index(self):
         "A simple sitemap index can be rendered with a custom template"
@@ -67,7 +64,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 
     @override_settings(TEMPLATES=[{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'templates')],
+        'DIRS': [os.path.join(os.path.dirname(__file__), 'templates')],
     }])
     def test_simple_custom_sitemap(self):
         "A simple sitemap can be rendered with a custom template"

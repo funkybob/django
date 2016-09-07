@@ -1,12 +1,11 @@
 """Translation helper functions."""
-from __future__ import unicode_literals
-
 import gettext as gettext_module
 import os
 import re
 import sys
 import warnings
 from collections import OrderedDict
+from functools import lru_cache
 from threading import local
 
 from django.apps import apps
@@ -15,8 +14,6 @@ from django.conf.locale import LANG_INFO
 from django.core.exceptions import AppRegistryNotReady
 from django.core.signals import setting_changed
 from django.dispatch import receiver
-from django.utils import lru_cache, six
-from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.safestring import SafeData, mark_safe
 from django.utils.translation import LANGUAGE_SESSION_KEY
@@ -157,7 +154,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
     def _init_translation_catalog(self):
         """Creates a base catalog using global django translations."""
-        settingsfile = upath(sys.modules[settings.__module__].__file__)
+        settingsfile = sys.modules[settings.__module__].__file__
         localedir = os.path.join(os.path.dirname(settingsfile), 'locale')
         translation = self._new_gnu_trans(localedir)
         self.merge(translation)
@@ -336,11 +333,7 @@ def gettext(message):
     """
     return do_translate(message, 'gettext')
 
-if six.PY3:
-    ugettext = gettext
-else:
-    def ugettext(message):
-        return do_translate(message, 'ugettext')
+ugettext = gettext
 
 
 def pgettext(context, message):
@@ -383,15 +376,7 @@ def ngettext(singular, plural, number):
     """
     return do_ntranslate(singular, plural, number, 'ngettext')
 
-if six.PY3:
-    ungettext = ngettext
-else:
-    def ungettext(singular, plural, number):
-        """
-        Returns a unicode strings of the translation of either the singular or
-        plural, based on the number.
-        """
-        return do_ntranslate(singular, plural, number, 'ungettext')
+ungettext = ngettext
 
 
 def npgettext(context, singular, plural, number):
@@ -409,12 +394,11 @@ def all_locale_paths():
     """
     Returns a list of paths to user-provides languages files.
     """
-    globalpath = os.path.join(
-        os.path.dirname(upath(sys.modules[settings.__module__].__file__)), 'locale')
+    globalpath = os.path.join(os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
     return [globalpath] + list(settings.LOCALE_PATHS)
 
 
-@lru_cache.lru_cache(maxsize=1000)
+@lru_cache(maxsize=1000)
 def check_for_language(lang_code):
     """
     Checks whether there is a global language file for the given language
@@ -434,7 +418,7 @@ def check_for_language(lang_code):
     return False
 
 
-@lru_cache.lru_cache()
+@lru_cache()
 def get_languages():
     """
     Cache of settings.LANGUAGES in an OrderedDict for easy lookups by key.
@@ -442,7 +426,7 @@ def get_languages():
     return OrderedDict(settings.LANGUAGES)
 
 
-@lru_cache.lru_cache(maxsize=1000)
+@lru_cache(maxsize=1000)
 def get_supported_language_variant(lang_code, strict=False):
     """
     Returns the language-code that's listed in supported languages, possibly

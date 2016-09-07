@@ -17,8 +17,6 @@ from django.test import TestCase, TransactionTestCase
 from django.test.runner import default_test_processes
 from django.test.selenium import SeleniumTestCaseBase
 from django.test.utils import get_runner
-from django.utils import six
-from django.utils._os import upath
 from django.utils.deprecation import (
     RemovedInDjango20Warning, RemovedInDjango21Warning,
 )
@@ -32,7 +30,7 @@ warnings.simplefilter("error", RuntimeWarning)
 # Ignore known warnings in test dependencies.
 warnings.filterwarnings("ignore", "'U' mode is deprecated", DeprecationWarning, module='docutils.io')
 
-RUNTESTS_DIR = os.path.abspath(os.path.dirname(upath(__file__)))
+RUNTESTS_DIR = os.path.abspath(os.path.dirname(__file__))
 
 TEMPLATE_DIR = os.path.join(RUNTESTS_DIR, 'templates')
 
@@ -45,7 +43,7 @@ tempfile.tempdir = os.environ['TMPDIR'] = TMPDIR
 # Removing the temporary TMPDIR. Ensure we pass in unicode so that it will
 # successfully remove temp trees containing non-ASCII filenames on Windows.
 # (We're assuming the temp dir name itself only contains ASCII characters.)
-atexit.register(shutil.rmtree, six.text_type(TMPDIR))
+atexit.register(shutil.rmtree, str(TMPDIR))
 
 
 SUBDIRS_TO_SKIP = [
@@ -282,7 +280,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
 
 def get_subprocess_args(options):
     subprocess_args = [
-        sys.executable, upath(__file__), '--settings=%s' % options.settings
+        sys.executable, __file__, '--settings=%s' % options.settings
     ]
     if options.failfast:
         subprocess_args.append('--failfast')

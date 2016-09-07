@@ -1,8 +1,6 @@
 """
 Tests for geography support in PostGIS
 """
-from __future__ import unicode_literals
-
 import os
 from unittest import skipUnless
 
@@ -12,7 +10,6 @@ from django.contrib.gis.measure import D
 from django.db import connection
 from django.db.models.functions import Cast
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
-from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from ..utils import oracle, postgis
@@ -76,7 +73,7 @@ class GeographyTest(TestCase):
         from django.contrib.gis.utils import LayerMapping
 
         # Getting the shapefile and mapping dictionary.
-        shp_path = os.path.realpath(os.path.join(os.path.dirname(upath(__file__)), '..', 'data'))
+        shp_path = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'data'))
         co_shp = os.path.join(shp_path, 'counties', 'counties.shp')
         co_mapping = {'name': 'Name',
                       'state': 'State',

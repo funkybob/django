@@ -4,11 +4,10 @@ Cross Site Request Forgery Middleware.
 This module provides a middleware that implements protection
 against request forgeries from other sites.
 """
-from __future__ import unicode_literals
-
 import logging
 import re
 import string
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.urls import get_callable
@@ -17,8 +16,6 @@ from django.utils.crypto import constant_time_compare, get_random_string
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.encoding import force_text
 from django.utils.http import is_same_domain
-from django.utils.six.moves import zip
-from django.utils.six.moves.urllib.parse import urlparse
 
 logger = logging.getLogger('django.security.csrf')
 

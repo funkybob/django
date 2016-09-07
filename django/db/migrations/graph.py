@@ -1,14 +1,10 @@
-from __future__ import unicode_literals
-
 import sys
 import warnings
 from collections import deque
 from functools import total_ordering
 
 from django.db.migrations.state import ProjectState
-from django.utils import six
 from django.utils.datastructures import OrderedSet
-from django.utils.encoding import python_2_unicode_compatible
 
 from .exceptions import CircularDependencyError, NodeNotFoundError
 
@@ -20,7 +16,6 @@ RECURSION_DEPTH_WARNING = (
 )
 
 
-@python_2_unicode_compatible
 @total_ordering
 class Node(object):
     """
@@ -104,7 +99,6 @@ class DummyNode(Node):
         raise NodeNotFoundError(self.error_message, self.key, origin=self.origin)
 
 
-@python_2_unicode_compatible
 class MigrationGraph(object):
     """
     Represents the digraph of all migrations in a project.
@@ -192,7 +186,7 @@ class MigrationGraph(object):
             exc_value.__cause__ = exc
             if not hasattr(exc, '__traceback__'):
                 exc.__traceback__ = sys.exc_info()[2]
-            six.reraise(NodeNotFoundError, exc_value, sys.exc_info()[2])
+            raise exc_value.with_traceback(sys.exc_info()[2])
         for replaced_key in replaced:
             self.nodes.pop(replaced_key, None)
             replaced_node = self.node_map.pop(replaced_key, None)
@@ -232,7 +226,7 @@ class MigrationGraph(object):
             exc_value.__cause__ = exc
             if not hasattr(exc, '__traceback__'):
                 exc.__traceback__ = sys.exc_info()[2]
-            six.reraise(NodeNotFoundError, exc_value, sys.exc_info()[2])
+            raise exc_value.with_traceback(sys.exc_info()[2])
         replaced_nodes = set()
         replaced_nodes_parents = set()
         for key in replaced:

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import datetime
 import re
 import sys
@@ -25,7 +23,7 @@ from django.test import (
 )
 from django.test.utils import requires_tz_support
 from django.urls import reverse
-from django.utils import six, timezone
+from django.utils import timezone
 
 from .forms import (
     EventForm, EventLocalizedForm, EventLocalizedModelForm, EventModelForm,
@@ -671,7 +669,7 @@ class SerializationTests(SimpleTestCase):
 
     def assert_yaml_contains_datetime(self, yaml, dt):
         # Depending on the yaml dumper, '!timestamp' might be absent
-        six.assertRegex(self, yaml, r"\n  fields: {dt: !(!timestamp)? '%s'}" % re.escape(dt))
+        self.assertRegex(yaml, r"\n  fields: {dt: !(!timestamp)? '%s'}" % re.escape(dt))
 
     def test_naive_datetime(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30)
@@ -882,8 +880,8 @@ class TemplateTests(SimpleTestCase):
             }
         }
 
-        for k1, dt in six.iteritems(datetimes):
-            for k2, tpl in six.iteritems(templates):
+        for k1, dt in datetimes.items():
+            for k2, tpl in templates.items():
                 ctx = Context({'dt': dt, 'ICT': ICT})
                 actual = tpl.render(ctx)
                 expected = results[k1][k2]
@@ -895,8 +893,8 @@ class TemplateTests(SimpleTestCase):
         results['ict']['notag'] = t('ict', 'eat', 'utc', 'ict')
 
         with self.settings(USE_TZ=False):
-            for k1, dt in six.iteritems(datetimes):
-                for k2, tpl in six.iteritems(templates):
+            for k1, dt in datetimes.items():
+                for k2, tpl in templates.items():
                     ctx = Context({'dt': dt, 'ICT': ICT})
                     actual = tpl.render(ctx)
                     expected = results[k1][k2]

@@ -14,7 +14,6 @@ from django.contrib.gis.geos.linestring import LinearRing, LineString
 from django.contrib.gis.geos.point import Point
 from django.contrib.gis.geos.polygon import Polygon
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.six.moves import range
 
 
 class GeometryCollection(GEOSGeometry):

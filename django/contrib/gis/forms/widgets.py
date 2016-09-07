@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import logging
 
 from django.conf import settings
@@ -7,7 +5,7 @@ from django.contrib.gis import gdal
 from django.contrib.gis.geos import GEOSException, GEOSGeometry
 from django.forms.widgets import Widget
 from django.template import loader
-from django.utils import six, translation
+from django.utils import translation
 
 logger = logging.getLogger('django.contrib.gis')
 
@@ -46,7 +44,7 @@ class BaseGeometryWidget(Widget):
     def render(self, name, value, attrs=None):
         # If a string reaches here (via a validation error on another
         # field) then just reconstruct the Geometry.
-        if value and isinstance(value, six.string_types):
+        if value and isinstance(value, str):
             value = self.deserialize(value)
 
         if value:

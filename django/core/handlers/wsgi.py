@@ -10,7 +10,6 @@ from django.conf import settings
 from django.core import signals
 from django.core.handlers import base
 from django.urls import set_script_prefix
-from django.utils import six
 from django.utils.encoding import (
     force_str, force_text, repercent_broken_unicode,
 )
@@ -221,7 +220,7 @@ def get_bytes_from_wsgi(environ, key, default):
     # Under Python 3, non-ASCII values in the WSGI environ are arbitrarily
     # decoded with ISO-8859-1. This is wrong for Django websites where UTF-8
     # is the default. Re-encode to recover the original bytestring.
-    return value.encode(ISO_8859_1) if six.PY3 else value
+    return value.encode(ISO_8859_1)
 
 
 def get_str_from_wsgi(environ, key, default):
@@ -232,4 +231,4 @@ def get_str_from_wsgi(environ, key, default):
     unicode objects provided they only contain ASCII characters.
     """
     value = get_bytes_from_wsgi(environ, key, default)
-    return value.decode(UTF_8, errors='replace') if six.PY3 else value
+    return value.decode(UTF_8, errors='replace')

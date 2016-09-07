@@ -7,18 +7,15 @@ This is a simple server for use in testing or debugging Django apps. It hasn't
 been reviewed for security issues. DON'T USE IT FOR PRODUCTION USE!
 """
 
-from __future__ import unicode_literals
-
 import logging
 import socket
+import socketserver
 import sys
 from wsgiref import simple_server
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.wsgi import get_wsgi_application
-from django.utils import six
 from django.utils.module_loading import import_string
-from django.utils.six.moves import socketserver
 
 __all__ = ('WSGIServer', 'WSGIRequestHandler')
 
@@ -53,8 +50,7 @@ def get_internal_wsgi_application():
                 'exception': e,
             })
         )
-        six.reraise(ImproperlyConfigured, ImproperlyConfigured(msg),
-                    sys.exc_info()[2])
+        raise ImproperlyConfigured(msg).with_traceback(sys.exc_info()[2])
 
 
 def is_broken_pipe_error():

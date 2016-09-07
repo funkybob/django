@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from decimal import Decimal, localcontext
 from unittest import expectedFailure
 
 from django.template.defaultfilters import floatformat
 from django.test import SimpleTestCase
-from django.utils import six
 from django.utils.safestring import mark_safe
 
 from ..utils import setup
@@ -67,13 +64,13 @@ class FunctionTests(SimpleTestCase):
 
     def test_infinity(self):
         pos_inf = float(1e30000)
-        self.assertEqual(floatformat(pos_inf), six.text_type(pos_inf))
+        self.assertEqual(floatformat(pos_inf), str(pos_inf))
 
         neg_inf = float(-1e30000)
-        self.assertEqual(floatformat(neg_inf), six.text_type(neg_inf))
+        self.assertEqual(floatformat(neg_inf), str(neg_inf))
 
         nan = pos_inf / pos_inf
-        self.assertEqual(floatformat(nan), six.text_type(nan))
+        self.assertEqual(floatformat(nan), str(nan))
 
     def test_float_dunder_method(self):
         class FloatWrapper(object):
@@ -100,9 +97,3 @@ class FunctionTests(SimpleTestCase):
 
     def test_many_zeroes(self):
         self.assertEqual(floatformat(1.00000000000000015, 16), '1.0000000000000002')
-
-    if six.PY2:
-        # The above test fails because of Python 2's float handling. Floats
-        # with many zeroes after the decimal point should be passed in as
-        # another type such as unicode or Decimal.
-        test_many_zeroes = expectedFailure(test_many_zeroes)

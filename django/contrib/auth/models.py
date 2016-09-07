@@ -8,9 +8,8 @@ from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.db import models
 from django.db.models.manager import EmptyManager
-from django.utils import six, timezone
+from django.utils import timezone
 from django.utils.deprecation import CallableFalse, CallableTrue
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from .validators import ASCIIUsernameValidator, UnicodeUsernameValidator
@@ -36,7 +35,6 @@ class PermissionManager(models.Manager):
         )
 
 
-@python_2_unicode_compatible
 class Permission(models.Model):
     """
     The permissions system provides a way to assign permissions to specific
@@ -78,9 +76,9 @@ class Permission(models.Model):
 
     def __str__(self):
         return "%s | %s | %s" % (
-            six.text_type(self.content_type.app_label),
-            six.text_type(self.content_type),
-            six.text_type(self.name))
+            str(self.content_type.app_label),
+            str(self.content_type),
+            str(self.name))
 
     def natural_key(self):
         return (self.codename,) + self.content_type.natural_key()
@@ -97,7 +95,6 @@ class GroupManager(models.Manager):
         return self.get(name=name)
 
 
-@python_2_unicode_compatible
 class Group(models.Model):
     """
     Groups are a generic way of categorizing users to apply permissions, or
@@ -301,7 +298,7 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
 
     Username and password are required. Other fields are optional.
     """
-    username_validator = UnicodeUsernameValidator() if six.PY3 else ASCIIUsernameValidator()
+    username_validator = UnicodeUsernameValidator()
 
     username = models.CharField(
         _('username'),
@@ -375,7 +372,6 @@ class User(AbstractUser):
         swappable = 'AUTH_USER_MODEL'
 
 
-@python_2_unicode_compatible
 class AnonymousUser(object):
     id = None
     pk = None

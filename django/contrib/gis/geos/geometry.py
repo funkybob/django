@@ -2,8 +2,6 @@
  This module contains the 'base' GEOSGeometry object -- all GEOS Geometries
  inherit from this object.
 """
-from __future__ import unicode_literals
-
 import json
 import warnings
 from ctypes import addressof, byref, c_double
@@ -20,7 +18,6 @@ from django.contrib.gis.geos.prepared import PreparedGeometry
 from django.contrib.gis.geos.prototypes.io import (
     ewkb_w, wkb_r, wkb_w, wkt_r, wkt_w,
 )
-from django.utils import six
 from django.utils.deconstruct import deconstructible
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_bytes, force_text
@@ -52,7 +49,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         """
         if isinstance(geo_input, bytes):
             geo_input = force_text(geo_input)
-        if isinstance(geo_input, six.string_types):
+        if isinstance(geo_input, str):
             wkt_m = wkt_regex.match(geo_input)
             if wkt_m:
                 # Handling WKT input.
@@ -70,7 +67,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         elif isinstance(geo_input, GEOM_PTR):
             # When the input is a pointer to a geometry (GEOM_PTR).
             g = geo_input
-        elif isinstance(geo_input, six.memoryview):
+        elif isinstance(geo_input, memoryview):
             # When the input is a buffer (WKB).
             g = wkb_r().read(geo_input)
         elif isinstance(geo_input, GEOSGeometry):
@@ -160,7 +157,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
     def __setstate__(self, state):
         # Instantiating from the tuple state that was pickled.
         wkb, srid = state
-        ptr = wkb_r().read(six.memoryview(wkb))
+        ptr = wkb_r().read(memoryview(wkb))
         if not ptr:
             raise GEOSException('Invalid Geometry loaded from pickled state.')
         self.ptr = ptr
@@ -176,7 +173,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         Equivalence testing, a Geometry may be compared with another Geometry
         or a WKT representation.
         """
-        if isinstance(other, six.string_types):
+        if isinstance(other, str):
             return self.wkt == other
         elif isinstance(other, GEOSGeometry):
             return self.equals_exact(other)
@@ -353,7 +350,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         Returns true if the elements in the DE-9IM intersection matrix for the
         two Geometries match the elements in pattern.
         """
-        if not isinstance(pattern, six.string_types) or len(pattern) > 9:
+        if not isinstance(pattern, str) or len(pattern) > 9:
             raise GEOSException('invalid intersection matrix pattern')
         return capi.geos_relatepattern(self.ptr, other.ptr, force_bytes(pattern))
 

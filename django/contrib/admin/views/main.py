@@ -17,7 +17,6 @@ from django.core.exceptions import (
 from django.core.paginator import InvalidPage
 from django.db import models
 from django.urls import reverse
-from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.http import urlencode
 from django.utils.translation import ugettext
@@ -146,7 +145,7 @@ class ChangeList(object):
                 use_distinct = use_distinct or lookup_needs_distinct(self.lookup_opts, key)
             return filter_specs, bool(filter_specs), lookup_params, use_distinct
         except FieldDoesNotExist as e:
-            six.reraise(IncorrectLookupParameters, IncorrectLookupParameters(e), sys.exc_info()[2])
+            raise IncorrectLookupParameters(e).with_traceback(sys.exc_info()[2])
 
     def get_query_string(self, new_params=None, remove=None):
         if new_params is None:
@@ -308,8 +307,7 @@ class ChangeList(object):
 
     def get_queryset(self, request):
         # First, we collect all the declared list filters.
-        (self.filter_specs, self.has_filters, remaining_lookup_params,
-         filters_use_distinct) = self.get_filters(request)
+        self.filter_specs, self.has_filters, remaining_lookup_params, filters_use_distinct = self.get_filters(request)
 
         # Then, we let every list filter modify the queryset to its liking.
         qs = self.root_queryset

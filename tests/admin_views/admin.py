@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import os
 import tempfile
+from io import StringIO
 from wsgiref.util import FileWrapper
 
 from django import forms
@@ -20,7 +19,6 @@ from django.forms.models import BaseModelFormSet
 from django.http import HttpResponse, StreamingHttpResponse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from django.utils.six import StringIO
 
 from .forms import MediaActionForm
 from .models import (

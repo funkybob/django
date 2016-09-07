@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Foo(models.Model):
     name = models.CharField(max_length=50)
     friend = models.CharField(max_length=50, blank=True)
@@ -14,7 +10,6 @@ class Foo(models.Model):
         return "Foo %s" % self.name
 
 
-@python_2_unicode_compatible
 class Bar(models.Model):
     name = models.CharField(max_length=50)
     normal = models.ForeignKey(Foo, models.CASCADE, related_name='normal_foo')
@@ -25,7 +20,6 @@ class Bar(models.Model):
         return "Bar %s" % self.place.name
 
 
-@python_2_unicode_compatible
 class Whiz(models.Model):
     name = models.CharField(max_length=50)
 
@@ -33,7 +27,6 @@ class Whiz(models.Model):
         return "Whiz %s" % self.name
 
 
-@python_2_unicode_compatible
 class Child(models.Model):
     parent = models.OneToOneField('Base', models.CASCADE)
     name = models.CharField(max_length=50)
@@ -42,7 +35,6 @@ class Child(models.Model):
         return "Child %s" % self.name
 
 
-@python_2_unicode_compatible
 class Base(models.Model):
     name = models.CharField(max_length=50)
 
@@ -50,7 +42,6 @@ class Base(models.Model):
         return "Base %s" % self.name
 
 
-@python_2_unicode_compatible
 class Article(models.Model):
     name = models.CharField(max_length=50)
     text = models.TextField()

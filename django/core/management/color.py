@@ -4,8 +4,9 @@ Sets up the terminal color scheme.
 
 import os
 import sys
+from functools import lru_cache
 
-from django.utils import lru_cache, termcolors
+from django.utils import termcolors
 
 
 def supports_color():
@@ -57,7 +58,7 @@ def make_style(config_string=''):
     return style
 
 
-@lru_cache.lru_cache(maxsize=None)
+@lru_cache(maxsize=None)
 def no_style():
     """
     Returns a Style object with no color scheme.

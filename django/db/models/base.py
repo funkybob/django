@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import copy
 import inspect
 import warnings
@@ -28,19 +26,14 @@ from django.db.models.manager import Manager
 from django.db.models.options import Options
 from django.db.models.query import Q
 from django.db.models.utils import make_model_tuple
-from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import (
-    force_str, force_text, python_2_unicode_compatible,
-)
+from django.utils.encoding import force_str, force_text
 from django.utils.functional import curry
-from django.utils.six.moves import zip
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext_lazy as _
 from django.utils.version import get_version
 
 
-@python_2_unicode_compatible
 class Deferred(object):
     def __repr__(self):
         return str('<Deferred field>')
@@ -459,7 +452,7 @@ class ModelState(object):
         self.adding = True
 
 
-class Model(six.with_metaclass(ModelBase)):
+class Model(metaclass=ModelBase):
 
     def __init__(self, *args, **kwargs):
         signals.pre_init.send(sender=self.__class__, args=args, kwargs=kwargs)
@@ -576,14 +569,12 @@ class Model(six.with_metaclass(ModelBase)):
 
     def __repr__(self):
         try:
-            u = six.text_type(self)
+            u = str(self)
         except (UnicodeEncodeError, UnicodeDecodeError):
             u = '[Bad Unicode data]'
         return force_str('<%s: %s>' % (self.__class__.__name__, u))
 
     def __str__(self):
-        if six.PY2 and hasattr(self, '__unicode__'):
-            return force_text(self).encode('utf-8')
         return str('%s object' % self.__class__.__name__)
 
     def __eq__(self, other):
@@ -1165,12 +1156,12 @@ class Model(six.with_metaclass(ModelBase)):
             code='unique_for_date',
             params={
                 'model': self,
-                'model_name': six.text_type(capfirst(opts.verbose_name)),
+                'model_name': str(capfirst(opts.verbose_name)),
                 'lookup_type': lookup_type,
                 'field': field_name,
-                'field_label': six.text_type(capfirst(field.verbose_name)),
+                'field_label': str(capfirst(field.verbose_name)),
                 'date_field': unique_for,
-                'date_field_label': six.text_type(capfirst(opts.get_field(unique_for).verbose_name)),
+                'date_field_label': str(capfirst(opts.get_field(unique_for).verbose_name)),
             }
         )
 
@@ -1180,14 +1171,14 @@ class Model(six.with_metaclass(ModelBase)):
         params = {
             'model': self,
             'model_class': model_class,
-            'model_name': six.text_type(capfirst(opts.verbose_name)),
+            'model_name': str(capfirst(opts.verbose_name)),
             'unique_check': unique_check,
         }
 
         # A unique field
         if len(unique_check) == 1:
             field = opts.get_field(unique_check[0])
-            params['field_label'] = six.text_type(capfirst(field.verbose_name))
+            params['field_label'] = str(capfirst(field.verbose_name))
             return ValidationError(
                 message=field.error_messages['unique'],
                 code='unique',
@@ -1197,7 +1188,7 @@ class Model(six.with_metaclass(ModelBase)):
         # unique_together
         else:
             field_labels = [capfirst(opts.get_field(f).verbose_name) for f in unique_check]
-            params['field_labels'] = six.text_type(get_text_list(field_labels, _('and')))
+            params['field_labels'] = str(get_text_list(field_labels, _('and')))
             return ValidationError(
                 message=_("%(model_name)s with this %(field_labels)s already exists."),
                 code='unique_together',
@@ -1695,7 +1686,7 @@ class Model(six.with_metaclass(ModelBase)):
 
         for f in cls._meta.local_many_to_many:
             # Skip nonexistent models.
-            if isinstance(f.remote_field.through, six.string_types):
+            if isinstance(f.remote_field.through, str):
                 continue
 
             # Check if auto-generated name for the M2M field is too long

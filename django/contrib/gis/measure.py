@@ -38,11 +38,10 @@ and Geoff Biggs' PhD work on dimensioned units for robotics.
 from decimal import Decimal
 from functools import total_ordering
 
-from django.utils import six
 
 __all__ = ['A', 'Area', 'D', 'Distance']
 
-NUMERIC_TYPES = six.integer_types + (float, Decimal)
+NUMERIC_TYPES = (int, float, Decimal)
 AREA_PREFIX = "sq_"
 
 
@@ -60,7 +59,7 @@ class MeasureBase(object):
     def __init__(self, default_unit=None, **kwargs):
         value, self._default_unit = self.default_units(kwargs)
         setattr(self, self.STANDARD_UNIT, value)
-        if default_unit and isinstance(default_unit, six.string_types):
+        if default_unit and isinstance(default_unit, str):
             self._default_unit = default_unit
 
     def _get_standard(self):
@@ -187,7 +186,7 @@ class MeasureBase(object):
         """
         val = 0.0
         default_unit = self.STANDARD_UNIT
-        for unit, value in six.iteritems(kwargs):
+        for unit, value in kwargs.items():
             if not isinstance(value, float):
                 value = float(value)
             if unit in self.UNITS:

@@ -1,6 +1,4 @@
 # -*- coding:utf-8 -*-
-from __future__ import unicode_literals
-
 import gettext
 import json
 from os import path
@@ -12,8 +10,6 @@ from django.test import (
 from django.test.selenium import SeleniumTestCase
 from django.test.utils import ignore_warnings
 from django.urls import reverse
-from django.utils import six
-from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.translation import (
     LANGUAGE_SESSION_KEY, get_language, override,
@@ -241,10 +237,7 @@ class JsI18NTests(SimpleTestCase):
         for lang_code in ['es', 'fr', 'ru']:
             with override(lang_code):
                 catalog = gettext.translation('djangojs', locale_dir, [lang_code])
-                if six.PY3:
-                    trans_txt = catalog.gettext('this is to be translated')
-                else:
-                    trans_txt = catalog.ugettext('this is to be translated')
+                trans_txt = catalog.gettext('this is to be translated')
                 response = self.client.get('/jsi18n/')
                 # response content must include a line like:
                 # "this is to be translated": <value of trans_txt Python variable>
@@ -413,7 +406,7 @@ class JsI18NTestsMultiPackage(SimpleTestCase):
     def test_i18n_with_locale_paths(self):
         extended_locale_paths = settings.LOCALE_PATHS + [
             path.join(
-                path.dirname(path.dirname(path.abspath(upath(__file__)))),
+                path.dirname(path.dirname(path.abspath(__file__))),
                 'app3',
                 'locale',
             ),

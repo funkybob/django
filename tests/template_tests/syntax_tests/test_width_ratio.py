@@ -1,6 +1,5 @@
 from django.template import TemplateSyntaxError
 from django.test import SimpleTestCase
-from django.utils import six
 
 from ..utils import setup
 
@@ -40,7 +39,7 @@ class WidthRatioTagTests(SimpleTestCase):
         See http://docs.python.org/py3k/whatsnew/3.0.html
         """
         output = self.engine.render_to_string('widthratio06', {'a': 50, 'b': 80})
-        self.assertEqual(output, '62' if six.PY3 else '63')
+        self.assertEqual(output, '62')
 
     @setup({'widthratio07': '{% widthratio a b 100 %}'})
     def test_widthratio07(self):

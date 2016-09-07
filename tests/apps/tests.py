@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import os
 from unittest import skipUnless
 
@@ -10,8 +8,6 @@ from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 from django.db import models
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import extend_sys_path, isolate_apps
-from django.utils import six
-from django.utils._os import upath
 
 from .default_config_app.apps import CustomConfig
 from .models import SoAlternative, TotallyNormal, new_apps
@@ -33,7 +29,7 @@ SOME_INSTALLED_APPS_NAMES = [
     'django.contrib.auth',
 ] + SOME_INSTALLED_APPS[2:]
 
-HERE = os.path.dirname(upath(__file__))
+HERE = os.path.dirname(__file__)
 
 
 class AppsTests(SimpleTestCase):
@@ -373,7 +369,6 @@ class AppConfigTests(SimpleTestCase):
         self.assertEqual(ac.path, 'a')
 
 
-@skipUnless(six.PY3, "Namespace packages sans __init__.py were added in Python 3.3")
 class NamespacePackageAppTests(SimpleTestCase):
     # We need nsapp to be top-level so our multiple-paths tests can add another
     # location for it (if its inside a normal package with an __init__.py that
@@ -390,7 +385,7 @@ class NamespacePackageAppTests(SimpleTestCase):
         with extend_sys_path(self.base_location):
             with self.settings(INSTALLED_APPS=['nsapp']):
                 app_config = apps.get_app_config('nsapp')
-                self.assertEqual(app_config.path, upath(self.app_path))
+                self.assertEqual(app_config.path, self.app_path)
 
     def test_multiple_paths(self):
         """
@@ -415,4 +410,4 @@ class NamespacePackageAppTests(SimpleTestCase):
         with extend_sys_path(self.base_location, self.other_location):
             with self.settings(INSTALLED_APPS=['nsapp.apps.NSAppConfig']):
                 app_config = apps.get_app_config('nsapp')
-                self.assertEqual(app_config.path, upath(self.app_path))
+                self.assertEqual(app_config.path, self.app_path)

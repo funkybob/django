@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import fnmatch
 import glob
 import io
@@ -17,7 +15,6 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import (
     find_command, handle_extensions, popen_wrapper,
 )
-from django.utils._os import upath
 from django.utils.encoding import DEFAULT_LOCALE_ENCODING, force_str
 from django.utils.functional import cached_property
 from django.utils.jslex import prepare_js_for_gettext
@@ -638,7 +635,7 @@ class Command(BaseCommand):
         the msgs string, inserting it at the right place. msgs should be the
         contents of a newly created .po file.
         """
-        django_dir = os.path.normpath(os.path.join(os.path.dirname(upath(django.__file__))))
+        django_dir = os.path.normpath(os.path.join(os.path.dirname(django.__file__)))
         if self.domain == 'djangojs':
             domains = ('djangojs', 'django')
         else:

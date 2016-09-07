@@ -1,4 +1,3 @@
-from django.utils import six
 from django.utils.deprecation import (
     DeprecationInstanceCheck, RemovedInDjango20Warning,
 )
@@ -33,7 +32,7 @@ def select_template(template_name_list, using=None):
 
     Raises TemplateDoesNotExist if no such template exists.
     """
-    if isinstance(template_name_list, six.string_types):
+    if isinstance(template_name_list, str):
         raise TypeError(
             'select_template() takes an iterable of template names but got a '
             'string: %r. Use get_template() if you want to load a single '
@@ -72,6 +71,6 @@ def _engine_list(using=None):
     return engines.all() if using is None else [engines[using]]
 
 
-class LoaderOrigin(six.with_metaclass(DeprecationInstanceCheck, Origin)):
+class LoaderOrigin(Origin, metaclass=DeprecationInstanceCheck):
     alternative = 'django.template.Origin'
     deprecation_warning = RemovedInDjango20Warning

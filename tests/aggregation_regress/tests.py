@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import datetime
 import pickle
 from decimal import Decimal
@@ -13,7 +11,6 @@ from django.db.models import (
 )
 from django.test import TestCase, skipUnlessAnyDBFeature, skipUnlessDBFeature
 from django.test.utils import Approximate
-from django.utils import six
 
 from .models import (
     Alfa, Author, Book, Bravo, Charlie, Clues, Entries, HardbackBook, ItemTag,
@@ -104,7 +101,7 @@ class AggregationTests(TestCase):
         s3.books.add(cls.b3, cls.b4, cls.b6)
 
     def assertObjectAttrs(self, obj, **kwargs):
-        for attr, value in six.iteritems(kwargs):
+        for attr, value in kwargs.items():
             self.assertEqual(getattr(obj, attr), value)
 
     def test_aggregates_in_where_clause(self):

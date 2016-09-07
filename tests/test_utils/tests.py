@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import sys
 import unittest
 import warnings
+from io import StringIO
 
 from django.conf.urls import url
 from django.contrib.staticfiles.finders import get_finder, get_finders
@@ -23,7 +22,6 @@ from django.test.utils import (
     setup_test_environment,
 )
 from django.urls import NoReverseMatch, reverse
-from django.utils import six
 from django.utils._os import abspathu
 from django.utils.deprecation import RemovedInDjango20Warning
 
@@ -123,7 +121,7 @@ class SkippingClassTestCase(SimpleTestCase):
             test_suite.addTest(SkippedTestsSubclass('test_will_be_skipped'))
         except unittest.SkipTest:
             self.fail("SkipTest should not be raised at this stage")
-        result = unittest.TextTestRunner(stream=six.StringIO()).run(test_suite)
+        result = unittest.TextTestRunner(stream=StringIO()).run(test_suite)
         self.assertEqual(result.testsRun, 3)
         self.assertEqual(len(result.skipped), 2)
         self.assertEqual(result.skipped[0][1], 'Database has feature(s) __class__')
@@ -232,7 +230,7 @@ class AssertQuerysetEqualTests(TestCase):
 class CaptureQueriesContextManagerTests(TestCase):
 
     def setUp(self):
-        self.person_pk = six.text_type(Person.objects.create(name='test').pk)
+        self.person_pk = str(Person.objects.create(name='test').pk)
 
     def test_simple(self):
         with CaptureQueriesContext(connection) as captured_queries:
@@ -368,16 +366,16 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
             pass
 
     def test_error_message(self):
-        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html'):
+        with self.assertRaisesRegex(AssertionError, r'^template_used/base\.html'):
             with self.assertTemplateUsed('template_used/base.html'):
                 pass
 
-        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html'):
+        with self.assertRaisesRegex(AssertionError, r'^template_used/base\.html'):
             with self.assertTemplateUsed(template_name='template_used/base.html'):
                 pass
 
-        with six.assertRaisesRegex(
-                self, AssertionError, r'^template_used/base\.html.*template_used/alternative\.html$'):
+        with self.assertRaisesRegex(
+                AssertionError, r'^template_used/base\.html.*template_used/alternative\.html$'):
             with self.assertTemplateUsed('template_used/base.html'):
                 render_to_string('template_used/alternative.html')
 

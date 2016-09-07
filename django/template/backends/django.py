@@ -1,6 +1,3 @@
-# Since this package contains a "django" module, this is required on Python 2.
-from __future__ import absolute_import
-
 import sys
 from importlib import import_module
 from pkgutil import walk_packages
@@ -11,7 +8,6 @@ from django.template import TemplateDoesNotExist
 from django.template.context import make_context
 from django.template.engine import Engine
 from django.template.library import InvalidTemplateLibrary
-from django.utils import six
 
 from .base import BaseEngine
 
@@ -86,7 +82,7 @@ def reraise(exc, backend):
     Reraise TemplateDoesNotExist while maintaining template debug information.
     """
     new = copy_exception(exc, backend)
-    six.reraise(exc.__class__, new, sys.exc_info()[2])
+    raise new.with_traceback(sys.exc_info()[2])
 
 
 def get_installed_libraries():

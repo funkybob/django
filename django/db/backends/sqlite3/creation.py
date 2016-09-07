@@ -5,7 +5,6 @@ import sys
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.base.creation import BaseDatabaseCreation
 from django.utils.encoding import force_text
-from django.utils.six.moves import input
 
 
 class DatabaseCreation(BaseDatabaseCreation):
@@ -43,7 +42,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                 ))
             if os.access(test_database_name, os.F_OK):
                 if not autoclobber:
-                    confirm = input(
+                    confirm = raw_input(
                         "Type 'yes' if you would like to try deleting the test "
                         "database '%s', or 'no' to cancel: " % test_database_name
                     )

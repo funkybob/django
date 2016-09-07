@@ -2,8 +2,6 @@
 """
 Unit tests for reverse URL lookups.
 """
-from __future__ import unicode_literals
-
 import sys
 import threading
 import unittest
@@ -26,7 +24,6 @@ from django.urls import (
     NoReverseMatch, RegexURLPattern, RegexURLResolver, Resolver404,
     ResolverMatch, get_callable, get_resolver, resolve, reverse, reverse_lazy,
 )
-from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from . import middleware, urlconf_outer, views
@@ -329,7 +326,7 @@ class URLPatternReverse(SimpleTestCase):
         name, expected, args, kwargs = test_data[0]
         self.assertIsInstance(
             reverse(name, args=args, kwargs=kwargs),
-            six.text_type
+            str
         )
 
 
@@ -398,7 +395,7 @@ class ResolverTests(SimpleTestCase):
             [{'type': RegexURLResolver}, {'type': RegexURLPattern, 'name': None}],
             [{'type': RegexURLResolver}, {'type': RegexURLResolver}],
         ]
-        with self.assertRaisesMessage(Resolver404, b'tried' if six.PY2 else 'tried') as cm:
+        with self.assertRaisesMessage(Resolver404, 'tried') as cm:
             resolve('/included/non-existent-url', urlconf=urls)
         e = cm.exception
         # make sure we at least matched the root ('/') url resolver:
@@ -431,7 +428,6 @@ class ResolverTests(SimpleTestCase):
         self.assertTrue(resolver._is_callback('urlpatterns_reverse.nested_urls.View3'))
         self.assertFalse(resolver._is_callback('urlpatterns_reverse.nested_urls.blub'))
 
-    @unittest.skipIf(six.PY2, "Python 2 doesn't support __qualname__.")
     def test_view_detail_as_method(self):
         # Views which have a class name as part of their path.
         resolver = get_resolver('urlpatterns_reverse.method_view_urls')
@@ -471,11 +467,6 @@ class ReverseLazyTest(TestCase):
             'Some URL: %s' % reverse_lazy('some-login-page'),
             'Some URL: /login/'
         )
-        if six.PY2:
-            self.assertEqual(
-                b'Some URL: %s' % reverse_lazy('some-login-page'),
-                'Some URL: /login/'
-            )
 
 
 class ReverseLazySettingsTest(AdminScriptTestCase):
@@ -1007,7 +998,7 @@ class ViewLoadingTests(SimpleTestCase):
     def test_exceptions(self):
         # A missing view (identified by an AttributeError) should raise
         # ViewDoesNotExist, ...
-        with six.assertRaisesRegex(self, ViewDoesNotExist, ".*View does not exist in.*"):
+        with self.assertRaisesRegex(ViewDoesNotExist, ".*View does not exist in.*"):
             get_callable('urlpatterns_reverse.views.i_should_not_exist')
         # ... but if the AttributeError is caused by something else don't
         # swallow it.

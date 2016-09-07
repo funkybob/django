@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import os
 from unittest import skipUnless
 
@@ -8,7 +6,6 @@ from django.template.base import Node
 from django.template.library import InvalidTemplateLibrary
 from django.test import SimpleTestCase
 from django.test.utils import extend_sys_path
-from django.utils import six
 
 from .templatetags import custom, inclusion
 from .utils import ROOT
@@ -339,7 +336,7 @@ class TemplateTagLoadingTests(SimpleTestCase):
             "trying to load 'template_tests.broken_tag': cannot import name "
             "'?Xtemplate'?"
         )
-        with six.assertRaisesRegex(self, InvalidTemplateLibrary, msg):
+        with self.assertRaisesRegex(InvalidTemplateLibrary, msg):
             Engine(libraries={
                 'broken_tag': 'template_tests.broken_tag',
             })
@@ -352,7 +349,7 @@ class TemplateTagLoadingTests(SimpleTestCase):
             "import name '?Xtemplate'?"
         )
         with extend_sys_path(egg_name):
-            with six.assertRaisesRegex(self, InvalidTemplateLibrary, msg):
+            with self.assertRaisesRegex(InvalidTemplateLibrary, msg):
                 Engine(libraries={
                     'broken_egg': 'tagsegg.templatetags.broken_egg',
                 })
@@ -366,7 +363,6 @@ class TemplateTagLoadingTests(SimpleTestCase):
             })
             engine.from_string(ttext)
 
-    @skipUnless(six.PY3, "Python 3 only -- Python 2 doesn't have annotations.")
     def test_load_annotated_function(self):
         Engine(libraries={
             'annotated_tag_function': 'template_tests.annotated_tag_function',

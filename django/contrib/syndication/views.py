@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from calendar import timegm
 
 from django.conf import settings
@@ -7,7 +5,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.http import Http404, HttpResponse
 from django.template import TemplateDoesNotExist, loader
-from django.utils import feedgenerator, six
+from django.utils import feedgenerator
 from django.utils.encoding import force_text, iri_to_uri
 from django.utils.html import escape
 from django.utils.http import http_date
@@ -85,9 +83,9 @@ class Feed(object):
             # catching the TypeError, because something inside the function
             # may raise the TypeError. This technique is more accurate.
             try:
-                code = six.get_function_code(attr)
+                code = attr.__code__
             except AttributeError:
-                code = six.get_function_code(attr.__call__)
+                code = attr.__call__.__code__
             if code.co_argcount == 2:       # one argument is 'self'
                 return attr(obj)
             else:

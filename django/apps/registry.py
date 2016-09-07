@@ -2,10 +2,9 @@ import sys
 import threading
 import warnings
 from collections import Counter, OrderedDict, defaultdict
-from functools import partial
+from functools import partial, lru_cache
 
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
-from django.utils import lru_cache
 
 from .config import AppConfig
 
@@ -156,7 +155,7 @@ class Apps(object):
             raise LookupError(message)
 
     # This method is performance-critical at least for Django's test suite.
-    @lru_cache.lru_cache(maxsize=None)
+    @lru_cache(maxsize=None)
     def get_models(self, include_auto_created=False, include_swapped=False):
         """
         Returns a list of all installed models.
@@ -269,7 +268,7 @@ class Apps(object):
                 "Model '%s.%s' not registered." % (app_label, model_name))
         return model
 
-    @lru_cache.lru_cache(maxsize=None)
+    @lru_cache(maxsize=None)
     def get_swappable_settings_name(self, to_string):
         """
         For a given model string (e.g. "auth.User"), return the name of the

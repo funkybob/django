@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from datetime import date
 
 from django import forms
@@ -15,7 +13,6 @@ from django.core.checks import Error
 from django.forms.models import BaseModelFormSet
 from django.forms.widgets import Select
 from django.test import SimpleTestCase, TestCase
-from django.utils import six
 
 from .models import (
     Band, Concert, ValidationTestInlineModel, ValidationTestModel,
@@ -653,7 +650,7 @@ class CheckTestCase(SimpleTestCase):
         self.assertEqual(error.hint, hint)
         self.assertEqual(error.obj, invalid_obj)
         self.assertEqual(error.id, id)
-        six.assertRegex(self, error.msg, msg)
+        self.assertRegex(error.msg, msg)
 
     def assertIsValid(self, model_admin, model):
         admin_obj = model_admin(model, AdminSite())

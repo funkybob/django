@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import unittest
 from datetime import datetime
 
@@ -8,7 +6,6 @@ from django.core.paginator import (
     UnorderedObjectListWarning,
 )
 from django.test import TestCase
-from django.utils import six
 
 from .custom import ValidAdjacentNumsPaginator
 from .models import Article
@@ -243,7 +240,7 @@ class PaginationTests(unittest.TestCase):
         """
         Paginator.page_range should be an iterator.
         """
-        self.assertIsInstance(Paginator([1, 2, 3], 2).page_range, type(six.moves.range(0)))
+        self.assertIsInstance(Paginator([1, 2, 3], 2).page_range, type(range(0)))
 
 
 class ModelPaginationTests(TestCase):
@@ -259,7 +256,7 @@ class ModelPaginationTests(TestCase):
     def test_first_page(self):
         paginator = Paginator(Article.objects.order_by('id'), 5)
         p = paginator.page(1)
-        self.assertEqual("<Page 1 of 2>", six.text_type(p))
+        self.assertEqual("<Page 1 of 2>", str(p))
         self.assertQuerysetEqual(p.object_list, [
             "<Article: Article 1>",
             "<Article: Article 2>",
@@ -279,7 +276,7 @@ class ModelPaginationTests(TestCase):
     def test_last_page(self):
         paginator = Paginator(Article.objects.order_by('id'), 5)
         p = paginator.page(2)
-        self.assertEqual("<Page 2 of 2>", six.text_type(p))
+        self.assertEqual("<Page 2 of 2>", str(p))
         self.assertQuerysetEqual(p.object_list, [
             "<Article: Article 6>",
             "<Article: Article 7>",
