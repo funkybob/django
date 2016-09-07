@@ -4,7 +4,7 @@ import sys
 
 import pytz
 
-from django.test import SimpleTestCase, mock, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.utils import timezone
 
 CET = pytz.timezone("Europe/Paris")

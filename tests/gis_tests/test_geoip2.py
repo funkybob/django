@@ -1,13 +1,9 @@
-# -*- coding: utf-8 -*-
-
 import os
-import unittest
-from unittest import skipUnless
+from unittest import mock, TestCase, skipUnless
 
 from django.conf import settings
 from django.contrib.gis.geoip2 import HAS_GEOIP2
 from django.contrib.gis.geos import HAS_GEOS, GEOSGeometry
-from django.test import mock
 
 if HAS_GEOIP2:
     from django.contrib.gis.geoip2 import GeoIP2, GeoIP2Exception
@@ -21,7 +17,7 @@ if HAS_GEOIP2:
     HAS_GEOIP2 and getattr(settings, "GEOIP_PATH", None),
     "GeoIP is required along with the GEOIP_PATH setting."
 )
-class GeoIPTest(unittest.TestCase):
+class GeoIPTest(TestCase):
     addr = '128.249.1.1'
     fqdn = 'tmc.edu'
 

@@ -1,9 +1,9 @@
-# -*- coding: utf8 -*-
 import locale
 import os
+from unittest import mock
 
 from django.db.backends.postgresql.client import DatabaseClient
-from django.test import SimpleTestCase, mock
+from django.test import SimpleTestCase
 from django.utils.encoding import force_bytes, force_str
 
 

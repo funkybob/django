@@ -1,14 +1,14 @@
-# -*- coding: utf-8 -*-
 import datetime
 import decimal
+import enum
 import functools
 import math
 import os
 import re
 import sys
 import tokenize
-import unittest
 from io import StringIO
+from unittest import mock, skipUnless
 
 import custom_migration_operations.more_operations
 import custom_migration_operations.operations
@@ -20,7 +20,7 @@ from django.db import migrations, models
 from django.db.migrations.writer import (
     MigrationWriter, OperationWriter, SettingsReference,
 )
-from django.test import SimpleTestCase, ignore_warnings, mock
+from django.test import SimpleTestCase, ignore_warnings
 from django.utils import datetime_safe
 from django.utils.deconstruct import deconstructible
 from django.utils.encoding import force_str
@@ -30,10 +30,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from .models import FoodManager, FoodQuerySet
 
-try:
-    import enum
-except ImportError:
-    enum = None
 
 PY36 = sys.version_info >= (3, 6)
 
@@ -264,7 +260,7 @@ class WriterTests(SimpleTestCase):
         lazy_pattern = SimpleLazyObject(lambda: pattern)
         self.assertEqual(self.serialize_round_trip(lazy_pattern), pattern)
 
-    @unittest.skipUnless(enum, "enum34 is required on Python 2")
+    @skipUnless(enum, "enum34 is required on Python 2")
     def test_serialize_enums(self):
         class TextEnum(enum.Enum):
             A = 'a-value'

@@ -1,7 +1,7 @@
 import datetime
 import itertools
-import unittest
 from copy import copy
+from unittest import mock, skipUnless
 
 from django.db import (
     DatabaseError, IntegrityError, OperationalError, connection,
@@ -19,7 +19,7 @@ from django.db.models.fields.related import (
 from django.db.models.indexes import Index
 from django.db.transaction import atomic
 from django.test import (
-    TransactionTestCase, mock, skipIfDBFeature, skipUnlessDBFeature,
+    TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
 )
 from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
@@ -472,7 +472,7 @@ class SchemaTests(TransactionTestCase):
         # these two types.
         self.assertIn(columns['bits'][0], ("BinaryField", "TextField"))
 
-    @unittest.skipUnless(connection.vendor == 'mysql', "MySQL specific")
+    @skipUnless(connection.vendor == 'mysql', "MySQL specific")
     def test_add_binaryfield_mediumblob(self):
         """
         Test adding a custom-sized binary field on MySQL (#24846).
@@ -1941,7 +1941,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.add_field(Author, new_field)
 
-    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
+    @skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
     def test_add_indexed_charfield(self):
         field = CharField(max_length=255, db_index=True)
         field.set_attributes_from_name('nom_de_plume')
@@ -1954,7 +1954,7 @@ class SchemaTests(TransactionTestCase):
             ['schema_author_nom_de_plume_7570a851', 'schema_author_nom_de_plume_7570a851_like'],
         )
 
-    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
+    @skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
     def test_add_unique_charfield(self):
         field = CharField(max_length=255, unique=True)
         field.set_attributes_from_name('nom_de_plume')
@@ -1967,7 +1967,7 @@ class SchemaTests(TransactionTestCase):
             ['schema_author_nom_de_plume_7570a851_like', 'schema_author_nom_de_plume_key']
         )
 
-    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
+    @skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
     def test_alter_field_add_index_to_charfield(self):
         # Create the table and verify no initial indexes.
         with connection.schema_editor() as editor:
@@ -1988,7 +1988,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Author, new_field, old_field, strict=True)
         self.assertEqual(self.get_constraints_for_column(Author, 'name'), [])
 
-    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
+    @skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
     def test_alter_field_add_unique_to_charfield(self):
         # Create the table and verify no initial indexes.
         with connection.schema_editor() as editor:
@@ -2009,7 +2009,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Author, new_field, old_field, strict=True)
         self.assertEqual(self.get_constraints_for_column(Author, 'name'), [])
 
-    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
+    @skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
     def test_alter_field_add_index_to_textfield(self):
         # Create the table and verify no initial indexes.
         with connection.schema_editor() as editor:
@@ -2030,7 +2030,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Note, new_field, old_field, strict=True)
         self.assertEqual(self.get_constraints_for_column(Note, 'info'), [])
 
-    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
+    @skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
     def test_alter_field_add_unique_to_charfield_with_db_index(self):
         # Create the table and verify initial indexes.
         with connection.schema_editor() as editor:
@@ -2059,7 +2059,7 @@ class SchemaTests(TransactionTestCase):
             ['schema_book_title_2dfb2dff', 'schema_book_title_2dfb2dff_like']
         )
 
-    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
+    @skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
     def test_alter_field_remove_unique_and_db_index_from_charfield(self):
         # Create the table and verify initial indexes.
         with connection.schema_editor() as editor:
@@ -2085,7 +2085,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(BookWithoutAuthor, new_field, new_field2, strict=True)
         self.assertEqual(self.get_constraints_for_column(BookWithoutAuthor, 'title'), [])
 
-    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
+    @skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
     def test_alter_field_swap_unique_and_db_index_with_charfield(self):
         # Create the table and verify initial indexes.
         with connection.schema_editor() as editor:
@@ -2114,7 +2114,7 @@ class SchemaTests(TransactionTestCase):
             ['schema_book_title_2dfb2dff', 'schema_book_title_2dfb2dff_like']
         )
 
-    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
+    @skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
     def test_alter_field_add_db_index_to_charfield_with_unique(self):
         # Create the table and verify initial indexes.
         with connection.schema_editor() as editor:

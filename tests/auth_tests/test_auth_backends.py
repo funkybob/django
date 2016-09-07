@@ -1,6 +1,5 @@
-from __future__ import unicode_literals
-
 from datetime import date
+from unittest import mock
 
 from django.contrib.auth import (
     BACKEND_SESSION_KEY, SESSION_KEY, authenticate, get_user, signals,
@@ -12,7 +11,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http import HttpRequest
 from django.test import (
-    SimpleTestCase, TestCase, mock, modify_settings, override_settings,
+    SimpleTestCase, TestCase, modify_settings, override_settings,
 )
 
 from .models import (

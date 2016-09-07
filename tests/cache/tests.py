@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Unit tests for cache framework
 # Uses whatever cache backend is set in the test settings file.
 
@@ -12,8 +10,8 @@ import shutil
 import tempfile
 import threading
 import time
-import unittest
 import warnings
+from unittest import mock, skip, skipUnless
 
 from django.conf import settings
 from django.core import management, signals
@@ -1249,7 +1247,7 @@ class BaseMemcachedTests(BaseCacheTests):
             signals.request_finished.connect(close_old_connections)
 
 
-@unittest.skipUnless(MemcachedCache_params, "MemcachedCache backend not configured")
+@skipUnless(MemcachedCache_params, "MemcachedCache backend not configured")
 @override_settings(CACHES=caches_setting_for_tests(
     base=MemcachedCache_params,
     exclude=memcached_excluded_caches,
@@ -1271,7 +1269,7 @@ class MemcachedCacheTests(BaseMemcachedTests, TestCase):
         self.assertEqual(cache._cache.server_max_value_length, 9999)
 
 
-@unittest.skipUnless(PyLibMCCache_params, "PyLibMCCache backend not configured")
+@skipUnless(PyLibMCCache_params, "PyLibMCCache backend not configured")
 @override_settings(CACHES=caches_setting_for_tests(
     base=PyLibMCCache_params,
     exclude=memcached_excluded_caches,
@@ -1286,7 +1284,7 @@ class PyLibMCCacheTests(BaseMemcachedTests, TestCase):
     # (#19914). The `verify_keys` behavior option could be set to True (which
     # would avoid triggering the server-side bug), however this test would
     # still fail due to https://github.com/lericson/pylibmc/issues/219.
-    @unittest.skip("triggers a memcached-server bug, causing subsequent tests to fail")
+    @skip("triggers a memcached-server bug, causing subsequent tests to fail")
     def test_invalid_key_characters(self):
         pass
 

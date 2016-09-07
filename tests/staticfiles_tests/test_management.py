@@ -2,8 +2,8 @@ import codecs
 import os
 import shutil
 import tempfile
-import unittest
 from io import StringIO
+from unittest import mock, skipUnless
 
 from admin_scripts.tests import AdminScriptTestCase
 
@@ -12,7 +12,7 @@ from django.contrib.staticfiles import storage
 from django.contrib.staticfiles.management.commands import collectstatic
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
-from django.test import mock, override_settings
+from django.test import override_settings
 from django.test.utils import extend_sys_path
 from django.utils._os import symlinks_supported
 from django.utils.encoding import force_text
@@ -390,7 +390,7 @@ class TestCollectionNonLocalStorage(TestNoFilesCreated, CollectionTestCase):
     pass
 
 
-@unittest.skipUnless(symlinks_supported(), "Must be able to symlink to run this test.")
+@skipUnless(symlinks_supported(), "Must be able to symlink to run this test.")
 class TestCollectionLinks(TestDefaults, CollectionTestCase):
     """
     Test ``--link`` option for ``collectstatic`` management command.

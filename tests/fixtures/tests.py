@@ -1,9 +1,9 @@
 import os
 import sys
 import tempfile
-import unittest
 import warnings
 from io import StringIO
+from unittest import mock, skipIf
 
 from django.apps import apps
 from django.contrib.sites.models import Site
@@ -13,9 +13,7 @@ from django.core.management import CommandError
 from django.core.management.commands.dumpdata import ProxyModelWarning
 from django.core.serializers.base import ProgressBar
 from django.db import IntegrityError, connection
-from django.test import (
-    TestCase, TransactionTestCase, mock, skipUnlessDBFeature,
-)
+from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 from django.utils.encoding import force_text
 
 from .models import (
@@ -373,7 +371,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         with self.assertRaisesMessage(management.CommandError, "Unknown model: fixtures.FooModel"):
             self._dumpdata_assert(['fixtures', 'sites'], '', exclude_list=['fixtures.FooModel'])
 
-    @unittest.skipIf(sys.platform.startswith('win'), "Windows doesn't support '?' in filenames.")
+    @skipIf(sys.platform.startswith('win'), "Windows doesn't support '?' in filenames.")
     def test_load_fixture_with_special_characters(self):
         management.call_command('loaddata', 'fixture_with[special]chars', verbosity=0)
         self.assertQuerysetEqual(Article.objects.all(), ['<Article: How To Deal With Special Characters>'])

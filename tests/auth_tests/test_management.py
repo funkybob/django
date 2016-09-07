@@ -1,7 +1,7 @@
 import sys
 from datetime import date
 from io import StringIO
-from unittest.mock import patch
+from unittest import mock
 
 from django.apps import apps
 from django.contrib.auth import management
@@ -14,7 +14,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.db import migrations
-from django.test import TestCase, mock, override_settings
+from django.test import TestCase, override_settings
 from django.utils.encoding import force_str
 from django.utils.translation import ugettext_lazy as _
 
@@ -48,7 +48,7 @@ def mock_inputs(inputs):
                     response = ''
                 return response
 
-            with patch('builtins.input', mock_input), patch('getpass.getpass', mock_getpass):
+            with mock.patch('builtins.input', mock_input), mock.patch('getpass.getpass', mock_getpass):
                 test_func(*args)
         return wrapped
     return inner

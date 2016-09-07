@@ -5,6 +5,7 @@ import io
 import os
 import sys
 from io import StringIO
+from unittest import mock
 
 from django.apps import apps
 from django.core.management import CommandError, call_command
@@ -15,7 +16,7 @@ from django.db.migrations.exceptions import (
     InconsistentMigrationHistory, MigrationSchemaMissing,
 )
 from django.db.migrations.recorder import MigrationRecorder
-from django.test import ignore_warnings, mock, override_settings
+from django.test import ignore_warnings, override_settings
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 

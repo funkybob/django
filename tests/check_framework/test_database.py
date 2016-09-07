@@ -1,9 +1,9 @@
-import unittest
+from unittest import mock, skipUnless
 
 from django.core.checks import Tags, run_checks
 from django.core.checks.registry import CheckRegistry
 from django.db import connection
-from django.test import TestCase, mock
+from django.test import TestCase
 
 
 class DatabaseCheckTests(TestCase):
@@ -32,7 +32,7 @@ class DatabaseCheckTests(TestCase):
             run_checks(tags=[Tags.database])
             self.assertTrue(mocked_check.called)
 
-    @unittest.skipUnless(connection.vendor == 'mysql', 'Test only for MySQL')
+    @skipUnless(connection.vendor == 'mysql', 'Test only for MySQL')
     def test_mysql_strict_mode(self):
         good_sql_modes = [
             'STRICT_TRANS_TABLES,STRICT_ALL_TABLES',

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Unit and doctests for specific database backends.
 
 import datetime
@@ -7,6 +6,7 @@ import threading
 import unittest
 import warnings
 from decimal import Decimal, Rounded
+from unittest import mock
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import no_style
@@ -22,7 +22,7 @@ from django.db.models import Avg, StdDev, Sum, Variance
 from django.db.models.sql.constants import CURSOR
 from django.db.utils import ConnectionHandler
 from django.test import (
-    SimpleTestCase, TestCase, TransactionTestCase, mock, override_settings,
+    SimpleTestCase, TestCase, TransactionTestCase, override_settings,
     skipIfDBFeature, skipUnlessDBFeature,
 )
 from . import models

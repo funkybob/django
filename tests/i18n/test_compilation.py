@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 import gettext as gettext_module
 import os
 import stat
-import unittest
 from io import StringIO
 from subprocess import Popen
+from unittest import mock, skipUnless
 
 from django.core.management import (
     CommandError, call_command, execute_from_command_line,
@@ -12,7 +11,7 @@ from django.core.management import (
 from django.core.management.commands.makemessages import \
     Command as MakeMessagesCommand
 from django.core.management.utils import find_command
-from django.test import SimpleTestCase, mock, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.utils import translation
 from django.utils.encoding import force_text
@@ -23,7 +22,7 @@ from .utils import RunInTmpDirMixin, copytree
 has_msgfmt = find_command('msgfmt')
 
 
-@unittest.skipUnless(has_msgfmt, 'msgfmt is mandatory for compilation tests')
+@skipUnless(has_msgfmt, 'msgfmt is mandatory for compilation tests')
 class MessageCompilationTests(RunInTmpDirMixin, SimpleTestCase):
 
     work_subdir = 'commands'
