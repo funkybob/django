@@ -1,12 +1,11 @@
 """
 Internationalization support.
 """
-from __future__ import unicode_literals
 
 import re
 import warnings
+from contextlib import ContextDecorator
 
-from django.utils.decorators import ContextDecorator
 from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
 from django.utils.functional import lazy

@@ -2,6 +2,7 @@
 Timezone-related classes and functions.
 """
 
+from contextlib import ContextDecorator
 from datetime import datetime, timedelta, tzinfo
 from functools import lru_cache
 from threading import local
@@ -9,7 +10,6 @@ from threading import local
 import pytz
 
 from django.conf import settings
-from django.utils.decorators import ContextDecorator
 
 __all__ = [
     'utc', 'get_fixed_timezone',
