@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+import os.path
 import sys
 import unittest
 import warnings
@@ -22,7 +22,6 @@ from django.test.utils import (
     setup_test_environment,
 )
 from django.urls import NoReverseMatch, reverse
-from django.utils._os import abspathu
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from .models import Car, Person, PossessedCar
@@ -986,7 +985,7 @@ class OverrideSettingsTests(SimpleTestCase):
         django.contrib.staticfiles.storage.staticfiles_storage.
         """
         with self.settings(STATIC_ROOT='/tmp/test'):
-            self.assertEqual(staticfiles_storage.location, abspathu('/tmp/test'))
+            self.assertEqual(staticfiles_storage.location, os.path.abspath('/tmp/test'))
 
     def test_override_staticfiles_storage(self):
         """

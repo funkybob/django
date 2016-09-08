@@ -9,9 +9,6 @@ from django.core.exceptions import SuspiciousFileOperation
 from django.utils.encoding import force_text
 
 
-abspathu = abspath
-
-
 def safe_join(base, *paths):
     """
     Joins one or more path components to the base path component intelligently.
@@ -22,8 +19,8 @@ def safe_join(base, *paths):
     """
     base = force_text(base)
     paths = [force_text(p) for p in paths]
-    final_path = abspathu(join(base, *paths))
-    base_path = abspathu(base)
+    final_path = abspath(join(base, *paths))
+    base_path = abspath(base)
     # Ensure final_path starts with base_path (using normcase to ensure we
     # don't false-negative on case insensitive operating systems like Windows),
     # further, one of the following conditions must be true:
