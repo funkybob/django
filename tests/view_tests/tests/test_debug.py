@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # This coding header is significant for tests, as the debug view is parsing
 # files to search for such a header to decode the source file content
 import importlib
@@ -7,6 +6,7 @@ import os
 import re
 import sys
 import tempfile
+from io import StringIO
 from unittest import skipIf
 
 from django.conf.urls import url
@@ -478,10 +478,7 @@ class ExceptionReporterTests(SimpleTestCase):
         An exception report can be generated for requests with 'items' in
         request GET, POST, FILES, or COOKIES QueryDicts.
         """
-        if six.PY3:
-            value = '<td>items</td><td class="code"><pre>&#39;Oops&#39;</pre></td>'
-        else:
-            value = '<td>items</td><td class="code"><pre>u&#39;Oops&#39;</pre></td>'
+        value = '<td>items</td><td class="code"><pre>&#39;Oops&#39;</pre></td>'
         # GET
         request = self.rf.get('/test_view/?items=Oops')
         reporter = ExceptionReporter(request, None, None, None)
@@ -493,7 +490,7 @@ class ExceptionReporterTests(SimpleTestCase):
         html = reporter.get_traceback_html()
         self.assertInHTML(value, html)
         # FILES
-        fp = six.StringIO('filecontent')
+        fp = StringIO('filecontent')
         request = self.rf.post('/test_view/', data={'name': 'filename', 'items': fp})
         reporter = ExceptionReporter(request, None, None, None)
         html = reporter.get_traceback_html()
@@ -570,10 +567,7 @@ class PlainTextReportTests(SimpleTestCase):
         An exception report can be generated for requests with 'items' in
         request GET, POST, FILES, or COOKIES QueryDicts.
         """
-        if six.PY3:
-            value = "items = 'Oops'"
-        else:
-            value = "items = u'Oops'"
+        value = "items = 'Oops'"
         # GET
         request = self.rf.get('/test_view/?items=Oops')
         reporter = ExceptionReporter(request, None, None, None)
@@ -585,7 +579,7 @@ class PlainTextReportTests(SimpleTestCase):
         text = reporter.get_traceback_text()
         self.assertIn(value, text)
         # FILES
-        fp = six.StringIO('filecontent')
+        fp = StringIO('filecontent')
         request = self.rf.post('/test_view/', data={'name': 'filename', 'items': fp})
         reporter = ExceptionReporter(request, None, None, None)
         text = reporter.get_traceback_text()
