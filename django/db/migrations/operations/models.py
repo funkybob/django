@@ -108,7 +108,7 @@ class CreateModel(ModelOperation):
         # Check we didn't inherit from the model
         models_to_check = [
             base for base in self.bases
-            if base is not models.Model and isinstance(base, (models.base.ModelBase, six.string_types))
+            if base is not models.Model and isinstance(base, (models.base.ModelBase, str))
         ]
         # Check we have no FKs/M2Ms with it
         for fname, field in self.fields:

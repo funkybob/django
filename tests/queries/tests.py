@@ -2940,10 +2940,7 @@ class QuerySetExceptionTests(TestCase):
             list(qs)
 
     def test_invalid_order_by(self):
-        msg = "Invalid order_by arguments: ['*']"
-        if six.PY2:
-            msg = msg.replace("[", "[u")
-        with self.assertRaisesMessage(FieldError, msg):
+        with self.assertRaisesMessage(FieldError, "Invalid order_by arguments: ['*']"):
             list(Article.objects.order_by('*'))
 
     def test_invalid_queryset_model(self):
