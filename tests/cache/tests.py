@@ -32,7 +32,7 @@ from django.template.context_processors import csrf
 from django.template.response import TemplateResponse
 from django.test import (
     RequestFactory, SimpleTestCase, TestCase, TransactionTestCase,
-    ignore_warnings, mock, override_settings,
+    ignore_warnings, override_settings,
 )
 from django.test.signals import setting_changed
 from django.utils import timezone, translation

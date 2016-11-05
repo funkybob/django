@@ -1,9 +1,8 @@
 # -*- coding:utf-8 -*-
-from __future__ import unicode_literals
-
 import logging
 import warnings
 from contextlib import contextmanager
+from io import StringIO
 
 from admin_scripts.tests import AdminScriptTestCase
 
@@ -14,7 +13,6 @@ from django.core.management import color
 from django.db import connection
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import LoggingCaptureMixin, patch_logger
-from django.utils import six
 from django.utils.deprecation import RemovedInNextVersionWarning
 from django.utils.log import (
     DEFAULT_LOGGING, AdminEmailHandler, CallbackFilter, RequireDebugFalse,
@@ -548,7 +546,7 @@ class LogFormattersTests(SimpleTestCase):
         @contextmanager
         def patch_django_server_logger():
             old_stream = logger.handlers[0].stream
-            new_stream = six.StringIO()
+            new_stream = StringIO()
             logger.handlers[0].stream = new_stream
             yield new_stream
             logger.handlers[0].stream = old_stream
@@ -559,4 +557,4 @@ class LogFormattersTests(SimpleTestCase):
 
         with patch_django_server_logger() as logger_output:
             logger.info(log_msg)
-            six.assertRegex(self, logger_output.getvalue(), r'^\[[-:,.\s\d]+\] %s' % log_msg)
+            self.assertRegex(logger_output.getvalue(), r'^\[[-:,.\s\d]+\] %s' % log_msg)
