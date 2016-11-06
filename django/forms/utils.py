@@ -170,7 +170,7 @@ def from_current_timezone(value):
                 'may be ambiguous or it may not exist.'
             )
             params = {'datetime': value, 'current_timezone': current_timezone}
-            ValidationError(
+            raise ValidationError(
                 message,
                 code='ambiguous_timezone',
                 params=params,
