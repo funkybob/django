@@ -148,7 +148,14 @@ class WSGIHandler(base.BaseHandler):
         response._handler_class = self.__class__
 
         status = '%d %s' % (response.status_code, response.reason_phrase)
-        response_headers = list(response.items())
+        def _split_headers():
+            for key, val in response.items():
+                if isinstance(val, (list, tuple)):
+                    for sval in val:
+                        yield key, sval
+                else:
+                    yield key, val
+        response_headers = list(_split_headers(response.items()))
         for c in response.cookies.values():
             response_headers.append(('Set-Cookie', c.output(header='')))
         start_response(status, response_headers)
