@@ -5,6 +5,7 @@ from .models import (
     DeleteModel, RemoveIndex, RenameModel,
 )
 from .special import RunPython, RunSQL, SeparateDatabaseAndState
+from .views import CreateView
 
 __all__ = [
     'CreateModel', 'DeleteModel', 'AlterModelTable', 'AlterUniqueTogether',
@@ -12,4 +13,5 @@ __all__ = [
     'RemoveIndex', 'AddField', 'RemoveField', 'AlterField', 'RenameField',
     'SeparateDatabaseAndState', 'RunSQL', 'RunPython',
     'AlterOrderWithRespectTo', 'AlterModelManagers',
+    'CreateView',
 ]

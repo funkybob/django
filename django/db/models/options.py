@@ -32,7 +32,7 @@ DEFAULT_NAMES = (
     'auto_created', 'index_together', 'apps', 'default_permissions',
     'select_on_save', 'default_related_name', 'required_db_features',
     'required_db_vendor', 'base_manager_name', 'default_manager_name',
-    'indexes',
+    'indexes', 'queryset',
     # For backwards compatibility with Django 1.11. RemovedInDjango30Warning
     'manager_inheritance_from_future',
 )
@@ -129,6 +129,10 @@ class Options:
         self.apps = self.default_apps
 
         self.default_related_name = None
+
+        # If the queryset attribute is set, this model is a database view, and
+        # its fields are defined by this queryset.
+        self.queryset = None
 
     @property
     def label(self):

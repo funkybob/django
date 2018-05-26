@@ -447,6 +447,7 @@ class ModelState:
                     options['indexes'] = indexes
                 else:
                     options[name] = model._meta.original_attrs[name]
+
         # If we're ignoring relationships, remove all field-listing model
         # options (that option basically just means "make a stub model")
         if exclude_rels:

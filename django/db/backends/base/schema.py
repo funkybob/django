@@ -52,6 +52,9 @@ class BaseDatabaseSchemaEditor:
     sql_retablespace_table = "ALTER TABLE %(table)s SET TABLESPACE %(new_tablespace)s"
     sql_delete_table = "DROP TABLE %(table)s CASCADE"
 
+    sql_create_view = "CREATE VIEW %(name)s AS %(sql)s"
+    sql_delete_view = "DROP VIEW IF EXIST %(name)s"
+
     sql_create_column = "ALTER TABLE %(table)s ADD COLUMN %(column)s %(definition)s"
     sql_alter_column = "ALTER TABLE %(table)s %(changes)s"
     sql_alter_column_type = "ALTER COLUMN %(column)s TYPE %(type)s"
@@ -1051,5 +1054,21 @@ class BaseDatabaseSchemaEditor:
         sql = self.sql_delete_procedure % {
             'procedure': self.quote_name(procedure_name),
             'param_types': ','.join(param_types),
+        }
+        self.execute(sql)
+
+    def create_view(self, model):
+        query = model._meta.queryset
+        if not isinstance(query, str):
+            query = query().as_sql()
+        sql = self.sql_create_view % {
+            'name': self.quote_name(model._meta.db_table),
+            'sql': query,
+        }
+        self.execute(sql)
+
+    def delete_view(self, model):
+        sql = self.sql_delete_view % {
+            'name': self.quote_name(model._meta.db_table),
         }
         self.execute(sql)

@@ -170,6 +170,8 @@ class MigrationAutodetector:
         self.generate_created_proxies()
         self.generate_altered_options()
         self.generate_altered_managers()
+        self.generate_deleted_views()
+        self.generate_created_views()
 
         # Create the altered indexes and store them in self.altered_indexes.
         # This avoids the same computation in generate_removed_indexes()
@@ -511,6 +513,10 @@ class MigrationAutodetector:
         for app_label, model_name in all_added_models:
             model_state = self.to_state.models[app_label, model_name]
             model_opts = self.new_apps.get_model(app_label, model_name)._meta
+
+            if model_opts.queryset:
+                continue
+
             # Gather related fields
             related_fields = {}
             primary_key_rel = None
@@ -645,6 +651,43 @@ class MigrationAutodetector:
                         ),
                         dependencies=[(app_label, model_name, None, True)],
                     )
+
+    def generate_created_views(self):
+        old_keys = self.old_model_keys | self.old_unmanaged_keys
+        added_models = self.new_model_keys - old_keys
+        for app_label, model_name in added_models:
+            model_state = self.to_state.models[app_label, model_name]
+            model_opts = self.new_apps.get_model(app_label, model_name)._meta
+
+            if not model_opts.queryset:
+                continue
+
+            qset = model_opts.queryset()
+
+            fields, klass_info, annotations = qset.query.get_compiler(using='default').get_select()
+            dependencies = set()
+            for field in fields:
+                _meta = field[0].field.model._meta
+                dependencies.add((_meta.app_label, _meta.model_name, None, False))
+
+            _fields = []
+            for col, _, alias in fields:
+                _fields.append((alias if alias else col.target.name, col.target))
+
+            self.add_operation(
+                app_label,
+                operations.CreateView(
+                    name=model_state.name,
+                    fields=_fields,
+                    options=model_state.options,
+                    bases=model_state.bases,
+                    managers=model_state.managers,
+                ),
+                dependencies=list(dependencies),
+            )
+
+    def generate_deleted_views(self):
+        pass
 
     def generate_created_proxies(self):
         """

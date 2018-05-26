@@ -287,6 +287,11 @@ class UUIDSerializer(BaseSerializer):
         return "uuid.%s" % repr(self.value), {"import uuid"}
 
 
+class QuerySetSerializer(BaseSerializer):
+    def serialize(self):
+        return repr(str(self.value.query)), {}
+
+
 def serializer_factory(value):
     from django.db.migrations.writer import SettingsReference
     if isinstance(value, Promise):
@@ -295,6 +300,14 @@ def serializer_factory(value):
         # The unwrapped value is returned as the first item of the arguments
         # tuple.
         value = value.__reduce__()[1][0]
+
+    if isinstance(value, types.LambdaType):
+        try:
+            value = value()
+        except:
+            pass
+    if isinstance(value, models.QuerySet):
+        return QuerySetSerializer(value)
 
     if isinstance(value, models.Field):
         return ModelFieldSerializer(value)
@@ -347,6 +360,7 @@ def serializer_factory(value):
         return RegexSerializer(value)
     if isinstance(value, uuid.UUID):
         return UUIDSerializer(value)
+
     raise ValueError(
         "Cannot serialize: %r\nThere are some values Django cannot serialize into "
         "migration files.\nFor more, see https://docs.djangoproject.com/en/%s/"
