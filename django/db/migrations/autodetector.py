@@ -662,7 +662,9 @@ class MigrationAutodetector:
             if not model_opts.queryset:
                 continue
 
-            qset = model_opts.queryset()
+            qset = model_opts.queryset
+            if callable(qset):
+                qset = qset()
 
             fields, klass_info, annotations = qset.query.get_compiler(using='default').get_select()
             dependencies = set()
@@ -687,7 +689,30 @@ class MigrationAutodetector:
             )
 
     def generate_deleted_views(self):
-        pass
+        new_keys = self.new_model_keys | self.new_unmanaged_keys
+        deleted_views = self.old_model_keys - new_keys
+        for app_label, model_name in deleted_views:
+            model_state = self.from_state.models[app_label, model_name]
+            model = self.old_apps.get_model(app_label, model_name)
+            if not model._meta.queryset:
+                continue
+
+            qset = model._meta.queryset()
+
+            fields, klass_info, annotations = qset.query.get_compiler(using='default').get_select()
+            dependencies = set()
+            for field in fields:
+                _meta = field[0].field.model._meta
+                dependencies.add((_meta.app_label, _meta.model_name, None, False))
+
+            # Finally, make the operation, deduping any dependencies
+            self.add_operation(
+                app_label,
+                operations.DeleteView(
+                    name=model_state.name,
+                ),
+                dependencies=list(dependencies),
+            )
 
     def generate_created_proxies(self):
         """
@@ -742,6 +767,9 @@ class MigrationAutodetector:
             model = self.old_apps.get_model(app_label, model_name)
             if not model._meta.managed:
                 # Skip here, no need to handle fields for unmanaged models
+                continue
+
+            if model._meta.queryset:
                 continue
 
             # Gather related fields
